@@ -1,4 +1,4 @@
-from munkipromoter.utils.exceptions import ProviderDoesNotImplement
+from utils.exceptions import ProviderDoesNotImplement
 
 
 class Provider:
