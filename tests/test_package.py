@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from core import Package, JiraBoardProvider
 
 
@@ -7,7 +9,7 @@ def test_package_equality():
         "Firefox",
         "61.2.3",
         "testing",
-        "23.02.2019",
+        datetime.strptime("10:05:55 01.01.2020","%H:%M:%S %d.%m.%Y"),
         False,
         False,
         False,
@@ -20,7 +22,7 @@ def test_package_equality():
         "Firefox",
         "61.2.3",
         "testing",
-        "23.02.2019",
+        datetime.strptime("10:05:55 01.01.2020","%H:%M:%S %d.%m.%Y"),
         False,
         False,
         False,
@@ -31,13 +33,14 @@ def test_package_equality():
 
     assert p1 == p2
 
+
 def test_package_inequality():
     """Different packages should not be equal."""
     p1 = Package(
         "Firefox",
         "61.2.3",
         "testing",
-        "23.02.2019",
+        datetime.now(),
         False,
         False,
         False,
@@ -50,7 +53,7 @@ def test_package_inequality():
         "Firefox",
         "61.2.4",
         "testing",
-        "23.02.2019",
+        datetime.now(),
         False,
         False,
         False,
@@ -60,3 +63,6 @@ def test_package_inequality():
     )
 
     assert p1 != p2
+
+def test_package_less_than():
+    pass
