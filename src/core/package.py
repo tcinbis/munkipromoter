@@ -9,14 +9,10 @@ from utils.config import JiraLane, Catalog, PackageState
 class Package:
     name: str = field(repr=True)
     version: str = field(repr=True, compare=True)
-    catalog: Catalog = field(repr=True)
-    date: datetime
-    is_autopromote: bool
-    is_present: bool
-    is_missing: bool
-    provider: Type[Provider]
-    jira_lane: JiraLane
-    state: PackageState
-
-    def __str__(self) -> str:
-        return f"Name:{self.name} Version:{self.version}"
+    catalog: Catalog = field(repr=True, compare=False)
+    date: datetime = field(repr=False, compare=False)
+    is_autopromote: bool = field(repr=False, compare=False)
+    is_present: bool = field(repr=False, compare=False)
+    provider: Type[Provider] = field(repr=False, compare=False)
+    jira_lane: JiraLane = field(repr=False, compare=False)
+    state: PackageState = field(repr=False, compare=False)
