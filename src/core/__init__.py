@@ -1,2 +1,2 @@
-from core.package import *
-from core.providers import *
+from core.package import Package, PackageVersion
+from core.providers import MunkiRepoProvider, JiraBoardProvider

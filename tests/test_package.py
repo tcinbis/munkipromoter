@@ -8,6 +8,7 @@ from utils import Catalog, JiraLane, PackageState
 
 @pytest.fixture
 def p1(request):
+    jira_board = JiraBoardProvider(name="jira")
     yield Package(
         "Firefox",
         request.param,
@@ -15,7 +16,7 @@ def p1(request):
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
         False,
-        JiraBoardProvider,
+        jira_board,
         JiraLane.TESTING,
         PackageState.NEW,
     )
@@ -23,6 +24,7 @@ def p1(request):
 
 @pytest.fixture
 def p2(request):
+    jira_board = JiraBoardProvider(name="jira")
     yield Package(
         "Firefox",
         Package.str_to_version(request.param),
@@ -30,7 +32,7 @@ def p2(request):
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
         False,
-        JiraBoardProvider,
+        jira_board,
         JiraLane.TESTING,
         PackageState.NEW,
     )
@@ -38,6 +40,7 @@ def p2(request):
 
 def test_package_equality():
     """Identical packages should be equal."""
+    jira_board = JiraBoardProvider(name="jira")
     p1 = Package(
         "Firefox",
         Package.str_to_version("61.3.5"),
@@ -45,7 +48,7 @@ def test_package_equality():
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
         False,
-        JiraBoardProvider,
+        jira_board,
         JiraLane.TESTING,
     )
 
@@ -56,7 +59,7 @@ def test_package_equality():
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
         False,
-        JiraBoardProvider,
+        jira_board,
         JiraLane.TESTING,
     )
 
@@ -67,7 +70,7 @@ def test_package_equality():
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
         False,
-        MunkiRepoProvider,
+        jira_board,
         JiraLane.TESTING,
     )
 

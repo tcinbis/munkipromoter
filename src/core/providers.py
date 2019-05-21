@@ -1,3 +1,19 @@
+from core import Package
+from utils.config import (
+    JIRA_PROJECT_FIELD,
+    JIRA_PROJECT_KEY,
+    JIRA_ISSUE_TYPE,
+    JIRA_ISSUE_TYPE_FIELD,
+    JIRA_SOFTWARE_NAME_FIELD,
+    JIRA_SOFTWARE_VERSION_FIELD,
+    JIRA_DUEDATE_FIELD,
+    JIRA_DESCRIPTION_FIELD,
+    JIRA_LABELS_FIELD,
+    JIRA_CATALOG_FIELD,
+    JIRA_AUTOPROMOTE_FIELD,
+    JIRA_PRESENT_FIELD,
+    JIRA_AUTOPROMOTE,
+)
 from utils.exceptions import ProviderDoesNotImplement
 
 
@@ -18,7 +34,7 @@ class Provider:
     def get(self):
         pass
 
-    def update(self, **kwargs):
+    def update(self, package: Package):
         """
         Updates the information of a package if it already exists or will create a new package.
         All parameters are expected to be passed through **kwargs.
@@ -40,7 +56,7 @@ class MunkiRepoProvider(Provider):
     def get(self):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
-    def update(self, **kwargs):
+    def update(self, package: Package):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
 
@@ -57,5 +73,16 @@ class JiraBoardProvider(Provider):
     def get(self):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
-    def update(self, **kwargs):
-        raise ProviderDoesNotImplement(self.__class__.__name__)
+    def update(self, package: Package):
+        issue_dict = {
+            JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
+            JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
+            JIRA_SOFTWARE_NAME_FIELD: package.name,
+            JIRA_SOFTWARE_VERSION_FIELD: package.version,
+            JIRA_DUEDATE_FIELD: package.date,
+            JIRA_DESCRIPTION_FIELD: package,
+            JIRA_LABELS_FIELD: package.state,
+            JIRA_CATALOG_FIELD: package.catalog,
+            JIRA_AUTOPROMOTE_FIELD: JIRA_AUTOPROMOTE.get(package.is_autopromote),
+            JIRA_PRESENT_FIELD: package.is_present,
+        }
