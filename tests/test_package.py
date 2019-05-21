@@ -64,20 +64,12 @@ def test_package_equality():
         JiraLane.TESTING,
     )
 
-    p3 = Package(
-        "Firefox",
-        Package.str_to_version("63.3.5"),
-        Catalog.TESTING,
-        datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
-        False,
-        Present.PRESENT,
-        jira_board,
-        JiraLane.TESTING,
-    )
-
     assert p1 == p2
-    assert p2 != p3
-    assert p1 != p3
+
+    p2.name = "Matlab"
+
+    assert p1 != p2
+
 
 
 @pytest.mark.parametrize(
@@ -88,10 +80,11 @@ def test_package_equality():
         ("10", "11", operator.lt),
         ("63.21.2a", "63.21.2b", operator.lt),
         ("123.21.2a", "63.21.2a", operator.gt),
+        ("2019b", "2019a", operator.gt),
     ],
     indirect=["p1", "p2"],
 )
 def test_package_version_comparision(p1, p2, op):
     """Test the version comparision methods of the package class."""
 
-    assert True == op(p1, p2)
+    assert op(p1, p2)
