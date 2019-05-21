@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
+
 from core.providers import Provider
 from utils.config import JiraLane, Catalog, PackageState, Present
 

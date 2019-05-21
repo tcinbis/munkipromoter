@@ -2,8 +2,9 @@ import operator
 from datetime import datetime
 
 import pytest
-from core import Package, JiraBoardProvider, MunkiRepoProvider
-from utils import Catalog, JiraLane, PackageState
+from core.package import Package
+from core.providers import JiraBoardProvider
+from utils.config import Catalog, JiraLane, PackageState, Present
 
 
 @pytest.fixture
@@ -15,7 +16,7 @@ def p1(request):
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
-        False,
+        Present.PRESENT,
         jira_board,
         JiraLane.TESTING,
         PackageState.NEW,
@@ -31,7 +32,7 @@ def p2(request):
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
-        False,
+        Present.PRESENT,
         jira_board,
         JiraLane.TESTING,
         PackageState.NEW,
@@ -47,7 +48,7 @@ def test_package_equality():
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
-        False,
+        Present.PRESENT,
         jira_board,
         JiraLane.TESTING,
     )
@@ -58,7 +59,7 @@ def test_package_equality():
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
-        False,
+        Present.PRESENT,
         jira_board,
         JiraLane.TESTING,
     )
@@ -69,7 +70,7 @@ def test_package_equality():
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
-        False,
+        Present.PRESENT,
         jira_board,
         JiraLane.TESTING,
     )

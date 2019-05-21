@@ -1,4 +1,5 @@
-from core import Package
+from core.package import Package
+from jira import JIRA
 from utils.config import (
     JIRA_PROJECT_FIELD,
     JIRA_PROJECT_KEY,
@@ -13,6 +14,7 @@ from utils.config import (
     JIRA_AUTOPROMOTE_FIELD,
     JIRA_PRESENT_FIELD,
     JIRA_AUTOPROMOTE,
+    JIRA_CONNECTION_INFO,
 )
 from utils.exceptions import ProviderDoesNotImplement
 
@@ -63,9 +65,15 @@ class MunkiRepoProvider(Provider):
 class JiraBoardProvider(Provider):
     def __init__(self, name):
         super().__init__(name)
+        self.__jira = None  # type: JIRA
 
     def connect(self):
-        raise ProviderDoesNotImplement(self.__class__.__name__)
+        self.__jira = JIRA(**JIRA_CONNECTION_INFO)
+
+        if self.__jira:
+            return True
+        else:
+            return False
 
     def load(self):
         raise ProviderDoesNotImplement(self.__class__.__name__)
@@ -86,3 +94,5 @@ class JiraBoardProvider(Provider):
             JIRA_AUTOPROMOTE_FIELD: JIRA_AUTOPROMOTE.get(package.is_autopromote),
             JIRA_PRESENT_FIELD: package.is_present,
         }
+
+        self.__jira.create_issue(fields=issue_dict)
