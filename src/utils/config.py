@@ -24,6 +24,7 @@ class Present(Enum):
 
 
 class PackageState(Enum):
+    DEFAULT = auto()
     NEW = auto()
     UPDATE = auto()
     MISSING = auto()
