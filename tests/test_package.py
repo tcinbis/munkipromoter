@@ -25,7 +25,7 @@ def p1(request):
 def p2(request):
     yield Package(
         "Firefox",
-        request.param,
+        Package.str_to_version(request.param),
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
@@ -40,7 +40,7 @@ def test_package_equality():
     """Identical packages should be equal."""
     p1 = Package(
         "Firefox",
-        "61.3.5",
+        Package.str_to_version("61.3.5"),
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
@@ -51,7 +51,7 @@ def test_package_equality():
 
     p2 = Package(
         "Firefox",
-        "61.3.5",
+        Package.str_to_version("61.3.5"),
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
@@ -62,7 +62,7 @@ def test_package_equality():
 
     p3 = Package(
         "Firefox",
-        "61.3.5",
+        Package.str_to_version("63.3.5"),
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         False,
@@ -78,7 +78,13 @@ def test_package_equality():
 
 @pytest.mark.parametrize(
     ["p1", "p2", "op"],
-    [("10", "10", operator.eq), ("11", "10", operator.gt), ("10", "11", operator.lt)],
+    [
+        ("10", "10", operator.eq),
+        ("11", "10", operator.gt),
+        ("10", "11", operator.lt),
+        ("63.21.2a", "63.21.2b", operator.lt),
+        ("123.21.2a", "63.21.2a", operator.gt),
+    ],
     indirect=["p1", "p2"],
 )
 def test_package_version_comparision(p1, p2, op):
