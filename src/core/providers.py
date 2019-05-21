@@ -1,4 +1,4 @@
-from core.package import Package
+import core.package
 from jira import JIRA
 from utils.config import (
     JIRA_PROJECT_FIELD,
@@ -36,7 +36,7 @@ class Provider:
     def get(self):
         pass
 
-    def update(self, package: Package):
+    def update(self, package: 'core.package.Package'):
         """
         Updates the information of a package if it already exists or will create a new package.
         All parameters are expected to be passed through **kwargs.
@@ -58,7 +58,7 @@ class MunkiRepoProvider(Provider):
     def get(self):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
-    def update(self, package: Package):
+    def update(self, package: 'core.package.Package'):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
 
@@ -81,7 +81,7 @@ class JiraBoardProvider(Provider):
     def get(self):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
-    def update(self, package: Package):
+    def update(self, package: 'core.package.Package'):
         issue_dict = {
             JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
             JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
