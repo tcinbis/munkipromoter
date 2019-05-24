@@ -15,7 +15,7 @@ from utils.config import (
     JIRA_PRESENT_FIELD,
     JIRA_AUTOPROMOTE,
     JIRA_CONNECTION_INFO,
-)
+    JIRA_SUMMARY_FIELD)
 from utils.exceptions import ProviderDoesNotImplement
 
 
@@ -66,12 +66,12 @@ class JiraBoardProvider(Provider):
     def __init__(self, name):
         super().__init__(name)
         # noinspection PyTypeChecker
-        self.__jira = None  # type: JIRA
+        self._jira = None  # type: JIRA
 
     def connect(self):
-        self.__jira = JIRA(**JIRA_CONNECTION_INFO)
+        self._jira = JIRA(**JIRA_CONNECTION_INFO)
 
-        if self.__jira:
+        if self._jira:
             return True
         else:
             return False
@@ -86,14 +86,14 @@ class JiraBoardProvider(Provider):
         issue_dict = {
             JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
             JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
+            JIRA_SUMMARY_FIELD: str(package),
             JIRA_SOFTWARE_NAME_FIELD: package.name,
-            JIRA_SOFTWARE_VERSION_FIELD: package.version,
-            JIRA_DUEDATE_FIELD: package.date,
-            JIRA_DESCRIPTION_FIELD: package,
-            JIRA_LABELS_FIELD: package.state,
-            JIRA_CATALOG_FIELD: package.catalog,
+            JIRA_SOFTWARE_VERSION_FIELD: package.version.vstring,
+            JIRA_DUEDATE_FIELD: package.date.strftime("%Y-%m-%d"),
+            JIRA_DESCRIPTION_FIELD: package.name,
+            JIRA_CATALOG_FIELD: [package.catalog.value],
             JIRA_AUTOPROMOTE_FIELD: JIRA_AUTOPROMOTE.get(package.is_autopromote),
-            JIRA_PRESENT_FIELD: package.is_present,
+            JIRA_PRESENT_FIELD: [package.is_present.value],
         }
 
-        self.__jira.create_issue(fields=issue_dict)
+        self._jira.create_issue(fields=issue_dict)

@@ -4,7 +4,7 @@ from distutils.version import LooseVersion
 
 import core.providers
 import utils.config
-from utils.config import JiraLane, Catalog, PackageState, Present
+from utils.config import PackageState
 
 
 class PackageVersion(LooseVersion):
@@ -15,16 +15,18 @@ class PackageVersion(LooseVersion):
 class Package:
     name: str = field(repr=True)
     version: PackageVersion = field(repr=True, compare=True)
-    catalog: 'utils.config.Catalog' = field(repr=True, compare=False)
+    catalog: "utils.config.Catalog" = field(repr=True, compare=False)
     date: datetime = field(repr=False, compare=False)
     is_autopromote: bool = field(repr=False, compare=False)
-    is_present: 'utils.config.Present' = field(repr=False, compare=False)
-    provider: 'core.providers.Provider' = field(repr=False, compare=False)
-    jira_lane: 'utils.config.JiraLane' = field(repr=False, compare=False)
-    state: 'utils.config.PackageState' = field(default=PackageState.DEFAULT, repr=False, compare=False)
+    is_present: "utils.config.Present" = field(repr=False, compare=False)
+    provider: "core.providers.Provider" = field(repr=False, compare=False)
+    jira_lane: "utils.config.JiraLane" = field(repr=False, compare=False)
+    state: "utils.config.PackageState" = field(
+        default=PackageState.DEFAULT, repr=False, compare=False
+    )
 
     @staticmethod
-    def str_to_version(version_str: str) -> LooseVersion:
+    def str_to_version(version_str: str) -> PackageVersion:
         return PackageVersion(version_str)
 
     def update(self):
@@ -34,3 +36,6 @@ class Package:
         :return: None
         """
         self.provider.update(self)
+
+    def __str__(self):
+        return f"{self.name} {self.version} {self.catalog.name}"

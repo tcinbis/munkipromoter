@@ -9,7 +9,7 @@ from utils.config import Catalog, JiraLane, PackageState, Present
 
 def test_package_equality():
     """Identical packages should be equal."""
-    jira_board = JiraBoardProvider(name="jira")
+    jira_board = JiraBoardProvider(name="_jira")
     p1 = Package(
         "Firefox",
         Package.str_to_version("61.3.5"),
