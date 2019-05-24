@@ -25,14 +25,14 @@ class TestJiraBoardProvider(object):
         issue_dict = {
             JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
             JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
+            JIRA_SUMMARY_FIELD: str(test_one_package),
             JIRA_SOFTWARE_NAME_FIELD: test_one_package.name,
-            JIRA_SOFTWARE_VERSION_FIELD: test_one_package.version,
-            JIRA_DUEDATE_FIELD: test_one_package.date,
-            JIRA_DESCRIPTION_FIELD: test_one_package,
-            JIRA_LABELS_FIELD: test_one_package.state,
-            JIRA_CATALOG_FIELD: test_one_package.catalog,
+            JIRA_SOFTWARE_VERSION_FIELD: test_one_package.version.vstring,
+            JIRA_DUEDATE_FIELD: test_one_package.date.strftime("%Y-%m-%d"),
+            JIRA_DESCRIPTION_FIELD: test_one_package.name,
+            JIRA_CATALOG_FIELD: [test_one_package.catalog.value],
             JIRA_AUTOPROMOTE_FIELD: JIRA_AUTOPROMOTE.get(test_one_package.is_autopromote),
-            JIRA_PRESENT_FIELD: test_one_package.is_present,
+            JIRA_PRESENT_FIELD: [test_one_package.is_present.value],
         }
 
         jira._jira.create_issue.assert_called_once_with(fields=issue_dict)

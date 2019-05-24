@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pytest
-from core.package import Package
+from core.base_classes import Package
 from core.providers import JiraBoardProvider
 from utils.config import Catalog, Present, JiraLane, PackageState
 
@@ -17,13 +17,14 @@ def test_one_package(request) -> Package:
         False,
         Present.PRESENT,
         jira_board,
+        "SWPM-789",
         JiraLane.TESTING,
         PackageState.NEW,
     )
 
 
 @pytest.fixture
-def test_two_packages(request) -> [Package]:
+def test_two_packages(request) -> ["Package"]:
     jira_board = JiraBoardProvider(name="_jira")
     yield [
         Package(
@@ -34,6 +35,7 @@ def test_two_packages(request) -> [Package]:
             False,
             Present.PRESENT,
             jira_board,
+            "SWPM-7859",
             JiraLane.TESTING,
             PackageState.NEW,
         ),
@@ -45,6 +47,7 @@ def test_two_packages(request) -> [Package]:
             False,
             Present.PRESENT,
             jira_board,
+            "SWPM-7389",
             JiraLane.TESTING,
             PackageState.NEW,
         ),

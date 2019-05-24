@@ -1,10 +1,34 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
-
-import core.providers
 import utils.config
 from utils.config import PackageState
+
+
+class Provider:
+    def __init__(self, name):
+        self.name = name
+
+    def connect(self) -> bool:
+        """
+        Check whether a connection is already established or try to establish a new one.
+        :return: True if the connection was already established or a new one could be created. Otherwise False
+        """
+        pass
+
+    def load(self):
+        pass
+
+    def get(self):
+        pass
+
+    def update(self, package: "Package"):
+        """
+        Updates the information of a package if it already exists or will create a new package.
+        All parameters are expected to be passed through **kwargs.
+        :return: True if successful or False if not.
+        """
+        pass
 
 
 class PackageVersion(LooseVersion):
@@ -19,7 +43,8 @@ class Package:
     date: datetime = field(repr=False, compare=False)
     is_autopromote: bool = field(repr=False, compare=False)
     is_present: "utils.config.Present" = field(repr=False, compare=False)
-    provider: "core.providers.Provider" = field(repr=False, compare=False)
+    provider: "Provider" = field(repr=False, compare=False)
+    jira_id: "str" = field(repr=False, compare=False)
     jira_lane: "utils.config.JiraLane" = field(repr=False, compare=False)
     state: "utils.config.PackageState" = field(
         default=PackageState.DEFAULT, repr=False, compare=False
