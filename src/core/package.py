@@ -14,7 +14,7 @@ class PackageVersion(LooseVersion):
 @dataclass(order=True)
 class Package:
     name: str = field(repr=True)
-    version: LooseVersion = field(repr=True, compare=True)
+    version: PackageVersion = field(repr=True, compare=True)
     catalog: 'utils.config.Catalog' = field(repr=True, compare=False)
     date: datetime = field(repr=False, compare=False)
     is_autopromote: bool = field(repr=False, compare=False)
@@ -25,7 +25,7 @@ class Package:
 
     @staticmethod
     def str_to_version(version_str: str) -> LooseVersion:
-        return LooseVersion(version_str)
+        return PackageVersion(version_str)
 
     def update(self):
         """

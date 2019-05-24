@@ -65,6 +65,7 @@ class MunkiRepoProvider(Provider):
 class JiraBoardProvider(Provider):
     def __init__(self, name):
         super().__init__(name)
+        # noinspection PyTypeChecker
         self.__jira = None  # type: JIRA
 
     def connect(self):

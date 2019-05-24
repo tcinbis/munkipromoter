@@ -37,14 +37,14 @@ MAKECATALOGS_PATH = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PATH", "/usr/local/mun
 
 # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
 JIRA_CONNECTION_INFO = {
-    "server": os.getenv("MUNKIPROMOTER_REPO_PATH", "https://your-jira-server.com"),
+    "server": os.getenv("MUNKIPROMOTER_REPO_PATH", "https://deployment-jira.its.unibas.ch"),
     "basic_auth": (
-        os.getenv("MUNKIPROMOTER_JIRA_USER", "user"),
-        os.getenv("MUNKIPROMOTER_JIRA_PASSWORD", "password"),
+        os.getenv("MUNKIPROMOTER_JIRA_USER", "***REMOVED***"),
+        os.getenv("MUNKIPROMOTER_JIRA_PASSWORD", "***REMOVED***"),
     ),
 }
 
-JIRA_PROJECT_KEY = os.getenv("MUNKIPROMOTER_JIRA_PROJECT_KEY", "XYZ")
+JIRA_PROJECT_KEY = os.getenv("MUNKIPROMOTER_JIRA_PROJECT_KEY", "SWPM")
 JIRA_ISSUE_TYPE = os.getenv("MUNKIPROMOTER_JIRA_ISSUE_TYPE", "Story")
 
 JIRA_SOFTWARE_NAME_FIELD = os.getenv(
@@ -88,4 +88,4 @@ DEFAULT_PROMOTION_DAY = os.getenv("MUNKIPROMOTER_DEFAULT_PROMOTION_DAY", "Thursd
 
 LOG_LEVEL = DEBUG
 LOG_DIR = os.getenv("MUNKIPROMOTER_LOG_DIR", "/var/log")
-LOG_MAIL = os.getenv("MUNKIPROMOTER_LOG_MAIL", "your_mail@example.com")
+LOG_MAIL = os.getenv("MUNKIPROMOTER_LOG_MAIL", "tom.cinbis@unibas.ch")
