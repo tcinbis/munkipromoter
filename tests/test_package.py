@@ -2,7 +2,7 @@ import operator
 from datetime import datetime
 
 import pytest
-from core.package import Package, PackageVersion
+from core.base_classes import Package, PackageVersion
 from core.providers import JiraBoardProvider
 from utils.config import Catalog, JiraLane, PackageState, Present
 
@@ -18,6 +18,7 @@ def test_package_equality():
         False,
         Present.PRESENT,
         jira_board,
+        "SWPM-4556",
         JiraLane.TESTING,
     )
 
@@ -29,6 +30,7 @@ def test_package_equality():
         False,
         Present.PRESENT,
         jira_board,
+        "SWPM-4556",
         JiraLane.TESTING,
     )
 

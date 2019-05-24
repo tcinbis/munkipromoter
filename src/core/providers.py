@@ -1,4 +1,5 @@
-import core.package
+import core
+from core.base_classes import Provider, Package
 from jira import JIRA
 from utils.config import (
     JIRA_PROJECT_FIELD,
@@ -15,34 +16,9 @@ from utils.config import (
     JIRA_PRESENT_FIELD,
     JIRA_AUTOPROMOTE,
     JIRA_CONNECTION_INFO,
-    JIRA_SUMMARY_FIELD)
+    JIRA_SUMMARY_FIELD,
+)
 from utils.exceptions import ProviderDoesNotImplement
-
-
-class Provider:
-    def __init__(self, name):
-        self.name = name
-
-    def connect(self) -> bool:
-        """
-        Check whether a connection is already established or try to establish a new one.
-        :return: True if the connection was already established or a new one could be created. Otherwise False
-        """
-        pass
-
-    def load(self):
-        pass
-
-    def get(self):
-        pass
-
-    def update(self, package: 'core.package.Package'):
-        """
-        Updates the information of a package if it already exists or will create a new package.
-        All parameters are expected to be passed through **kwargs.
-        :return: True if successful or False if not.
-        """
-        pass
 
 
 class MunkiRepoProvider(Provider):
@@ -58,7 +34,7 @@ class MunkiRepoProvider(Provider):
     def get(self):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
-    def update(self, package: 'core.package.Package'):
+    def update(self, package: "Package"):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
 
@@ -80,9 +56,37 @@ class JiraBoardProvider(Provider):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
     def get(self):
-        raise ProviderDoesNotImplement(self.__class__.__name__)
+        query = f"project={JIRA_PROJECT_KEY}"
+        search_result = self._jira.search_issues(query, maxResults=500)
+        total_issues = search_result.total
 
-    def update(self, package: 'core.package.Package'):
+        if total_issues != len(search_result):
+            # we could only fetch some tickets and need to fetch more
+            cumulative_results = list()
+
+            while len(cumulative_results) != total_issues:
+                cumulative_results.extend(search_result.iterable)
+                start_at = search_result.startAt + len(search_result)
+                search_result.clear()
+                search_result = self._jira.search_issues(
+                    query, startAt=start_at, maxResults=500
+                )
+            return self._jira_issue_to_package(cumulative_results)
+
+        return self._jira_issue_to_package(search_result)
+
+    def _check_jira_issue_exists(self, package: "Package"):
+        pass
+
+    def _jira_issue_to_package(self, issues) -> ["Package"]:
+        packages = list()
+        for issue in issues:
+            packages.append(Package())
+
+        return packages
+
+
+    def update(self, package: "Package"):
         issue_dict = {
             JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
             JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
