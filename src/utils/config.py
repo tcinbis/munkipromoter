@@ -3,27 +3,39 @@ from enum import Enum, auto
 from logging import DEBUG
 
 
-class JiraLane(Enum):
-    TO_DEVELOPMENT = "to_dev"
-    DEVELOPMENT = "dev"
-    TO_TESTING = "to_test"
-    TESTING = "test"
-    TO_PRODUCTION = "to_prod"
-    PRODUCTION = "prod"
+class JiraEnum(Enum):
+    def to_jira_rest_dict(self):
+        """
+        When submitting a field to the Jira API it usually requires a dictionary with a  key called id and the
+        corresponding value of this id. This method simply returns a dict with such key and the value stored in the
+        enum instance.
+        :return: Dictionary with id key and id value.
+        """
+        return {"id": self.value}
 
 
-class Catalog(Enum):
-    DEVELOPMENT = {"id": "12000"}
-    TESTING = {"id": "12001"}
-    PRODUCTION = {"id": "12002"}
+class JiraLane(JiraEnum):
+    # TODO: Replace with ids
+    TO_DEVELOPMENT = "To Development"
+    DEVELOPMENT = "Development"
+    TO_TESTING = "To Testing"
+    TESTING = "Testing"
+    TO_PRODUCTION = "To Production"
+    PRODUCTION = "Production"
 
 
-class Present(Enum):
-    PRESENT = {"id": "12005"}
-    MISSING = {"id": "12006"}
+class Catalog(JiraEnum):
+    DEVELOPMENT = "12000"
+    TESTING = "12001"
+    PRODUCTION = "12002"
 
 
-class PackageState(Enum):
+class Present(JiraEnum):
+    PRESENT = "12005"
+    MISSING = "12006"
+
+
+class PackageState(JiraEnum):
     DEFAULT = auto()
     NEW = auto()
     UPDATE = auto()
@@ -58,7 +70,7 @@ JIRA_SOFTWARE_VERSION_FIELD = os.getenv(
     "MUNKIPROMOTER_JIRA_SOFTWARE_VERSION_FIELD", "customfield_12504"
 )
 JIRA_DUEDATE_FIELD = "duedate"
-JIRA_LABELS_FIELD = "labels-textarea"
+JIRA_LABELS_FIELD = "labels"
 JIRA_CATALOG_FIELD = os.getenv("MUNKIPROMOTER_JIRA_CATALOG_FIELD", "customfield_12700")
 JIRA_AUTOPROMOTE_FIELD = os.getenv(
     "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD", "customfield_12701"
