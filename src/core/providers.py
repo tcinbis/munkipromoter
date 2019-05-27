@@ -23,7 +23,8 @@ from utils.config import (
     JiraLane,
     Catalog,
     Present,
-    JiraAutopromote)
+    JiraAutopromote,
+)
 from utils.exceptions import ProviderDoesNotImplement
 
 logger = l.get_logger(__file__)
@@ -83,10 +84,10 @@ class JiraBoardProvider(Provider):
                 search_result = self._jira.search_issues(
                     query, startAt=start_at, maxResults=500
                 )
-            self._packages = self._jira_issue_to_package(cumulative_results)
+            self._packages = self._jira_issue_to_package_list(cumulative_results)
             return
 
-        self._packages = self._jira_issue_to_package(search_result)
+        self._packages = self._jira_issue_to_package_list(search_result)
 
     def get(self):
         super().get()
@@ -95,35 +96,37 @@ class JiraBoardProvider(Provider):
     def _check_jira_issue_exists(self, package: "Package"):
         pass
 
-    def _jira_issue_to_package(self, issues: [Issue]) -> ["Package"]:
+    def _jira_issue_to_package_list(self, issues: [Issue]) -> ["Package"]:
         packages = list()
         for issue in issues:
-            fields_dict = issue.fields.__dict__  # type: dict
-
-            if all(field in fields_dict for field in ISSUE_FIELDS):
-                # Before we try to get all fields from our issue we check, whether all fields are present as keys
-                p = Package(
-                    name=fields_dict.get(JIRA_SOFTWARE_NAME_FIELD),
-                    version=Package.str_to_version(
-                        fields_dict.get(JIRA_SOFTWARE_VERSION_FIELD)
-                    ),
-                    # TODO: Remove index 0 as catalog field will be changed to RadioSelect
-                    catalog=Catalog(fields_dict.get(JIRA_CATALOG_FIELD)[0].id),
-                    date=datetime.strptime(
-                        fields_dict.get(JIRA_DUEDATE_FIELD), "%Y-%m-%d"
-                    ),
-                    is_autopromote=JiraAutopromote(fields_dict.get(JIRA_AUTOPROMOTE_FIELD).id),
-                    # TODO: Remove index 0 as present field will be changed to RadioSelect
-                    is_present=Present(fields_dict.get(JIRA_PRESENT_FIELD)[0].id),
-                    provider=self,
-                    jira_id=issue.key,
-                    jira_lane=JiraLane(fields_dict.get("status").name),
-                    state=PackageState.DEFAULT,
-                )
-
-                packages.append(p)
+            packages.append(self._jira_issue_to_package(issue))
 
         return packages
+
+    def _jira_issue_to_package(self, issue: Issue) -> "Package":
+        fields_dict = issue.fields.__dict__  # type: dict
+
+        if all(field in fields_dict for field in ISSUE_FIELDS):
+            # Before we try to get all fields from our issue we check, whether all fields are present as keys
+            p = Package(
+                name=fields_dict.get(JIRA_SOFTWARE_NAME_FIELD),
+                version=Package.str_to_version(
+                    fields_dict.get(JIRA_SOFTWARE_VERSION_FIELD)
+                ),
+                # TODO: Remove index 0 as catalog field will be changed to RadioSelect
+                catalog=Catalog(fields_dict.get(JIRA_CATALOG_FIELD)[0].id),
+                date=datetime.strptime(fields_dict.get(JIRA_DUEDATE_FIELD), "%Y-%m-%d"),
+                is_autopromote=JiraAutopromote(
+                    fields_dict.get(JIRA_AUTOPROMOTE_FIELD).id
+                ),
+                # TODO: Remove index 0 as present field will be changed to RadioSelect
+                is_present=Present(fields_dict.get(JIRA_PRESENT_FIELD)[0].id),
+                provider=self,
+                jira_id=issue.key,
+                jira_lane=JiraLane(fields_dict.get("status").name),
+                state=PackageState.DEFAULT,
+            )
+            return p
 
     def update(self, package: "Package"):
         issue_dict = {
@@ -142,8 +145,17 @@ class JiraBoardProvider(Provider):
             # Ticket with this id already exists.
             existing_ticket = self._jira.search_issues(
                 f"project={JIRA_PROJECT_KEY} AND key={package.jira_id} "
-            )[0]
-            existing_ticket.update(fields=issue_dict)
+            )[
+                0
+            ]  # type: Issue
+
+            existing_package = self._jira_issue_to_package(existing_ticket)
+
+            for key, value in package.__dict__.items():
+                if existing_package.__dict__.get(key) != value:
+                    # Not all values of the existing jira ticket and the local version match. Therefore update.
+                    existing_ticket.update(fields=issue_dict)
+                    break
         else:
             # Create a new ticket.
             # Add the required fields we need to create a new ticket compared to an update call.
