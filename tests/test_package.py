@@ -4,7 +4,7 @@ from datetime import datetime
 import pytest
 from core.base_classes import Package, PackageVersion
 from core.providers import JiraBoardProvider
-from utils.config import Catalog, JiraLane, PackageState, Present
+from utils.config import Catalog, JiraLane, PackageState, Present, JiraAutopromote
 
 
 def test_package_equality():
@@ -15,7 +15,7 @@ def test_package_equality():
         Package.str_to_version("61.3.5"),
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
-        False,
+        JiraAutopromote.NOPROMOTE,
         Present.PRESENT,
         jira_board,
         "SWPM-4556",
@@ -27,7 +27,7 @@ def test_package_equality():
         Package.str_to_version("61.3.5"),
         Catalog.TESTING,
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
-        False,
+        JiraAutopromote.NOPROMOTE,
         Present.PRESENT,
         jira_board,
         "SWPM-4556",

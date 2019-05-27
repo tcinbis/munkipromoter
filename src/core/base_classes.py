@@ -54,7 +54,7 @@ class Package:
     version: "PackageVersion" = field(repr=True, compare=True)
     catalog: "utils.config.Catalog" = field(repr=True, compare=False)
     date: "datetime" = field(repr=False, compare=False)
-    is_autopromote: "bool" = field(repr=False, compare=False)
+    is_autopromote: "utils.config.JiraAutopromote" = field(repr=False, compare=False)
     is_present: "utils.config.Present" = field(repr=False, compare=False)
     provider: "Provider" = field(repr=False, compare=False)
     jira_id: "str" = field(repr=False, compare=False)
