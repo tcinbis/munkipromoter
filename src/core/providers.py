@@ -1,5 +1,7 @@
+import requests
 from core.base_classes import Provider, Package
 from jira import JIRA, Issue
+from utils import logger as l
 from utils.config import (
     JIRA_PROJECT_FIELD,
     JIRA_PROJECT_KEY,
@@ -21,6 +23,8 @@ from utils.config import (
     Catalog,
 )
 from utils.exceptions import ProviderDoesNotImplement
+
+logger = l.get_logger(__file__)
 
 
 class MunkiRepoProvider(Provider):
@@ -46,12 +50,17 @@ class JiraBoardProvider(Provider):
         # noinspection PyTypeChecker
         self._jira = None  # type: JIRA
 
-    def connect(self):
-        self._jira = JIRA(**JIRA_CONNECTION_INFO)
+    def connect(self, connection_params=JIRA_CONNECTION_INFO):
+        try:
+            self._jira = JIRA(**connection_params)
 
-        if self._jira:
-            return True
-        else:
+            if self._jira:
+                logger.debug("Successfully connected to Jira instance.")
+                return True
+        except requests.exceptions.ConnectionError as e:
+            logger.critical(
+                f"Couldn't connect to Jira instance: {JIRA_CONNECTION_INFO.get('server')}."
+            )
             return False
 
     def load(self):
