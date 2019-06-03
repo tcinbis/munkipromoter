@@ -6,6 +6,11 @@ from core.providers import JiraBoardProvider
 from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote
 
 
+@pytest.fixture
+def jira_board_provider():
+    return JiraBoardProvider("test_instance")
+
+
 @pytest.fixture(params=["10"])
 def test_one_package(request) -> Package:
     jira_board = JiraBoardProvider(name="_jira")
