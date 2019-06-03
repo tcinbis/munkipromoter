@@ -25,7 +25,7 @@ from utils.config import (
     Present,
     JiraAutopromote,
 )
-from utils.exceptions import ProviderDoesNotImplement
+from utils.exceptions import ProviderDoesNotImplement, JiraIssueMissingFields
 
 logger = l.get_logger(__file__)
 
@@ -133,6 +133,8 @@ class JiraBoardProvider(Provider):
                 state=PackageState.DEFAULT,
             )
             return p
+        else:
+            raise JiraIssueMissingFields()
 
     def update(self, package: "Package"):
         issue_dict = {
