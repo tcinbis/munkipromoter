@@ -93,8 +93,14 @@ class JiraBoardProvider(Provider):
         super().get()
         return self._packages
 
-    def _check_jira_issue_exists(self, package: "Package"):
-        pass
+    @staticmethod
+    def check_jira_issue_exists(package: "Package") -> bool:
+        """
+        Checks whether a given package already exists in the Jira Board or not.
+        :param package: The package to check whether it exists in Jira.
+        :return: True if the package has a Jira ID and False if not
+        """
+        return bool(package.jira_id)
 
     def _jira_issue_to_package_list(self, issues: [Issue]) -> ["Package"]:
         packages = list()
@@ -141,7 +147,7 @@ class JiraBoardProvider(Provider):
             JIRA_PRESENT_FIELD: [package.is_present.to_jira_rest_dict()],
         }
 
-        if package.jira_id:
+        if JiraBoardProvider.check_jira_issue_exists(package):
             # Ticket with this id already exists.
             existing_ticket = self._jira.search_issues(
                 f"project={JIRA_PROJECT_KEY} AND key={package.jira_id} "
