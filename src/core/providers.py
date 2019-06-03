@@ -1,3 +1,5 @@
+import os
+import plistlib
 from datetime import datetime
 
 import requests
@@ -24,7 +26,8 @@ from utils.config import (
     Catalog,
     Present,
     JiraAutopromote,
-)
+    REPO_PATH,
+    CATALOGS_PATH)
 from utils.exceptions import ProviderDoesNotImplement, JiraIssueMissingFields
 
 logger = l.get_logger(__file__)
@@ -35,13 +38,22 @@ class MunkiRepoProvider(Provider):
         super().__init__(name)
 
     def connect(self):
-        raise ProviderDoesNotImplement(self.__class__.__name__)
+        """
+        The munki repository needs to be mounted when trying to connect.
+        """
+        if os.path.ismount(REPO_PATH):
+            logger.debug(f"Repo at {REPO_PATH} mounted.")
+            return True
+        else:
+            logger.critical(f"Repo mount point {REPO_PATH} not mounted.")
+            return False
 
     def load(self):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
     def get(self):
-        raise ProviderDoesNotImplement(self.__class__.__name__)
+        super().get()
+        return self._packages
 
     def update(self, package: "Package"):
         raise ProviderDoesNotImplement(self.__class__.__name__)
