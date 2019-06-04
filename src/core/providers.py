@@ -32,7 +32,11 @@ from utils.config import (
     CATALOGS_PATH,
     PROMOTE_AFTER_DAYS,
 )
-from utils.exceptions import ProviderDoesNotImplement, JiraIssueMissingFields, MunkiItemInMultipleCatalogs
+from utils.exceptions import (
+    ProviderDoesNotImplement,
+    JiraIssueMissingFields,
+    MunkiItemInMultipleCatalogs,
+)
 
 logger = l.get_logger(__file__)
 
@@ -61,32 +65,37 @@ class MunkiRepoProvider(Provider):
                 )
 
                 for item in munki_packages:
-                    if 'promotion_date' in item:
-                        promotion_date = item.get('date')
-                    else:
-                        promotion_date = datetime.now() + timedelta(
-                            days=PROMOTE_AFTER_DAYS
+                    try:
+                        if "promotion_date" in item:
+                            promotion_date = item.get("date")
+                        else:
+                            promotion_date = datetime.now() + timedelta(
+                                days=PROMOTE_AFTER_DAYS
+                            )
+
+                        if len(item.get("catalogs")) > 1:
+                            raise MunkiItemInMultipleCatalogs(item)
+                        else:
+                            item_catalog = Catalog.str_to_catalog(
+                                item.get("catalogs")[0]
+                            )
+                        # TODO: Check if promotion date in pkginfo plist
+                        p = Package(
+                            name=item.get("name"),
+                            version=item.get("version"),
+                            catalog=item_catalog,
+                            date=promotion_date,
+                            is_autopromote=JiraAutopromote.PROMOTE,
+                            is_present=Present.PRESENT,
+                            provider=self,
+                            jira_id=None,
+                            jira_lane=JiraLane.catalog_to_lane(item_catalog),
+                            state=PackageState.DEFAULT,
                         )
 
-                    if len(item.get('catalogs')) > 1:
-                        raise MunkiItemInMultipleCatalogs(item)
-                    else:
-                        item_catalog = Catalog.str_to_catalog(item.get('catalogs')[0])
-                    # TODO: Check if promotion date in pkginfo plist
-                    p = Package(
-                        name=item.get('name'),
-                        version=item.get('version'),
-                        catalog=item_catalog,
-                        date=promotion_date,
-                        is_autopromote=JiraAutopromote.PROMOTE,
-                        is_present=Present.PRESENT,
-                        provider=self,
-                        jira_id=None,
-                        jira_lane=JiraLane.catalog_to_lane(item_catalog),
-                        state=PackageState.DEFAULT
-                    )
-
-                    self._packages.append(p)
+                        self._packages.append(p)
+                    except MunkiItemInMultipleCatalogs as e:
+                        logger.error(e)
 
     def update(self, package: Package):
         raise ProviderDoesNotImplement(self.__class__.__name__)
