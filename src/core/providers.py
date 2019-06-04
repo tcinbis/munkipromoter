@@ -1,6 +1,8 @@
+from __future__ import annotations
 import os
 import plistlib
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import List
 
 import requests
 from core.base_classes import Provider, Package
@@ -27,8 +29,10 @@ from utils.config import (
     Present,
     JiraAutopromote,
     REPO_PATH,
-    CATALOGS_PATH)
-from utils.exceptions import ProviderDoesNotImplement, JiraIssueMissingFields
+    CATALOGS_PATH,
+    PROMOTE_AFTER_DAYS,
+)
+from utils.exceptions import ProviderDoesNotImplement, JiraIssueMissingFields, MunkiItemInMultipleCatalogs
 
 logger = l.get_logger(__file__)
 
@@ -49,13 +53,46 @@ class MunkiRepoProvider(Provider):
             return False
 
     def load(self):
-        raise ProviderDoesNotImplement(self.__class__.__name__)
+        for filename in os.listdir(CATALOGS_PATH):
+            if not (filename.startswith(".") or filename == "all"):
+                # Ignore hidden files
+                munki_packages = plistlib.load(
+                    open(os.path.join(CATALOGS_PATH, filename), "rb")
+                )
+
+                for item in munki_packages:
+                    if 'promotion_date' in item:
+                        promotion_date = item.get('date')
+                    else:
+                        promotion_date = datetime.now() + timedelta(
+                            days=PROMOTE_AFTER_DAYS
+                        )
+
+                    if len(item.get('catalogs')) > 1:
+                        raise MunkiItemInMultipleCatalogs(item)
+                    else:
+                        item_catalog = Catalog.str_to_catalog(item.get('catalogs')[0])
+                    # TODO: Check if promotion date in pkginfo plist
+                    p = Package(
+                        name=item.get('name'),
+                        version=item.get('version'),
+                        catalog=item_catalog,
+                        date=promotion_date,
+                        is_autopromote=JiraAutopromote.PROMOTE,
+                        is_present=Present.PRESENT,
+                        provider=self,
+                        jira_id=None,
+                        jira_lane=JiraLane.catalog_to_lane(item_catalog),
+                        state=PackageState.DEFAULT
+                    )
+
+                    self._packages.append(p)
 
     def get(self):
         super().get()
         return self._packages
 
-    def update(self, package: "Package"):
+    def update(self, package: Package):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
 
@@ -106,7 +143,7 @@ class JiraBoardProvider(Provider):
         return self._packages
 
     @staticmethod
-    def check_jira_issue_exists(package: "Package") -> bool:
+    def check_jira_issue_exists(package: Package) -> bool:
         """
         Checks whether a given package already exists in the Jira Board or not.
         :param package: The package to check whether it exists in Jira.
@@ -114,7 +151,7 @@ class JiraBoardProvider(Provider):
         """
         return bool(package.jira_id)
 
-    def _jira_issue_to_package_list(self, issues: [Issue]) -> ["Package"]:
+    def _jira_issue_to_package_list(self, issues: List[Issue]) -> List[Package]:
         packages = list()
         for issue in issues:
             packages.append(self._jira_issue_to_package(issue))
@@ -148,7 +185,7 @@ class JiraBoardProvider(Provider):
         else:
             raise JiraIssueMissingFields()
 
-    def update(self, package: "Package"):
+    def update(self, package: Package):
         issue_dict = {
             # TODO: Add/Set status
             # TODO: Add/Set Package State
