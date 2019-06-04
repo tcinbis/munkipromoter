@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 from enum import Enum, auto
 
@@ -5,6 +6,8 @@ REPO_PATH = os.getenv("MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo")
 CATALOGS_PATH = os.getenv("MUNKIPROMOTER_CATALOGS_PATH", f"{REPO_PATH}/catalogs")
 PKGS_INFO_PATH = os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", f"{REPO_PATH}/pkgsinfo")
 MAKECATALOGS_PATH = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PATH", "/usr/local/munki")
+
+PROMOTE_AFTER_DAYS = 7
 
 # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
 JIRA_CONNECTION_INFO = {
@@ -80,11 +83,26 @@ class JiraLane(JiraEnum):
     TO_PRODUCTION = "To Production"
     PRODUCTION = "Production"
 
+    @staticmethod
+    def catalog_to_lane(catalog: Catalog) -> JiraLane:
+        for j_enum in JiraLane:
+            if j_enum.name == catalog.name:
+                return j_enum
+
 
 class Catalog(JiraEnum):
     DEVELOPMENT = "12000"
     TESTING = "12001"
     PRODUCTION = "12002"
+
+    @staticmethod
+    def str_to_catalog(catalog_string: str) -> Catalog:
+        catalog_string = (
+            catalog_string.upper()
+        )  # in case the string is not already all upper case we will do it here
+        for c_enum in Catalog:
+            if c_enum.name == catalog_string:
+                return c_enum
 
 
 class Present(JiraEnum):
