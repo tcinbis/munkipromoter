@@ -1,6 +1,6 @@
 requests==2.22.0
 tqdm==4.32.1
-pytest==4.6.1
+pytest==4.6.2
 # Because the jira package on pypi is still version 2.0.0 instead of 2.0.1rc1 (since 19.12.2018) we manually checkout
 # the commit for version 2.0.1rc1
 -e git://github.com/pycontribs/jira.git@72f2f6b181004fd0dff0b4946f427b83b9c0c68a#egg=jira
