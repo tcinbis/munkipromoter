@@ -88,10 +88,6 @@ class MunkiRepoProvider(Provider):
 
                     self._packages.append(p)
 
-    def get(self):
-        super().get()
-        return self._packages
-
     def update(self, package: Package):
         raise ProviderDoesNotImplement(self.__class__.__name__)
 
@@ -137,10 +133,6 @@ class JiraBoardProvider(Provider):
             return
 
         self._packages = self._jira_issue_to_package_list(search_result)
-
-    def get(self):
-        super().get()
-        return self._packages
 
     @staticmethod
     def check_jira_issue_exists(package: Package) -> bool:

@@ -34,6 +34,7 @@ class Provider:
             logger.debug("Provider not yet loaded. Loading now...")
             self.load()
         logger.debug("Loading complete.")
+        return self._packages
 
     def update(self, package: "Package"):
         """
