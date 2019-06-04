@@ -2,13 +2,18 @@ from datetime import datetime
 
 import pytest
 from core.base_classes import Package
-from core.providers import JiraBoardProvider
+from core.providers import JiraBoardProvider, MunkiRepoProvider
 from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote
 
 
 @pytest.fixture
 def jira_board_provider():
     return JiraBoardProvider("test_instance")
+
+
+@pytest.fixture
+def munki_repo_provider():
+    return MunkiRepoProvider("test_instance")
 
 
 @pytest.fixture(params=["10"])
