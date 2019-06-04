@@ -80,3 +80,23 @@ class TestJiraBoardProvider:
         #     }
         #
         #     jira._jira.create_issue.assert_called_once_with(fields=issue_dict)
+
+
+class TestMunkiRepoProvider:
+    def test_connect_fail(self, jira_board_provider):
+        pass
+
+    def test_load(self, munki_repo_provider):
+        munki_repo_provider.load()
+
+    def test_get(self):
+        pass
+
+    def test__jira_issue_to_package_list(self):
+        pass
+
+    def test__jira_issue_to_package(self, jira_board_provider):
+        pass
+
+    def test_update(self):
+        pass
