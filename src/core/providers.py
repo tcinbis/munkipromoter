@@ -212,16 +212,53 @@ class JiraBoardProvider(Provider):
             for key, value in package.__dict__.items():
                 if existing_package.__dict__.get(key) != value:
                     # Not all values of the existing jira ticket and the local version match. Therefore update.
-                    existing_ticket.update(fields=issue_dict)
-                    break
+                    package.state = PackageState.UPDATE
         else:
             # Create a new ticket.
             # Add the required fields we need to create a new ticket compared to an update call.
-            issue_dict.update(
-                {
-                    JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
-                    JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
-                    JIRA_SUMMARY_FIELD: str(package),
+            package.state = PackageState.NEW
+
+            if package not in self._packages:
+                # TODO: Add a more appropriate data structure to reduce lookup costs.
+                self._packages.append(package)
+
+    def commit(self) -> bool:
+        if not self._dry_run:
+            for package in self._packages:
+
+                issue_dict = {
+                    # TODO: Add/Set status
+                    # TODO: Add/Set Package State
+                    JIRA_SOFTWARE_NAME_FIELD: package.name,
+                    JIRA_SOFTWARE_VERSION_FIELD: package.version.vstring,
+                    JIRA_DUEDATE_FIELD: package.date.strftime("%Y-%m-%d"),
+                    JIRA_DESCRIPTION_FIELD: package.name,
+                    JIRA_CATALOG_FIELD: [package.catalog.to_jira_rest_dict()],
+                    JIRA_AUTOPROMOTE_FIELD: package.is_autopromote.to_jira_rest_dict(),
+                    JIRA_PRESENT_FIELD: [package.is_present.to_jira_rest_dict()],
                 }
-            )
-            self._jira.create_issue(fields=issue_dict)
+
+                if package.state == PackageState.NEW:
+                    # Create a new ticket.
+                    # Add the required fields we need to create a new ticket compared to an update call.
+                    issue_dict.update(
+                        {
+                            JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
+                            JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
+                            JIRA_SUMMARY_FIELD: str(package),
+                        }
+                    )
+                    self._jira.create_issue(fields=issue_dict)
+
+                elif package.state == PackageState.UPDATE:
+                    # Update package information
+                    existing_ticket = self._jira.search_issues(
+                        f"project={JIRA_PROJECT_KEY} AND key={package.jira_id} "
+                    )[
+                        0
+                    ]  # type: Issue
+
+                    existing_ticket.update(fields=issue_dict)
+            return True
+
+        return False
