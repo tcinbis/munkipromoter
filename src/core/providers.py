@@ -42,8 +42,8 @@ logger = l.get_logger(__file__)
 
 
 class MunkiRepoProvider(Provider):
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, dry_run=False):
+        super().__init__(name, dry_run)
 
     def connect(self):
         """
@@ -102,8 +102,8 @@ class MunkiRepoProvider(Provider):
 
 
 class JiraBoardProvider(Provider):
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, dry_run=False):
+        super().__init__(name, dry_run)
         # noinspection PyTypeChecker
         self._jira = None  # type: JIRA
 
