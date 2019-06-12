@@ -91,9 +91,9 @@ class JiraLane(JiraEnum):
 
 
 class Catalog(JiraEnum):
-    DEVELOPMENT = "12000"
-    TESTING = "12001"
-    PRODUCTION = "12002"
+    DEVELOPMENT = "12007"
+    TESTING = "12008"
+    PRODUCTION = "12009"
 
     @staticmethod
     def str_to_catalog(catalog_string: str) -> Catalog:

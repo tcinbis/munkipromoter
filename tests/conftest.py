@@ -18,7 +18,6 @@ def munki_repo_provider():
 
 @pytest.fixture(params=["10"])
 def test_one_package(request) -> Package:
-    jira_board = JiraBoardProvider(name="_jira")
     yield Package(
         "Firefox",
         Package.str_to_version(request.param),
@@ -26,7 +25,7 @@ def test_one_package(request) -> Package:
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         JiraAutopromote.NOPROMOTE,
         Present.PRESENT,
-        jira_board,
+        JiraBoardProvider,
         "SWPM-789",
         JiraLane.TESTING,
         PackageState.NEW,
@@ -35,7 +34,6 @@ def test_one_package(request) -> Package:
 
 @pytest.fixture
 def test_two_packages(request) -> ["Package"]:
-    jira_board = JiraBoardProvider(name="_jira")
     yield [
         Package(
             "Firefox",
@@ -44,7 +42,7 @@ def test_two_packages(request) -> ["Package"]:
             datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
             JiraAutopromote.NOPROMOTE,
             Present.PRESENT,
-            jira_board,
+            JiraBoardProvider,
             "SWPM-7859",
             JiraLane.TESTING,
             PackageState.NEW,
@@ -56,8 +54,8 @@ def test_two_packages(request) -> ["Package"]:
             datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
             JiraAutopromote.NOPROMOTE,
             Present.PRESENT,
-            jira_board,
-            "SWPM-7389",
+            JiraBoardProvider,
+            "SWPM-7859",
             JiraLane.TESTING,
             PackageState.NEW,
         ),
