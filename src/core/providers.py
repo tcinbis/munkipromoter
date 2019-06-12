@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import plistlib
+import subprocess
 from datetime import datetime, timedelta
 from typing import List
 from uuid import uuid4
@@ -35,7 +36,7 @@ from utils.config import (
     PROMOTE_AFTER_DAYS,
     PKGS_INFO_PATH,
     DEBUG_PKGS_INFO_SAVE_PATH,
-)
+    MAKECATALOGS)
 from utils.exceptions import (
     ProviderDoesNotImplement,
     JiraIssueMissingFields,
@@ -183,14 +184,19 @@ class MunkiRepoProvider(Provider):
                         f"Pkg info for {package} not written, because package state is {package.state}"
                     )
 
-            self._make_catalogs()
-
+            MunkiRepoProvider.make_catalogs()
             return True
         return False
 
-    def _make_catalogs(self):
-        # TODO: Implement
-        pass
+    @staticmethod
+    def make_catalogs():
+        """
+        Run makecatalogs and check whether the return code is 0.
+        """
+        cmd = [MAKECATALOGS, REPO_PATH]
+        logger.info("Running makecatalogs.")
+        subprocess.run(cmd, check=True)
+        logger.info("Makecatalogs completed.")
 
 
 class JiraBoardProvider(Provider):
