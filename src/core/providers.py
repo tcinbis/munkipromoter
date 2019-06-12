@@ -34,6 +34,7 @@ from utils.config import (
     CATALOGS_PATH,
     PROMOTE_AFTER_DAYS,
     PKGS_INFO_PATH,
+    DEBUG_PKGS_INFO_SAVE_PATH,
 )
 from utils.exceptions import (
     ProviderDoesNotImplement,
@@ -158,8 +159,18 @@ class MunkiRepoProvider(Provider):
                     if pkg_info:
                         # Plist already exists in Repo so we can continue to update it.
                         pkg_info.update({"catalogs": [package.catalog.name.lower()]})
-                        plistlib.dump(pkg_info, open(pkg_info_path, "wb"))
-                        logger.debug(f"Wrote pkg info file at {pkg_info_path}")
+
+                        f = open(
+                            os.path.join(
+                                DEBUG_PKGS_INFO_SAVE_PATH,
+                                os.path.basename(pkg_info_path),
+                            )
+                            if DEBUG_PKGS_INFO_SAVE_PATH
+                            else pkg_info_path,
+                            "wb",
+                        )
+                        plistlib.dump(pkg_info, f)
+                        logger.debug(f"Wrote pkg info file at {f.name}")
                     else:
                         # Plist does not exist in Repo, and we can not create a new one.
                         package.state = PackageState.MISSING
@@ -171,8 +182,15 @@ class MunkiRepoProvider(Provider):
                     logger.debug(
                         f"Pkg info for {package} not written, because package state is {package.state}"
                     )
+
+            self._make_catalogs()
+
             return True
         return False
+
+    def _make_catalogs(self):
+        # TODO: Implement
+        pass
 
 
 class JiraBoardProvider(Provider):

@@ -38,7 +38,7 @@ class Provider:
         if not self.is_loaded:
             logger.debug("Provider not yet loaded. Loading now...")
             self.load()
-        logger.debug("Loading complete.")
+            logger.debug("Loading complete.")
         # only return a copy of the internal list, to later compare if changes were made.
         return copy.deepcopy(self._packages)
 
