@@ -164,19 +164,23 @@ class JiraBoardProvider(Provider):
 
         if all(field in fields_dict for field in ISSUE_FIELDS):
             # Before we try to get all fields from our issue we check, whether all fields are present as keys
+
+            if fields_dict.get(JIRA_PRESENT_FIELD):
+                is_present = Present(fields_dict.get(JIRA_PRESENT_FIELD)[0].id)
+            else:
+                is_present = Present(None)
+
             p = Package(
                 name=fields_dict.get(JIRA_SOFTWARE_NAME_FIELD),
                 version=Package.str_to_version(
                     fields_dict.get(JIRA_SOFTWARE_VERSION_FIELD)
                 ),
-                # TODO: Remove index 0 as catalog field will be changed to RadioSelect
-                catalog=Catalog(fields_dict.get(JIRA_CATALOG_FIELD)[0].id),
+                catalog=Catalog(fields_dict.get(JIRA_CATALOG_FIELD).id),
                 date=datetime.strptime(fields_dict.get(JIRA_DUEDATE_FIELD), "%Y-%m-%d"),
                 is_autopromote=JiraAutopromote(
                     fields_dict.get(JIRA_AUTOPROMOTE_FIELD).id
                 ),
-                # TODO: Remove index 0 as present field will be changed to RadioSelect
-                is_present=Present(fields_dict.get(JIRA_PRESENT_FIELD)[0].id),
+                is_present=is_present,
                 provider=self,
                 jira_id=issue.key,
                 jira_lane=JiraLane(fields_dict.get("status").name),
@@ -187,22 +191,10 @@ class JiraBoardProvider(Provider):
             raise JiraIssueMissingFields()
 
     def update(self, package: Package):
-        issue_dict = {
-            # TODO: Add/Set status
-            # TODO: Add/Set Package State
-            JIRA_SOFTWARE_NAME_FIELD: package.name,
-            JIRA_SOFTWARE_VERSION_FIELD: package.version.vstring,
-            JIRA_DUEDATE_FIELD: package.date.strftime("%Y-%m-%d"),
-            JIRA_DESCRIPTION_FIELD: package.name,
-            JIRA_CATALOG_FIELD: [package.catalog.to_jira_rest_dict()],
-            JIRA_AUTOPROMOTE_FIELD: package.is_autopromote.to_jira_rest_dict(),
-            JIRA_PRESENT_FIELD: [package.is_present.to_jira_rest_dict()],
-        }
-
         if JiraBoardProvider.check_jira_issue_exists(package):
             # Ticket with this id already exists.
             existing_ticket = self._jira.search_issues(
-                f"project={JIRA_PROJECT_KEY} AND key={package.jira_id} "
+                f"project={JIRA_PROJECT_KEY} AND key={package.jira_id}"
             )[
                 0
             ]  # type: Issue
@@ -214,10 +206,7 @@ class JiraBoardProvider(Provider):
                     # Not all values of the existing jira ticket and the local version match. Therefore update.
                     package.state = PackageState.UPDATE
         else:
-            # Create a new ticket.
-            # Add the required fields we need to create a new ticket compared to an update call.
             package.state = PackageState.NEW
-
             if package not in self._packages:
                 # TODO: Add a more appropriate data structure to reduce lookup costs.
                 self._packages.append(package)
