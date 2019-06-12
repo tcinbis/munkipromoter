@@ -4,7 +4,7 @@ import os
 import plistlib
 import subprocess
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Dict
 from uuid import uuid4
 
 import requests
@@ -36,7 +36,8 @@ from utils.config import (
     PROMOTE_AFTER_DAYS,
     PKGS_INFO_PATH,
     DEBUG_PKGS_INFO_SAVE_PATH,
-    MAKECATALOGS)
+    MAKECATALOGS,
+)
 from utils.exceptions import (
     ProviderDoesNotImplement,
     JiraIssueMissingFields,
@@ -100,7 +101,7 @@ class MunkiRepoProvider(Provider):
                             munki_uuid=uuid4(),
                         )
 
-                        self._packages.append(p)
+                        self._packages_dict.update({p.munki_uuid: p})
                     except MunkiItemInMultipleCatalogs as e:
                         logger.error(e)
 
@@ -132,26 +133,23 @@ class MunkiRepoProvider(Provider):
         if package.provider == MunkiRepoProvider:
             # Ticket was originally created by MunkiRepoProvider.
             # Therefore must already exist and we only need to update.
-            for i, p in enumerate(self._packages):
-                # TODO: Add a more appropriate data structure to reduce lookup costs.
-                if p.munki_uuid == package.munki_uuid:
-                    for key, value in package.__dict__.items():
-                        if p.__dict__.get(key) != value:
-                            # Not all values of the existing jira ticket and the local version match. Therefore update.
-                            package.state = PackageState.UPDATE
-                            self._packages[i] = package
-                            break
-                    break
+            p = self._packages_dict.get(package.munki_uuid)
+            if p.munki_uuid == package.munki_uuid:
+                for key, value in package.__dict__.items():
+                    if p.__dict__.get(key) != value:
+                        # Not all values of the existing jira ticket and the local version match. Therefore update.
+                        package.state = PackageState.UPDATE
+                        self._packages_dict.update({package.munki_uuid: package})
+                        break
         elif package.provider == JiraBoardProvider:
             raise ProviderDoesNotImplement()
             package.state = PackageState.NEW
-            if package not in self._packages:
-                # TODO: Add a more appropriate data structure to reduce lookup costs.
-                self._packages.append(package)
+            if package not in self._packages_dict:
+                self._packages_dict.update({package.munki_uuid: package})
 
     def commit(self) -> bool:
         if not self._dry_run:
-            for package in self._packages:
+            for package in self._packages_dict.values():
                 if package.state == PackageState.UPDATE:
                     pkg_info, pkg_info_path = self._pkg_info_files.get(
                         package.name
@@ -236,10 +234,10 @@ class JiraBoardProvider(Provider):
                 search_result = self._jira.search_issues(
                     query, startAt=start_at, maxResults=500
                 )
-            self._packages = self._jira_issue_to_package_list(cumulative_results)
+            self._packages_dict = self._jira_issue_to_package_dict(cumulative_results)
             return
 
-        self._packages = self._jira_issue_to_package_list(search_result)
+        self._packages_dict = self._jira_issue_to_package_dict(search_result)
 
     @staticmethod
     def check_jira_issue_exists(package: Package) -> bool:
@@ -250,10 +248,11 @@ class JiraBoardProvider(Provider):
         """
         return bool(package.jira_id)
 
-    def _jira_issue_to_package_list(self, issues: List[Issue]) -> List[Package]:
-        packages = list()
+    def _jira_issue_to_package_dict(self, issues: List[Issue]) -> Dict:
+        packages = dict()
         for issue in issues:
-            packages.append(self._jira_issue_to_package(issue))
+            p = self._jira_issue_to_package(issue)
+            packages.update({p.jira_id: p})
 
         return packages
 
@@ -292,26 +291,23 @@ class JiraBoardProvider(Provider):
     def update(self, package: Package):
         if JiraBoardProvider.check_jira_issue_exists(package):
             # Ticket with this id already exists.
-            for p in self._packages:
-                # TODO: Add a more appropriate data structure to reduce lookup costs.
-                if p.jira_id == package.jira_id:
-                    for key, value in package.__dict__.items():
-                        if p.__dict__.get(key) != value:
-                            # Not all values of the existing jira ticket and the local version match. Therefore update.
-                            package.state = PackageState.UPDATE
-                            # Replace original package with updated package
-                            p = package
-                            break
+            p = self._packages_dict.get(package.jira_id)
+
+            for key, value in package.__dict__.items():
+                if p.__dict__.get(key) != value:
+                    # Not all values of the existing jira ticket and the local version match. Therefore update.
+                    package.state = PackageState.UPDATE
+                    # Replace original package with updated package
+                    self._packages_dict.update({p.jira_id: package})
                     break
         else:
             package.state = PackageState.NEW
-            if package not in self._packages:
-                # TODO: Add a more appropriate data structure to reduce lookup costs.
-                self._packages.append(package)
+            if package not in self._packages_dict:
+                self._packages_dict.update({package.jira_id, package})
 
     def commit(self) -> bool:
         if not self._dry_run:
-            for package in self._packages:
+            for package in self._packages_dict.values():
 
                 issue_dict = {
                     # TODO: Add/Set status

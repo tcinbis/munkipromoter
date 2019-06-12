@@ -17,6 +17,7 @@ class Provider:
         self.name = name
         self.is_loaded = False
         self._packages = list()
+        self._packages_dict = dict()
         self._dry_run = dry_run
 
     def connect(self) -> bool:
