@@ -1,10 +1,10 @@
 from __future__ import annotations
-
 import copy
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
-from typing import List
+from typing import List, Type
+from uuid import UUID
 
 from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane
 from utils import logger as l
@@ -67,14 +67,15 @@ class PackageVersion(LooseVersion):
 class Package:
     name: str = field(repr=True)
     version: PackageVersion = field(repr=True, compare=True)
-    catalog: Catalog = field(repr=True, compare=False)
+    catalog: Catalog = field(repr=True, compare=True)
     date: datetime = field(repr=False, compare=False)
     is_autopromote: JiraAutopromote = field(repr=False, compare=False)
     is_present: Present = field(repr=False, compare=False)
-    provider: Provider = field(repr=False, compare=False)
-    jira_id: str = field(repr=False, compare=False)
-    jira_lane: JiraLane = field(repr=False, compare=False)
-    state: PackageState = field(default=PackageState.DEFAULT, repr=False, compare=False)
+    provider: Type[Provider] = field(repr=False, compare=True)
+    jira_id: str = field(repr=False, compare=True)
+    jira_lane: JiraLane = field(repr=False, compare=True)
+    state: PackageState = field(default=PackageState.DEFAULT, repr=False, compare=True)
+    munki_uuid: UUID = field(repr=False, default=None, compare=True)
 
     @staticmethod
     def str_to_version(version_str: str) -> PackageVersion:
@@ -83,7 +84,6 @@ class Package:
     def update(self):
         """
         Call the update method of the provider which created the package.
-        :param kwargs: all fields which are defined in the package shall be passed on as a dict
         :return: None
         """
         self.provider.update(self)

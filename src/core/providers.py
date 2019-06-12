@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 import os
 import plistlib
 from datetime import datetime, timedelta
 from typing import List
+from uuid import uuid4
 
 import requests
 from core.base_classes import Provider, Package
@@ -31,6 +33,7 @@ from utils.config import (
     REPO_PATH,
     CATALOGS_PATH,
     PROMOTE_AFTER_DAYS,
+    PKGS_INFO_PATH,
 )
 from utils.exceptions import (
     ProviderDoesNotImplement,
@@ -44,6 +47,7 @@ logger = l.get_logger(__file__)
 class MunkiRepoProvider(Provider):
     def __init__(self, name, dry_run=False):
         super().__init__(name, dry_run)
+        self._pkg_info_files = dict(dict())
 
     def connect(self):
         """
@@ -56,7 +60,7 @@ class MunkiRepoProvider(Provider):
             logger.critical(f"Repo mount point {REPO_PATH} not mounted.")
             return False
 
-    def load(self):
+    def _load_packages(self):
         for filename in os.listdir(CATALOGS_PATH):
             if not (filename.startswith(".") or filename == "all"):
                 # Ignore hidden files
@@ -87,18 +91,88 @@ class MunkiRepoProvider(Provider):
                             date=promotion_date,
                             is_autopromote=JiraAutopromote.PROMOTE,
                             is_present=Present.PRESENT,
-                            provider=self,
+                            provider=MunkiRepoProvider,
                             jira_id=None,
                             jira_lane=JiraLane.catalog_to_lane(item_catalog),
                             state=PackageState.DEFAULT,
+                            munki_uuid=uuid4(),
                         )
 
                         self._packages.append(p)
                     except MunkiItemInMultipleCatalogs as e:
                         logger.error(e)
 
+    def _load_pkg_infos(self):
+        for dirpath, dirnames, filenames in os.walk(PKGS_INFO_PATH):
+            for file in filenames:
+                if file.startswith("."):
+                    continue
+
+                pkg_info_path = os.path.join(dirpath, file)
+                pkg_info = plistlib.load(open(pkg_info_path, "rb"))
+
+                # at index 0 we store the actual plist and at index 1 the path to that plist file is stored.
+                d = {pkg_info.get("version"): (pkg_info, pkg_info_path)}
+
+                if self._pkg_info_files.get(pkg_info.get("name")):
+                    # pkg info files with this name already stored -> update
+                    self._pkg_info_files.get(pkg_info.get("name")).update(d)
+                else:
+                    # no pkg info files with this name already stored -> add
+                    self._pkg_info_files.update({pkg_info.get("name"): d})
+
+    def load(self):
+        self._load_packages()
+        self._load_pkg_infos()
+        self.is_loaded = True
+
     def update(self, package: Package):
-        raise ProviderDoesNotImplement(self.__class__.__name__)
+        if package.provider == MunkiRepoProvider:
+            # Ticket was originally created by MunkiRepoProvider.
+            # Therefore must already exist and we only need to update.
+            for i, p in enumerate(self._packages):
+                # TODO: Add a more appropriate data structure to reduce lookup costs.
+                if p.munki_uuid == package.munki_uuid:
+                    for key, value in package.__dict__.items():
+                        if p.__dict__.get(key) != value:
+                            # Not all values of the existing jira ticket and the local version match. Therefore update.
+                            package.state = PackageState.UPDATE
+                            self._packages[i] = package
+                            break
+                    break
+        elif package.provider == JiraBoardProvider:
+            raise ProviderDoesNotImplement()
+            package.state = PackageState.NEW
+            if package not in self._packages:
+                # TODO: Add a more appropriate data structure to reduce lookup costs.
+                self._packages.append(package)
+
+    def commit(self) -> bool:
+        if not self._dry_run:
+            for package in self._packages:
+                if package.state == PackageState.UPDATE:
+                    pkg_info, pkg_info_path = self._pkg_info_files.get(
+                        package.name
+                    ).get(package.version)
+
+                    if pkg_info:
+                        # Plist already exists in Repo so we can continue to update it.
+                        pkg_info.update({"catalogs": [package.catalog.name.lower()]})
+                        plistlib.dump(pkg_info, open(pkg_info_path, "wb"))
+                        logger.debug(f"Wrote pkg info file at {pkg_info_path}")
+                    else:
+                        # Plist does not exist in Repo, and we can not create a new one.
+                        package.state = PackageState.MISSING
+                        logger.debug(
+                            f"{package} is missing in {self.name} {self.__class__.__name__}"
+                        )
+                        continue
+                elif package.state == PackageState.NEW:
+                    logger.debug(
+                        f"Pkg info for {package} not written, because package state is {package.state}"
+                    )
+            return True
+        return False
 
 
 class JiraBoardProvider(Provider):
@@ -181,10 +255,11 @@ class JiraBoardProvider(Provider):
                     fields_dict.get(JIRA_AUTOPROMOTE_FIELD).id
                 ),
                 is_present=is_present,
-                provider=self,
+                provider=JiraBoardProvider,
                 jira_id=issue.key,
                 jira_lane=JiraLane(fields_dict.get("status").name),
                 state=PackageState.DEFAULT,
+                munki_uuid=None,
             )
             return p
         else:
@@ -194,12 +269,14 @@ class JiraBoardProvider(Provider):
         if JiraBoardProvider.check_jira_issue_exists(package):
             # Ticket with this id already exists.
             for p in self._packages:
+                # TODO: Add a more appropriate data structure to reduce lookup costs.
                 if p.jira_id == package.jira_id:
-                    # TODO: Add a more appropriate data structure to reduce lookup costs.
                     for key, value in package.__dict__.items():
                         if p.__dict__.get(key) != value:
                             # Not all values of the existing jira ticket and the local version match. Therefore update.
                             package.state = PackageState.UPDATE
+                            # Replace original package with updated package
+                            p = package
                             break
                     break
         else:

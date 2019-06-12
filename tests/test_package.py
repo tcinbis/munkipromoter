@@ -9,7 +9,6 @@ from utils.config import Catalog, JiraLane, PackageState, Present, JiraAutopromo
 
 def test_package_equality():
     """Identical packages should be equal."""
-    jira_board = JiraBoardProvider(name="_jira")
     p1 = Package(
         "Firefox",
         Package.str_to_version("61.3.5"),
@@ -17,7 +16,7 @@ def test_package_equality():
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         JiraAutopromote.NOPROMOTE,
         Present.PRESENT,
-        jira_board,
+        JiraBoardProvider,
         "SWPM-4556",
         JiraLane.TESTING,
     )
@@ -29,7 +28,7 @@ def test_package_equality():
         datetime.strptime("10:05:55 01.01.2020", "%H:%M:%S %d.%m.%Y"),
         JiraAutopromote.NOPROMOTE,
         Present.PRESENT,
-        jira_board,
+        JiraBoardProvider,
         "SWPM-4556",
         JiraLane.TESTING,
     )
