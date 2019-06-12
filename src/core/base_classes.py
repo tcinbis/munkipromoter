@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import copy
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
@@ -37,7 +39,8 @@ class Provider:
             logger.debug("Provider not yet loaded. Loading now...")
             self.load()
         logger.debug("Loading complete.")
-        return self._packages
+        # only return a copy of the internal list, to later compare if changes were made.
+        return copy.deepcopy(self._packages)
 
     def update(self, package: Package):
         """
