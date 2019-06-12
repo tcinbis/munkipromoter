@@ -193,18 +193,15 @@ class JiraBoardProvider(Provider):
     def update(self, package: Package):
         if JiraBoardProvider.check_jira_issue_exists(package):
             # Ticket with this id already exists.
-            existing_ticket = self._jira.search_issues(
-                f"project={JIRA_PROJECT_KEY} AND key={package.jira_id}"
-            )[
-                0
-            ]  # type: Issue
-
-            existing_package = self._jira_issue_to_package(existing_ticket)
-
-            for key, value in package.__dict__.items():
-                if existing_package.__dict__.get(key) != value:
-                    # Not all values of the existing jira ticket and the local version match. Therefore update.
-                    package.state = PackageState.UPDATE
+            for p in self._packages:
+                if p.jira_id == package.jira_id:
+                    # TODO: Add a more appropriate data structure to reduce lookup costs.
+                    for key, value in package.__dict__.items():
+                        if p.__dict__.get(key) != value:
+                            # Not all values of the existing jira ticket and the local version match. Therefore update.
+                            package.state = PackageState.UPDATE
+                            break
+                    break
         else:
             package.state = PackageState.NEW
             if package not in self._packages:
