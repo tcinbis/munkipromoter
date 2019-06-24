@@ -36,7 +36,8 @@ from utils.config import (
     PKGS_INFO_PATH,
     DEBUG_PKGS_INFO_SAVE_PATH,
     MAKECATALOGS,
-    DEFAULT_PROMOTION_INTERVAL)
+    DEFAULT_PROMOTION_INTERVAL,
+)
 from utils.exceptions import (
     ProviderDoesNotImplement,
     JiraIssueMissingFields,
@@ -100,7 +101,7 @@ class MunkiRepoProvider(Provider):
                             munki_uuid=uuid4(),
                         )
 
-                        self._packages_dict.update({p.munki_uuid: p})
+                        self._packages_dict.update({p.key: p})
                     except MunkiItemInMultipleCatalogs as e:
                         logger.error(e)
 
@@ -132,19 +133,16 @@ class MunkiRepoProvider(Provider):
         if package.provider == MunkiRepoProvider:
             # Ticket was originally created by MunkiRepoProvider.
             # Therefore must already exist and we only need to update.
-            p = self._packages_dict.get(package.munki_uuid)
-            if p.munki_uuid == package.munki_uuid:
+            p = self._packages_dict.get(package.key)
+            if p.key == package.key:
                 for key, value in package.__dict__.items():
                     if p.__dict__.get(key) != value:
                         # Not all values of the existing jira ticket and the local version match. Therefore update.
                         package.state = PackageState.UPDATE
-                        self._packages_dict.update({package.munki_uuid: package})
+                        self._packages_dict.update({package.key: package})
                         break
         elif package.provider == JiraBoardProvider:
             raise ProviderDoesNotImplement()
-            package.state = PackageState.NEW
-            if package not in self._packages_dict:
-                self._packages_dict.update({package.munki_uuid: package})
 
     def commit(self) -> bool:
         if not self._dry_run:
@@ -252,11 +250,11 @@ class JiraBoardProvider(Provider):
         packages = dict()
         for issue in issues:
             p = self._jira_issue_to_package(issue)
-            packages.update({p.jira_id: p})
+            packages.update({p.key: p})
 
         return packages
 
-    def _jira_issue_to_package(self, issue: Issue) -> "Package":
+    def _jira_issue_to_package(self, issue: Issue) -> Package:
         fields_dict = issue.fields.__dict__  # type: dict
 
         if all(field in fields_dict for field in ISSUE_FIELDS):
@@ -294,19 +292,19 @@ class JiraBoardProvider(Provider):
     def update(self, package: Package):
         if JiraBoardProvider.check_jira_issue_exists(package):
             # Ticket with this id already exists.
-            p = self._packages_dict.get(package.jira_id)
+            p = self._packages_dict.get(package.key)
 
             for key, value in package.__dict__.items():
                 if p.__dict__.get(key) != value:
                     # Not all values of the existing jira ticket and the local version match. Therefore update.
                     package.state = PackageState.UPDATE
                     # Replace original package with updated package
-                    self._packages_dict.update({p.jira_id: package})
+                    self._packages_dict.update({p.key: package})
                     break
         else:
             package.state = PackageState.NEW
             if package not in self._packages_dict:
-                self._packages_dict.update({package.jira_id, package})
+                self._packages_dict.update({package.key: package})
 
     def commit(self) -> bool:
         if not self._dry_run:
@@ -316,7 +314,7 @@ class JiraBoardProvider(Provider):
                     # TODO: Add/Set status
                     # TODO: Add/Set Package State
                     JIRA_SOFTWARE_NAME_FIELD: package.name,
-                    JIRA_SOFTWARE_VERSION_FIELD: package.version.vstring,
+                    JIRA_SOFTWARE_VERSION_FIELD: str(package.version),
                     JIRA_DUEDATE_FIELD: package.promote_date.strftime("%Y-%m-%d"),
                     JIRA_DESCRIPTION_FIELD: package.name,
                     JIRA_CATALOG_FIELD: package.catalog.to_jira_rest_dict(),
@@ -334,7 +332,14 @@ class JiraBoardProvider(Provider):
                             JIRA_SUMMARY_FIELD: str(package),
                         }
                     )
-                    self._jira.create_issue(fields=issue_dict)
+                    created_ticket = self._jira.create_issue(fields=issue_dict)
+                    current_ticket_lane = JiraLane(
+                        created_ticket.fields.__dict__.get("status").name
+                    )
+                    if current_ticket_lane != package.jira_lane:
+                        self._jira.transition_issue(
+                            created_ticket, package.catalog.transition_id
+                        )
 
                 elif package.state == PackageState.UPDATE:
                     # Update package information
@@ -345,9 +350,20 @@ class JiraBoardProvider(Provider):
                     ]  # type: Issue
 
                     existing_ticket.update(fields=issue_dict)
-                    current_ticket_lane = JiraLane(existing_ticket.fields.__dict__.get("status").name)
+                    current_ticket_lane = JiraLane(
+                        existing_ticket.fields.__dict__.get("status").name
+                    )
                     if current_ticket_lane != package.jira_lane:
-                        self._jira.transition_issue(existing_ticket, package.catalog.transition_id)
+                        self._jira.transition_issue(
+                            existing_ticket, package.catalog.transition_id
+                        )
             return True
 
         return False
+
+    def update_jira_from_repo(self, munki_packages: Dict):
+        for munki_key, munki_package in munki_packages.items():
+            if not self._packages_dict.get(munki_key):
+                logger.debug(f"Adding munki package {munki_package} to jira.")
+                munki_package.state = PackageState.NEW
+                self._packages_dict.update({munki_key: munki_package})
