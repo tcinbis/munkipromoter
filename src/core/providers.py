@@ -33,11 +33,10 @@ from utils.config import (
     JiraAutopromote,
     REPO_PATH,
     CATALOGS_PATH,
-    PROMOTE_AFTER_DAYS,
     PKGS_INFO_PATH,
     DEBUG_PKGS_INFO_SAVE_PATH,
     MAKECATALOGS,
-)
+    DEFAULT_PROMOTION_INTERVAL)
 from utils.exceptions import (
     ProviderDoesNotImplement,
     JiraIssueMissingFields,
@@ -74,10 +73,10 @@ class MunkiRepoProvider(Provider):
                 for item in munki_packages:
                     try:
                         if "promotion_date" in item:
-                            promotion_date = item.get("date")
+                            promotion_date = item.get("promote_date")
                         else:
                             promotion_date = datetime.now() + timedelta(
-                                days=PROMOTE_AFTER_DAYS
+                                days=DEFAULT_PROMOTION_INTERVAL
                             )
 
                         if len(item.get("catalogs")) > 1:
@@ -86,12 +85,12 @@ class MunkiRepoProvider(Provider):
                             item_catalog = Catalog.str_to_catalog(
                                 item.get("catalogs")[0]
                             )
-                        # TODO: Check if promotion date in pkginfo plist
+                        # TODO: Check if promotion promote_date in pkginfo plist
                         p = Package(
                             name=item.get("name"),
                             version=item.get("version"),
                             catalog=item_catalog,
-                            date=promotion_date,
+                            promote_date=promotion_date,
                             is_autopromote=JiraAutopromote.PROMOTE,
                             is_present=Present.PRESENT,
                             provider=MunkiRepoProvider,
@@ -202,6 +201,7 @@ class JiraBoardProvider(Provider):
         super().__init__(name, dry_run)
         # noinspection PyTypeChecker
         self._jira = None  # type: JIRA
+        self.connect()
 
     def connect(self, connection_params=JIRA_CONNECTION_INFO):
         try:
@@ -273,7 +273,9 @@ class JiraBoardProvider(Provider):
                     fields_dict.get(JIRA_SOFTWARE_VERSION_FIELD)
                 ),
                 catalog=Catalog(fields_dict.get(JIRA_CATALOG_FIELD).id),
-                date=datetime.strptime(fields_dict.get(JIRA_DUEDATE_FIELD), "%Y-%m-%d"),
+                promote_date=datetime.strptime(
+                    fields_dict.get(JIRA_DUEDATE_FIELD), "%Y-%m-%d"
+                ),
                 is_autopromote=JiraAutopromote(
                     fields_dict.get(JIRA_AUTOPROMOTE_FIELD).id
                 ),
@@ -284,6 +286,7 @@ class JiraBoardProvider(Provider):
                 state=PackageState.DEFAULT,
                 munki_uuid=None,
             )
+
             return p
         else:
             raise JiraIssueMissingFields()
@@ -314,9 +317,9 @@ class JiraBoardProvider(Provider):
                     # TODO: Add/Set Package State
                     JIRA_SOFTWARE_NAME_FIELD: package.name,
                     JIRA_SOFTWARE_VERSION_FIELD: package.version.vstring,
-                    JIRA_DUEDATE_FIELD: package.date.strftime("%Y-%m-%d"),
+                    JIRA_DUEDATE_FIELD: package.promote_date.strftime("%Y-%m-%d"),
                     JIRA_DESCRIPTION_FIELD: package.name,
-                    JIRA_CATALOG_FIELD: [package.catalog.to_jira_rest_dict()],
+                    JIRA_CATALOG_FIELD: package.catalog.to_jira_rest_dict(),
                     JIRA_AUTOPROMOTE_FIELD: package.is_autopromote.to_jira_rest_dict(),
                     JIRA_PRESENT_FIELD: [package.is_present.to_jira_rest_dict()],
                 }
@@ -342,6 +345,9 @@ class JiraBoardProvider(Provider):
                     ]  # type: Issue
 
                     existing_ticket.update(fields=issue_dict)
+                    current_ticket_lane = JiraLane(existing_ticket.fields.__dict__.get("status").name)
+                    if current_ticket_lane != package.jira_lane:
+                        self._jira.transition_issue(existing_ticket, package.catalog.transition_id)
             return True
 
         return False

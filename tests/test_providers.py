@@ -70,7 +70,7 @@ class TestJiraBoardProvider:
         #         JIRA_SUMMARY_FIELD: str(test_one_package),
         #         JIRA_SOFTWARE_NAME_FIELD: test_one_package.name,
         #         JIRA_SOFTWARE_VERSION_FIELD: test_one_package.version.vstring,
-        #         JIRA_DUEDATE_FIELD: test_one_package.date.strftime("%Y-%m-%d"),
+        #         JIRA_DUEDATE_FIELD: test_one_package.promote_date.strftime("%Y-%m-%d"),
         #         JIRA_DESCRIPTION_FIELD: test_one_package.name,
         #         JIRA_CATALOG_FIELD: [test_one_package.catalog.value],
         #         JIRA_AUTOPROMOTE_FIELD: JIRA_AUTOPROMOTE.get(
