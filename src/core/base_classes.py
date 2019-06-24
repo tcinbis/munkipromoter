@@ -3,13 +3,13 @@ import copy
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
-from typing import List, Type
+from typing import List, Type, Dict
 from uuid import UUID
 
 from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane
-from utils import logger as l
+from utils import logger as log
 
-logger = l.get_logger(__file__)
+logger = log.get_logger(__file__)
 
 
 class Provider:
@@ -30,7 +30,7 @@ class Provider:
     def load(self) -> None:
         pass
 
-    def get(self) -> List[Package]:
+    def get(self) -> Dict:
         """
         If the providers load method was already called this method will return all received packages in a list.
         Otherwise it will first call load and then return the results.
@@ -41,7 +41,7 @@ class Provider:
             self.load()
             logger.debug("Loading complete.")
         # only return a copy of the internal list, to later compare if changes were made.
-        return copy.deepcopy(self._packages)
+        return copy.deepcopy(self._packages_dict)
 
     def update(self, package: Package):
         """
@@ -69,7 +69,7 @@ class Package:
     name: str = field(repr=True)
     version: PackageVersion = field(repr=True, compare=True)
     catalog: Catalog = field(repr=True, compare=True)
-    date: datetime = field(repr=False, compare=False)
+    promote_date: datetime = field(repr=False, compare=False)
     is_autopromote: JiraAutopromote = field(repr=False, compare=False)
     is_present: Present = field(repr=False, compare=False)
     provider: Type[Provider] = field(repr=False, compare=True)

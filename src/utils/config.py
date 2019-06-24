@@ -8,8 +8,6 @@ PKGS_INFO_PATH = os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", f"{REPO_PATH}/pkgsinf
 DEBUG_PKGS_INFO_SAVE_PATH = os.getenv("MUNKIPROMOTER_DEBUG_PKGS_INFO_SAVE_PATH", None)
 MAKECATALOGS = os.getenv("MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs")
 
-PROMOTE_AFTER_DAYS = 7
-
 # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
 JIRA_CONNECTION_INFO = {
     "server": os.getenv("MUNKIPROMOTER_REPO_PATH", "***REMOVED***"),
