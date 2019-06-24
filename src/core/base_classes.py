@@ -91,3 +91,7 @@ class Package:
 
     def __str__(self):
         return f"{self.name} {self.version} {self.catalog.name}"
+
+    @property
+    def key(self):
+        return self.name + str(self.version)
