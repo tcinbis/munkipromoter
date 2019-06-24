@@ -44,6 +44,16 @@ _JIRA_AUTOPROMOTE_FALSE = os.getenv("MUNKIPROMOTER_JIRA_AUTOPROMOTE_FALSE", "120
 
 JIRA_PRESENT_FIELD = os.getenv("MUNKIPROMOTER_JIRA_PRESENT_FIELD", "customfield_12704")
 
+JIRA_DEVELOPMENT_TRANSITION_NAME = os.getenv(
+    "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME", "all to development"
+)
+JIRA_TESTING_TRANSITION_NAME = os.getenv(
+    "MUNKIPROMOTER_JIRA_TESTING_TRANSITION_NAME", "all to testing"
+)
+JIRA_PRODUCTION_TRANSITION_NAME = os.getenv(
+    "MUNKIPROMOTER_JIRA_PRODUCTION_TRANSITION_NAME", "to prod"
+)
+
 ISSUE_FIELDS = [
     JIRA_SOFTWARE_NAME_FIELD,
     JIRA_SOFTWARE_VERSION_FIELD,
@@ -76,7 +86,6 @@ class JiraEnum(Enum):
 
 
 class JiraLane(JiraEnum):
-    # TODO: Replace with ids
     TO_DEVELOPMENT = "To Development"
     DEVELOPMENT = "Development"
     TO_TESTING = "To Testing"
@@ -89,6 +98,12 @@ class JiraLane(JiraEnum):
         for j_enum in JiraLane:
             if j_enum.name == catalog.name:
                 return j_enum
+
+    @property
+    def is_promotion_lane(self):
+        if "TO" in self.name:
+            return True
+        return False
 
 
 class Catalog(JiraEnum):
@@ -104,6 +119,34 @@ class Catalog(JiraEnum):
         for c_enum in Catalog:
             if c_enum.name == catalog_string:
                 return c_enum
+
+    @staticmethod
+    def jira_lane_to_catalog(jira_lane: JiraLane) -> Catalog:
+        return Catalog.str_to_catalog(jira_lane.name.replace("TO_", ""))
+
+    @property
+    def next_catalog(self) -> Catalog:
+        catalog_order = {
+            0: Catalog.DEVELOPMENT,
+            1: Catalog.TESTING,
+            2: Catalog.PRODUCTION,
+        }
+        inv_catalog_order = {v: k for k, v in catalog_order.items()}
+
+        new_catalog = catalog_order.get(inv_catalog_order.get(self) + 1)
+        return (
+            new_catalog if new_catalog else self
+        )  # in case we get a catalog like prod there is no next catalog
+
+    @property
+    def transition_id(self) -> str:
+        transition_dict = {
+            Catalog.DEVELOPMENT: JIRA_DEVELOPMENT_TRANSITION_NAME,
+            Catalog.TESTING: JIRA_TESTING_TRANSITION_NAME,
+            Catalog.PRODUCTION: JIRA_PRODUCTION_TRANSITION_NAME,
+        }
+
+        return transition_dict.get(self)
 
 
 class Present(JiraEnum):
