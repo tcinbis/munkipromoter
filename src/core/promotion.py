@@ -6,7 +6,9 @@ from utils.config import (
     PackageState,
     Catalog,
     JiraLane,
-    DEFAULT_PROMOTION_DAY, DEFAULT_PROMOTION_INTERVAL)
+    DEFAULT_PROMOTION_DAY,
+    DEFAULT_PROMOTION_INTERVAL,
+)
 
 logger = log.get_logger(__file__)
 
@@ -19,7 +21,7 @@ class Promoter:
     def promote(self):
         if not datetime.now().strftime("%A") == DEFAULT_PROMOTION_DAY:
             logger.warning(
-                f"Will not promote packages as it is not {DEFAULT_PROMOTION_DAY}"
+                f"Will not promote packages, as it's not {DEFAULT_PROMOTION_DAY}"
             )
         else:
             self._date_promotions()
@@ -40,20 +42,26 @@ class Promoter:
                 jira_pkg.catalog = Catalog.jira_lane_to_catalog(jira_pkg.jira_lane)
                 jira_pkg.state = PackageState.UPDATE
 
+            self.jira_pkgs.update({jira_pkg.key: jira_pkg})
+
     def _date_promotions(self):
         # Start to check for promotion as it is the correct weekday
         for jira_pkg in self.jira_pkgs.values():
-            if (datetime.now() - jira_pkg.promote_date).days > DEFAULT_PROMOTION_INTERVAL:
+            if (
+                datetime.now() - jira_pkg.promote_date
+            ).days > DEFAULT_PROMOTION_INTERVAL:
                 # number of days in catalog exceeds limit
                 if jira_pkg.is_autopromote:
                     # only promote if autopromote is enabled
                     new_catalog = jira_pkg.catalog.next_catalog
 
                     if jira_pkg.catalog != new_catalog:
-                        logger.debug(f"Promotion {jira_pkg} to {new_catalog}.")
+                        logger.debug(f"Promote {jira_pkg} to {new_catalog}.")
                         jira_pkg.state = PackageState.UPDATE
                         jira_pkg.catalog = new_catalog
+                        jira_pkg.jira_lane = JiraLane.catalog_to_lane(jira_pkg.catalog)
                         jira_pkg.promote_date = datetime.now()
+                        self.jira_pkgs.update({jira_pkg.key: jira_pkg})
                 else:
                     logger.debug(
                         f"Ignoring {jira_pkg}, because autopromote is not set."
