@@ -35,10 +35,14 @@ class Promoter:
                 jira_pkg.catalog = Catalog.str_to_catalog(
                     jira_pkg.jira_lane.name.replace("TO_", "")
                 )
+
+                logger.debug(f"Package {jira_pkg} in promotion lane. Promoting to {jira_pkg.catalog}")
+
                 jira_pkg.state = PackageState.UPDATE
                 jira_pkg.promote_date = datetime.now()
                 jira_pkg.jira_lane = JiraLane.catalog_to_lane(jira_pkg.catalog)
             elif jira_pkg.jira_lane != JiraLane.catalog_to_lane(jira_pkg.catalog):
+                logger.debug(f"Catalog and JiraLane Missmatch for package {jira_pkg}. Resetting catalog.")
                 jira_pkg.catalog = Catalog.jira_lane_to_catalog(jira_pkg.jira_lane)
                 jira_pkg.state = PackageState.UPDATE
 
@@ -56,7 +60,7 @@ class Promoter:
                     new_catalog = jira_pkg.catalog.next_catalog
 
                     if jira_pkg.catalog != new_catalog:
-                        logger.debug(f"Promote {jira_pkg} to {new_catalog}.")
+                        logger.debug(f"Date promotion for {jira_pkg} to {new_catalog}.")
                         jira_pkg.state = PackageState.UPDATE
                         jira_pkg.catalog = new_catalog
                         jira_pkg.jira_lane = JiraLane.catalog_to_lane(jira_pkg.catalog)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import os
 import plistlib
 import subprocess
@@ -130,19 +131,22 @@ class MunkiRepoProvider(Provider):
         self.is_loaded = True
 
     def update(self, package: Package):
-        if package.provider == MunkiRepoProvider:
-            # Ticket was originally created by MunkiRepoProvider.
-            # Therefore must already exist and we only need to update.
-            p = self._packages_dict.get(package.key)
-            if p.key == package.key:
-                for key, value in package.__dict__.items():
-                    if p.__dict__.get(key) != value:
-                        # Not all values of the existing jira ticket and the local version match. Therefore update.
-                        package.state = PackageState.UPDATE
-                        self._packages_dict.update({package.key: package})
-                        break
-        elif package.provider == JiraBoardProvider:
-            raise ProviderDoesNotImplement()
+        package = copy.deepcopy(package)
+
+        if package.key not in self._packages_dict:
+            package.state = PackageState.NEW
+            self._packages_dict.update({package.key: package})
+            return
+
+        p = self._packages_dict.get(package.key)
+
+        for key, value in package.__dict__.items():
+            if key is not 'promote_date' and key is not 'jira_id' and key is not 'munki_uuid' and key is not 'provider':
+                if p.__dict__.get(key) != value:
+                    # Not all values of the existing jira ticket and the local version match. Therefore update.
+                    package.state = PackageState.UPDATE
+                    self._packages_dict.update({package.key: package})
+                    break
 
     def commit(self) -> bool:
         if not self._dry_run:
@@ -150,7 +154,7 @@ class MunkiRepoProvider(Provider):
                 if package.state == PackageState.UPDATE:
                     pkg_info, pkg_info_path = self._pkg_info_files.get(
                         package.name
-                    ).get(package.version)
+                    ).get(str(package.version))
 
                     if pkg_info:
                         # Plist already exists in Repo so we can continue to update it.
@@ -167,6 +171,7 @@ class MunkiRepoProvider(Provider):
                         )
                         plistlib.dump(pkg_info, f)
                         logger.debug(f"Wrote pkg info file at {f.name}")
+                        f.close()
                     else:
                         # Plist does not exist in Repo, and we can not create a new one.
                         package.state = PackageState.MISSING
@@ -188,7 +193,7 @@ class MunkiRepoProvider(Provider):
         """
         Run makecatalogs and check whether the return code is 0.
         """
-        cmd = [MAKECATALOGS, REPO_PATH]
+        cmd = ["python2", MAKECATALOGS, REPO_PATH]
         logger.info("Running makecatalogs.")
         subprocess.run(cmd, check=True)
         logger.info("Makecatalogs completed.")
@@ -290,6 +295,7 @@ class JiraBoardProvider(Provider):
             raise JiraIssueMissingFields()
 
     def update(self, package: Package):
+        package = copy.deepcopy(package)
         if JiraBoardProvider.check_jira_issue_exists(package):
             # Ticket with this id already exists.
             p = self._packages_dict.get(package.key)
@@ -297,13 +303,14 @@ class JiraBoardProvider(Provider):
             for key, value in package.__dict__.items():
                 if p.__dict__.get(key) != value:
                     # Not all values of the existing jira ticket and the local version match. Therefore update.
-                    package.state = PackageState.UPDATE
+                    p.state = PackageState.UPDATE
                     # Replace original package with updated package
                     self._packages_dict.update({p.key: package})
                     break
         else:
             package.state = PackageState.NEW
             if package not in self._packages_dict:
+                logger.debug(f"Creating new jira ticket for {package}")
                 self._packages_dict.update({package.key: package})
 
     def commit(self) -> bool:
