@@ -48,7 +48,7 @@ def get_logger(name, formatter="default"):
     if formatter is "default":
         stream_handler.setFormatter(
             logging.Formatter(
-                "%(asctime)s - %(levelname)s - %(filename)s:\t%(message)s",
+                "%(asctime)s - %(levelname)s - %(filename)s,%(lineno)d:\t%(message)s",
                 datefmt="%b %d %Y %H:%M:%S %Z",
             )
         )

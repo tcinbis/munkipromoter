@@ -7,14 +7,16 @@ if __name__ == "__main__":
     __m = MunkiRepoProvider("test1")
     __m.load()
 
-    promoter = Promoter(__m.get(), __j.get())
-
-    promoter.promote()
-
-    __j._packages_dict.update(promoter.jira_pkgs)
-
     __j.update_jira_from_repo(__m.get())
 
+    promoter = Promoter(__m.get(), __j.get())
+    promoter.promote()
+
+    for k, p in promoter.jira_pkgs.items():
+        __j.update(p)
+        __m.update(p)
+
     __j.commit()
+    __m.commit()
 
     print()
