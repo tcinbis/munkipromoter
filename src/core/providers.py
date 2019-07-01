@@ -332,6 +332,9 @@ class JiraBoardProvider(Provider):
                             JIRA_SUMMARY_FIELD: str(package),
                         }
                     )
+
+                    logger.debug(f"Creating new ticket for package {package}")
+
                     created_ticket = self._jira.create_issue(fields=issue_dict)
                     current_ticket_lane = JiraLane(
                         created_ticket.fields.__dict__.get("status").name
@@ -348,6 +351,8 @@ class JiraBoardProvider(Provider):
                     )[
                         0
                     ]  # type: Issue
+
+                    logger.debug(f"Updating ticket for package {package}")
 
                     existing_ticket.update(fields=issue_dict)
                     current_ticket_lane = JiraLane(
