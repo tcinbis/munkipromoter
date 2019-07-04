@@ -3,8 +3,8 @@ from datetime import datetime
 
 import pytest
 from core.base_classes import Package, PackageVersion
-from core.providers import JiraBoardProvider
-from utils.config import Catalog, JiraLane, PackageState, Present, JiraAutopromote
+from core.provider.jiraprovider import JiraBoardProvider
+from utils.config import Catalog, JiraLane, Present, JiraAutopromote
 
 
 def test_package_equality():

@@ -1,7 +1,7 @@
 from random import random
 from unittest.mock import Mock
 
-from core.providers import JiraBoardProvider
+from core.provider.jiraprovider import JiraBoardProvider
 from jira import Issue
 from utils.config import ISSUE_FIELDS
 from utils.exceptions import JiraIssueMissingFields
