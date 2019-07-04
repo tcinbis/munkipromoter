@@ -156,7 +156,6 @@ class JiraBoardProvider(Provider):
 
                 issue_dict = {
                     # TODO: Add/Set status
-                    # TODO: Add/Set Package State
                     JIRA_SOFTWARE_NAME_FIELD: package.name,
                     JIRA_SOFTWARE_VERSION_FIELD: str(package.version),
                     JIRA_DUEDATE_FIELD: package.promote_date.strftime("%Y-%m-%d"),

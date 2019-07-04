@@ -16,8 +16,10 @@ if __name__ == "__main__":
     promoter.promote()
 
     for k, p in promoter.jira_pkgs.items():
-        __j.update(p)
+        # Note: the order in which you execute the updates matters. The MunkiRepo will first check whether a package is
+        # present or not and then propagate this information by reference to the jira provider.
         __m.update(p)
+        __j.update(p)
 
     __j.commit()
     __m.commit()
