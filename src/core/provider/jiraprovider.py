@@ -143,7 +143,8 @@ class JiraBoardProvider(Provider):
                     p.state = PackageState.UPDATE
                     # Replace original package with updated package
                     self._packages_dict.update({p.key: package})
-                    break
+                    return
+            logger.debug(f"Jira update called for {package}, but no changes detected.")
         else:
             package.state = PackageState.NEW
             if package not in self._packages_dict:
@@ -152,7 +153,7 @@ class JiraBoardProvider(Provider):
 
     def commit(self) -> bool:
         if not self._dry_run:
-            for package in self._packages_dict.values():
+            for package in self.get().values():
 
                 issue_dict = {
                     # TODO: Add/Set status
@@ -172,7 +173,7 @@ class JiraBoardProvider(Provider):
                         {
                             JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
                             JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
-                            JIRA_SUMMARY_FIELD: str(package),
+                            JIRA_SUMMARY_FIELD: package.key,
                         }
                     )
 
@@ -211,7 +212,8 @@ class JiraBoardProvider(Provider):
 
     def update_jira_from_repo(self, munki_packages: Dict):
         for munki_key, munki_package in munki_packages.items():
-            if not self._packages_dict.get(munki_key):
+            munki_package = copy.deepcopy(munki_package)
+            if not self._get(munki_key):
                 logger.debug(f"Adding munki package {munki_package} to jira.")
                 munki_package.state = PackageState.NEW
                 self._packages_dict.update({munki_key: munki_package})

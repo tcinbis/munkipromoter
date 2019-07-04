@@ -40,8 +40,12 @@ class Provider:
             logger.debug("Provider not yet loaded. Loading now...")
             self.load()
             logger.debug("Loading complete.")
+        return self._packages_dict
         # only return a copy of the internal list, to later compare if changes were made.
-        return copy.deepcopy(self._packages_dict)
+        #return copy.deepcopy(self._packages_dict)
+
+    def _get(self, package_key:str) -> Package:
+        return self.get().get(package_key)
 
     def update(self, package: Package):
         """
