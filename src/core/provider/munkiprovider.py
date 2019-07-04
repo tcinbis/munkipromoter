@@ -139,7 +139,8 @@ class MunkiRepoProvider(Provider):
                     # Not all values of the existing jira ticket and the local version match. Therefore update.
                     package_copy.state = PackageState.UPDATE
                     self._packages_dict.update({package_copy.key: package_copy})
-                    break
+                    return
+        logger.debug(f"Munki update called for {package}, but no changes detected.")
 
     def commit(self) -> bool:
         if not self._dry_run:
