@@ -2,7 +2,8 @@ from datetime import datetime
 
 import pytest
 from core.base_classes import Package
-from core.providers import JiraBoardProvider, MunkiRepoProvider
+from core.provider.jiraprovider import JiraBoardProvider
+from core.provider.munkiprovider import MunkiRepoProvider
 from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote
 
 

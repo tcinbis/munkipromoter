@@ -1,7 +1,10 @@
 from core.promotion import Promoter
-from core.providers import JiraBoardProvider, MunkiRepoProvider
+from core.provider.jiraprovider import JiraBoardProvider
+from core.provider.munkiprovider import MunkiRepoProvider
 
 if __name__ == "__main__":
+    #sentry_sdk.init("https://***REMOVED***@sentry.io/***REMOVED***")
+
     __j = JiraBoardProvider("test1")
     __j.load()
     __m = MunkiRepoProvider("test1")
@@ -18,5 +21,3 @@ if __name__ == "__main__":
 
     __j.commit()
     __m.commit()
-
-    print()
