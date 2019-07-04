@@ -117,9 +117,12 @@ class MunkiRepoProvider(Provider):
 
         if package.key not in self._packages_dict:
             # The package is not present in the Munki repo therefore it must be missing locally
+            # also update the referenced package such that jira will be informed
+            package.state = PackageState.UPDATE
             package.is_present = Present.MISSING
             # the package is new for the munki repo
             package_copy.state = PackageState.NEW
+
             self._packages_dict.update({package_copy.key: package_copy})
             return
 
