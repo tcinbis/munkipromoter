@@ -42,9 +42,9 @@ class Provider:
             logger.debug("Loading complete.")
         return self._packages_dict
         # only return a copy of the internal list, to later compare if changes were made.
-        #return copy.deepcopy(self._packages_dict)
+        # return copy.deepcopy(self._packages_dict)
 
-    def _get(self, package_key:str) -> Package:
+    def _get(self, package_key: str) -> Package:
         return self.get().get(package_key)
 
     def update(self, package: Package):
@@ -70,17 +70,17 @@ class PackageVersion(LooseVersion):
 
 @dataclass(order=True)
 class Package:
-    name: str = field(repr=True)
+    name: str = field(repr=True, compare=True)
     version: PackageVersion = field(repr=True, compare=True)
     catalog: Catalog = field(repr=True, compare=True)
     promote_date: datetime = field(repr=False, compare=False)
     is_autopromote: JiraAutopromote = field(repr=False, compare=False)
-    is_present: Present = field(repr=False, compare=False)
-    provider: Type[Provider] = field(repr=False, compare=True)
-    jira_id: str = field(repr=False, compare=True)
+    is_present: Present = field(repr=False, compare=True)
+    provider: Type[Provider] = field(repr=False, compare=False)
+    jira_id: str = field(repr=False, compare=False)
     jira_lane: JiraLane = field(repr=False, compare=True)
-    state: PackageState = field(default=PackageState.DEFAULT, repr=False, compare=True)
-    munki_uuid: UUID = field(repr=False, default=None, compare=True)
+    state: PackageState = field(default=PackageState.DEFAULT, repr=False, compare=False)
+    munki_uuid: UUID = field(repr=False, default=None, compare=False)
 
     @staticmethod
     def str_to_version(version_str: str) -> PackageVersion:

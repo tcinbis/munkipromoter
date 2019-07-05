@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
+from core.base_classes import Package
 from utils import logger as log
 from utils.config import (
     PackageState,
@@ -49,14 +50,10 @@ class Promoter:
             munki_package = self.munki_pkgs_dict.get(jira_pkg.key)
             if munki_package:
                 for key, value in jira_pkg.__dict__.items():
-                    if (
-                            key is not "promote_date"
-                            and key is not "jira_id"
-                            and key is not "munki_uuid"
-                            and key is not "provider"
-                    ):
-                        if munki_package.__dict__.get(key) != value:
+                    if key not in Package.ignored_compare_keys():
+                        if munki_package != jira_pkg:
                             # Not all values of the existing jira ticket and the local version match. Therefore update.
+                            logger.debug(f"Updating munki pkg {munki_package} values as {key} do not match: {munki_package.__dict__.get(key)} != {value}")
                             munki_package.state = PackageState.UPDATE
                             setattr(munki_package, key, value)
                             return
