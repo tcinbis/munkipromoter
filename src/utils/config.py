@@ -113,6 +113,9 @@ class MunkiPromoterConfig:
     def __getattr__(self, item):
         return getattr(self.instance, item)
 
+    def __setattr__(self, key, value):
+        setattr(self.instance, key, value)
+
 
 conf = MunkiPromoterConfig()
 
