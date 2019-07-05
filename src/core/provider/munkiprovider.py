@@ -14,17 +14,9 @@ from utils.config import (
     JiraLane,
     Catalog,
     Present,
-    JiraAutopromote,
-    REPO_PATH,
-    CATALOGS_PATH,
-    PKGS_INFO_PATH,
-    DEBUG_PKGS_INFO_SAVE_PATH,
-    MAKECATALOGS,
-    DEFAULT_PROMOTION_INTERVAL,
-)
-from utils.exceptions import (
-    MunkiItemInMultipleCatalogs,
-)
+    JiraAutopromote)
+from utils.config import conf
+from utils.exceptions import MunkiItemInMultipleCatalogs
 
 logger = l.get_logger(__file__)
 
@@ -38,19 +30,20 @@ class MunkiRepoProvider(Provider):
         """
         The munki repository needs to be mounted when trying to connect.
         """
-        if os.path.ismount(REPO_PATH):
-            logger.debug(f"Repo at {REPO_PATH} mounted.")
+        if os.path.ismount(conf.REPO_PATH):
+            logger.debug(f"Repo at {conf.REPO_PATH} mounted.")
             return True
         else:
-            logger.critical(f"Repo mount point {REPO_PATH} not mounted.")
+            logger.critical(f"Repo mount point {conf.REPO_PATH} not mounted.")
             return False
 
     def _load_packages(self):
-        for filename in os.listdir(CATALOGS_PATH):
+        logger.debug(f"Loading packages from repo: {conf.REPO_PATH}")
+        for filename in os.listdir(conf.CATALOGS_PATH):
             if not (filename.startswith(".") or filename == "all"):
                 # Ignore hidden files
                 munki_packages = plistlib.load(
-                    open(os.path.join(CATALOGS_PATH, filename), "rb")
+                    open(os.path.join(conf.CATALOGS_PATH, filename), "rb")
                 )
 
                 for item in munki_packages:
@@ -59,7 +52,7 @@ class MunkiRepoProvider(Provider):
                             promotion_date = item.get("promote_date")
                         else:
                             promotion_date = datetime.now() + timedelta(
-                                days=DEFAULT_PROMOTION_INTERVAL
+                                days=conf.DEFAULT_PROMOTION_INTERVAL
                             )
 
                         if len(item.get("catalogs")) > 1:
@@ -88,7 +81,7 @@ class MunkiRepoProvider(Provider):
                         logger.error(e)
 
     def _load_pkg_infos(self):
-        for dirpath, dirnames, filenames in os.walk(PKGS_INFO_PATH):
+        for dirpath, dirnames, filenames in os.walk(conf.PKGS_INFO_PATH):
             for file in filenames:
                 if file.startswith("."):
                     continue
@@ -156,10 +149,10 @@ class MunkiRepoProvider(Provider):
 
                         f = open(
                             os.path.join(
-                                DEBUG_PKGS_INFO_SAVE_PATH,
+                                conf.DEBUG_PKGS_INFO_SAVE_PATH,
                                 os.path.basename(pkg_info_path),
                             )
-                            if DEBUG_PKGS_INFO_SAVE_PATH
+                            if conf.DEBUG_PKGS_INFO_SAVE_PATH
                             else pkg_info_path,
                             "wb",
                         )
@@ -187,7 +180,7 @@ class MunkiRepoProvider(Provider):
         """
         Run makecatalogs and check whether the return code is 0.
         """
-        cmd = ["python2", MAKECATALOGS, REPO_PATH]
+        cmd = ["python2", conf.MAKECATALOGS, conf.REPO_PATH]
         logger.info("Running makecatalogs.")
         subprocess.run(cmd, check=True)
         logger.info("Makecatalogs completed.")

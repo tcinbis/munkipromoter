@@ -1,75 +1,120 @@
 from __future__ import annotations
+
 import os
 from enum import Enum, auto
 
-REPO_PATH = os.getenv("MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo")
-CATALOGS_PATH = os.getenv("MUNKIPROMOTER_CATALOGS_PATH", f"{REPO_PATH}/catalogs")
-PKGS_INFO_PATH = os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", f"{REPO_PATH}/pkgsinfo")
-DEBUG_PKGS_INFO_SAVE_PATH = os.getenv("MUNKIPROMOTER_DEBUG_PKGS_INFO_SAVE_PATH", None)
-MAKECATALOGS = os.getenv("MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs")
 
-# Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
-JIRA_CONNECTION_INFO = {
-    "server": os.getenv("MUNKIPROMOTER_REPO_PATH", "https://deployment-jira.its.unibas.ch"),
-    "basic_auth": (
-        os.getenv("MUNKIPROMOTER_JIRA_USER", "***REMOVED***"),
-        os.getenv("MUNKIPROMOTER_JIRA_PASSWORD", "***REMOVED***"),
-    ),
-}
+class MunkiPromoterConfig:
+    """
+    This class stores all relevant configuration and will try to load them from the local environment, before falling
+    back to the predefined default values.
+    As the class is supposed to be consistent throughout the project the singleton pattern is used to ensure only one
+    instance with the same information exists.
+    """
 
-JIRA_PROJECT_KEY = os.getenv("MUNKIPROMOTER_JIRA_PROJECT_KEY", "SWPM")
-JIRA_ISSUE_TYPE = os.getenv("MUNKIPROMOTER_JIRA_ISSUE_TYPE", "Story")
+    class __MunkiPromoterConfig:
+        REPO_PATH = os.getenv("MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo_test")
+        CATALOGS_PATH = os.getenv(
+            "MUNKIPROMOTER_CATALOGS_PATH", f"{REPO_PATH}/catalogs"
+        )
+        PKGS_INFO_PATH = os.getenv(
+            "MUNKIPROMOTER_PKGS_INFO_PATH", f"{REPO_PATH}/pkgsinfo"
+        )
+        DEBUG_PKGS_INFO_SAVE_PATH = os.getenv(
+            "MUNKIPROMOTER_DEBUG_PKGS_INFO_SAVE_PATH", None
+        )
+        MAKECATALOGS = os.getenv(
+            "MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs"
+        )
 
-JIRA_SOFTWARE_NAME_FIELD = os.getenv(
-    "MUNKIPROMOTER_JIRA_SOFTWARE_NAME_FIELD", "customfield_12503"
-)
-JIRA_PROJECT_FIELD = "project"
-JIRA_ISSUE_TYPE_FIELD = "issuetype"
-JIRA_SUMMARY_FIELD = "summary"
-JIRA_DESCRIPTION_FIELD = "description"
-JIRA_SOFTWARE_VERSION_FIELD = os.getenv(
-    "MUNKIPROMOTER_JIRA_SOFTWARE_VERSION_FIELD", "customfield_12504"
-)
-JIRA_DUEDATE_FIELD = "duedate"
-JIRA_LABELS_FIELD = "labels"
-JIRA_CATALOG_FIELD = os.getenv("MUNKIPROMOTER_JIRA_CATALOG_FIELD", "customfield_12703")
-JIRA_AUTOPROMOTE_FIELD = os.getenv(
-    "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD", "customfield_12701"
-)
+        # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
+        JIRA_CONNECTION_INFO = {
+            "server": os.getenv(
+                "MUNKIPROMOTER_REPO_PATH", "https://deployment-jira.its.unibas.ch"
+            ),
+            "basic_auth": (
+                os.getenv("MUNKIPROMOTER_JIRA_USER", "***REMOVED***"),
+                os.getenv("MUNKIPROMOTER_JIRA_PASSWORD", "***REMOVED***"),
+            ),
+        }
 
-_JIRA_AUTOPROMOTE_TRUE = os.getenv("MUNKIPROMOTER_JIRA_AUTOPROMOTE_TRUE", "12003")
-_JIRA_AUTOPROMOTE_FALSE = os.getenv("MUNKIPROMOTER_JIRA_AUTOPROMOTE_FALSE", "12004")
+        JIRA_PROJECT_KEY = os.getenv("MUNKIPROMOTER_JIRA_PROJECT_KEY", "SWPM")
+        JIRA_ISSUE_TYPE = os.getenv("MUNKIPROMOTER_JIRA_ISSUE_TYPE", "Story")
 
-JIRA_PRESENT_FIELD = os.getenv("MUNKIPROMOTER_JIRA_PRESENT_FIELD", "customfield_12704")
+        JIRA_SOFTWARE_NAME_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_SOFTWARE_NAME_FIELD", "customfield_12503"
+        )
+        JIRA_PROJECT_FIELD = "project"
+        JIRA_ISSUE_TYPE_FIELD = "issuetype"
+        JIRA_SUMMARY_FIELD = "summary"
+        JIRA_DESCRIPTION_FIELD = "description"
+        JIRA_SOFTWARE_VERSION_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_SOFTWARE_VERSION_FIELD", "customfield_12504"
+        )
+        JIRA_DUEDATE_FIELD = "duedate"
+        JIRA_LABELS_FIELD = "labels"
+        JIRA_CATALOG_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_CATALOG_FIELD", "customfield_12703"
+        )
+        JIRA_AUTOPROMOTE_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD", "customfield_12701"
+        )
 
-JIRA_DEVELOPMENT_TRANSITION_NAME = os.getenv(
-    "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME", "all to development"
-)
-JIRA_TESTING_TRANSITION_NAME = os.getenv(
-    "MUNKIPROMOTER_JIRA_TESTING_TRANSITION_NAME", "all to test"
-)
-JIRA_PRODUCTION_TRANSITION_NAME = os.getenv(
-    "MUNKIPROMOTER_JIRA_PRODUCTION_TRANSITION_NAME", "all to prod"
-)
+        _JIRA_AUTOPROMOTE_TRUE = os.getenv(
+            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_TRUE", "12003"
+        )
+        _JIRA_AUTOPROMOTE_FALSE = os.getenv(
+            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FALSE", "12004"
+        )
 
-ISSUE_FIELDS = [
-    JIRA_SOFTWARE_NAME_FIELD,
-    JIRA_SOFTWARE_VERSION_FIELD,
-    JIRA_DUEDATE_FIELD,
-    JIRA_DESCRIPTION_FIELD,
-    JIRA_LABELS_FIELD,
-    JIRA_CATALOG_FIELD,
-    JIRA_AUTOPROMOTE_FIELD,
-    JIRA_PRESENT_FIELD,
-]
+        JIRA_PRESENT_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_PRESENT_FIELD", "customfield_12704"
+        )
 
-DEFAULT_PROMOTION_INTERVAL = os.getenv("MUNKIPROMOTER_DEFAULT_PROMOTION_INTERVAL", 4)
-DEFAULT_PROMOTION_DAY = os.getenv("MUNKIPROMOTER_DEFAULT_PROMOTION_DAY", "Thursday")
+        JIRA_DEVELOPMENT_TRANSITION_NAME = os.getenv(
+            "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME", "all to development"
+        )
+        JIRA_TESTING_TRANSITION_NAME = os.getenv(
+            "MUNKIPROMOTER_JIRA_TESTING_TRANSITION_NAME", "all to test"
+        )
+        JIRA_PRODUCTION_TRANSITION_NAME = os.getenv(
+            "MUNKIPROMOTER_JIRA_PRODUCTION_TRANSITION_NAME", "all to prod"
+        )
 
-LOG_LEVEL = os.getenv("MUNKIPROMOTER_LOG_LEVEL", "DEBUG")
-LOG_BACKUP_COUNT = os.getenv("MUNKIPROMOTER_LOG_BACKUP_COUNT", 3)
-LOG_DIR = os.getenv("MUNKIPROMOTER_LOG_DIR", "/var/log")
-LOG_MAIL = os.getenv("MUNKIPROMOTER_LOG_MAIL", "tom.cinbis@unibas.ch")
+        ISSUE_FIELDS = [
+            JIRA_SOFTWARE_NAME_FIELD,
+            JIRA_SOFTWARE_VERSION_FIELD,
+            JIRA_DUEDATE_FIELD,
+            JIRA_DESCRIPTION_FIELD,
+            JIRA_LABELS_FIELD,
+            JIRA_CATALOG_FIELD,
+            JIRA_AUTOPROMOTE_FIELD,
+            JIRA_PRESENT_FIELD,
+        ]
+
+        DEFAULT_PROMOTION_INTERVAL = os.getenv(
+            "MUNKIPROMOTER_DEFAULT_PROMOTION_INTERVAL", 7
+        )
+        DEFAULT_PROMOTION_DAY = os.getenv(
+            "MUNKIPROMOTER_DEFAULT_PROMOTION_DAY", "Thursday"
+        )
+
+        LOG_LEVEL = os.getenv("MUNKIPROMOTER_LOG_LEVEL", "DEBUG")
+        LOG_BACKUP_COUNT = os.getenv("MUNKIPROMOTER_LOG_BACKUP_COUNT", 3)
+        LOG_DIR = os.getenv("MUNKIPROMOTER_LOG_DIR", "/var/log")
+        LOG_MAIL = os.getenv("MUNKIPROMOTER_LOG_MAIL", "tom.cinbis@unibas.ch")
+
+    instance = None
+
+    def __init__(self):
+        if not MunkiPromoterConfig.instance:
+            MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
+
+    def __getattr__(self, item):
+        return getattr(self.instance, item)
+
+
+conf = MunkiPromoterConfig()
 
 
 class JiraEnum(Enum):
@@ -139,9 +184,9 @@ class Catalog(JiraEnum):
     @property
     def transition_id(self) -> str:
         transition_dict = {
-            Catalog.DEVELOPMENT: JIRA_DEVELOPMENT_TRANSITION_NAME,
-            Catalog.TESTING: JIRA_TESTING_TRANSITION_NAME,
-            Catalog.PRODUCTION: JIRA_PRODUCTION_TRANSITION_NAME,
+            Catalog.DEVELOPMENT: conf.JIRA_DEVELOPMENT_TRANSITION_NAME,
+            Catalog.TESTING: conf.JIRA_TESTING_TRANSITION_NAME,
+            Catalog.PRODUCTION: conf.JIRA_PRODUCTION_TRANSITION_NAME,
         }
 
         return transition_dict.get(self)
@@ -156,12 +201,11 @@ class PackageState(JiraEnum):
     DEFAULT = auto()
     NEW = auto()
     UPDATE = auto()
-    MISSING = auto()
 
 
 class JiraAutopromote(JiraEnum):
-    PROMOTE = _JIRA_AUTOPROMOTE_TRUE
-    NOPROMOTE = _JIRA_AUTOPROMOTE_FALSE
+    PROMOTE = conf._JIRA_AUTOPROMOTE_TRUE
+    NOPROMOTE = conf._JIRA_AUTOPROMOTE_FALSE
 
     def __bool__(self):
         if self.name == self.PROMOTE.name:

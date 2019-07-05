@@ -9,29 +9,14 @@ from core.base_classes import Provider, Package
 from jira import JIRA, Issue
 from utils import logger as l
 from utils.config import (
-    JIRA_PROJECT_FIELD,
-    JIRA_PROJECT_KEY,
-    JIRA_ISSUE_TYPE,
-    JIRA_ISSUE_TYPE_FIELD,
-    JIRA_SOFTWARE_NAME_FIELD,
-    JIRA_SOFTWARE_VERSION_FIELD,
-    JIRA_DUEDATE_FIELD,
-    JIRA_DESCRIPTION_FIELD,
-    JIRA_CATALOG_FIELD,
-    JIRA_AUTOPROMOTE_FIELD,
-    JIRA_PRESENT_FIELD,
-    JIRA_CONNECTION_INFO,
-    JIRA_SUMMARY_FIELD,
-    ISSUE_FIELDS,
     PackageState,
     JiraLane,
     Catalog,
     Present,
     JiraAutopromote,
 )
-from utils.exceptions import (
-    JiraIssueMissingFields,
-)
+from utils.config import conf
+from utils.exceptions import JiraIssueMissingFields
 
 logger = l.get_logger(__file__)
 
@@ -43,7 +28,7 @@ class JiraBoardProvider(Provider):
         self._jira = None  # type: JIRA
         self.connect()
 
-    def connect(self, connection_params=JIRA_CONNECTION_INFO):
+    def connect(self, connection_params=conf.JIRA_CONNECTION_INFO):
         try:
             self._jira = JIRA(**connection_params)
 
@@ -52,12 +37,12 @@ class JiraBoardProvider(Provider):
                 return True
         except requests.exceptions.ConnectionError as e:
             logger.critical(
-                f"Couldn't connect to Jira instance: {JIRA_CONNECTION_INFO.get('server')}."
+                f"Couldn't connect to Jira instance: {conf.JIRA_CONNECTION_INFO.get('server')}."
             )
             return False
 
     def load(self):
-        query = f"project={JIRA_PROJECT_KEY}"
+        query = f"project={conf.JIRA_PROJECT_KEY}"
         search_result = self._jira.search_issues(query, maxResults=500)
         total_issues = search_result.total
         self.is_loaded = True
@@ -99,25 +84,25 @@ class JiraBoardProvider(Provider):
     def _jira_issue_to_package(self, issue: Issue) -> Package:
         fields_dict = issue.fields.__dict__  # type: dict
 
-        if all(field in fields_dict for field in ISSUE_FIELDS):
+        if all(field in fields_dict for field in conf.ISSUE_FIELDS):
             # Before we try to get all fields from our issue we check, whether all fields are present as keys
 
-            if fields_dict.get(JIRA_PRESENT_FIELD):
-                is_present = Present(fields_dict.get(JIRA_PRESENT_FIELD)[0].id)
+            if fields_dict.get(conf.JIRA_PRESENT_FIELD):
+                is_present = Present(fields_dict.get(conf.JIRA_PRESENT_FIELD)[0].id)
             else:
                 is_present = Present(None)
 
             p = Package(
-                name=fields_dict.get(JIRA_SOFTWARE_NAME_FIELD),
+                name=fields_dict.get(conf.JIRA_SOFTWARE_NAME_FIELD),
                 version=Package.str_to_version(
-                    fields_dict.get(JIRA_SOFTWARE_VERSION_FIELD)
+                    fields_dict.get(conf.JIRA_SOFTWARE_VERSION_FIELD)
                 ),
-                catalog=Catalog(fields_dict.get(JIRA_CATALOG_FIELD).id),
+                catalog=Catalog(fields_dict.get(conf.JIRA_CATALOG_FIELD).id),
                 promote_date=datetime.strptime(
-                    fields_dict.get(JIRA_DUEDATE_FIELD), "%Y-%m-%d"
+                    fields_dict.get(conf.JIRA_DUEDATE_FIELD), "%Y-%m-%d"
                 ),
                 is_autopromote=JiraAutopromote(
-                    fields_dict.get(JIRA_AUTOPROMOTE_FIELD).id
+                    fields_dict.get(conf.JIRA_AUTOPROMOTE_FIELD).id
                 ),
                 is_present=is_present,
                 provider=JiraBoardProvider,
@@ -157,13 +142,13 @@ class JiraBoardProvider(Provider):
 
                 issue_dict = {
                     # TODO: Add/Set status
-                    JIRA_SOFTWARE_NAME_FIELD: package.name,
-                    JIRA_SOFTWARE_VERSION_FIELD: str(package.version),
-                    JIRA_DUEDATE_FIELD: package.promote_date.strftime("%Y-%m-%d"),
-                    JIRA_DESCRIPTION_FIELD: package.name,
-                    JIRA_CATALOG_FIELD: package.catalog.to_jira_rest_dict(),
-                    JIRA_AUTOPROMOTE_FIELD: package.is_autopromote.to_jira_rest_dict(),
-                    JIRA_PRESENT_FIELD: [package.is_present.to_jira_rest_dict()],
+                    conf.JIRA_SOFTWARE_NAME_FIELD: package.name,
+                    conf.JIRA_SOFTWARE_VERSION_FIELD: str(package.version),
+                    conf.JIRA_DUEDATE_FIELD: package.promote_date.strftime("%Y-%m-%d"),
+                    conf.JIRA_DESCRIPTION_FIELD: package.name,
+                    conf.JIRA_CATALOG_FIELD: package.catalog.to_jira_rest_dict(),
+                    conf.JIRA_AUTOPROMOTE_FIELD: package.is_autopromote.to_jira_rest_dict(),
+                    conf.JIRA_PRESENT_FIELD: [package.is_present.to_jira_rest_dict()],
                 }
 
                 if package.state == PackageState.NEW:
@@ -171,9 +156,9 @@ class JiraBoardProvider(Provider):
                     # Add the required fields we need to create a new ticket compared to an update call.
                     issue_dict.update(
                         {
-                            JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
-                            JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
-                            JIRA_SUMMARY_FIELD: package.key,
+                            conf.JIRA_PROJECT_FIELD: conf.JIRA_PROJECT_KEY,
+                            conf.JIRA_ISSUE_TYPE_FIELD: conf.JIRA_ISSUE_TYPE,
+                            conf.JIRA_SUMMARY_FIELD: package.key,
                         }
                     )
 
@@ -191,7 +176,7 @@ class JiraBoardProvider(Provider):
                 elif package.state == PackageState.UPDATE:
                     # Update package information
                     existing_ticket = self._jira.search_issues(
-                        f"project={JIRA_PROJECT_KEY} AND key={package.jira_id} "
+                        f"project={conf.JIRA_PROJECT_KEY} AND key={package.jira_id} "
                     )[
                         0
                     ]  # type: Issue

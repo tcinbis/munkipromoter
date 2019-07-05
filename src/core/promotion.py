@@ -3,13 +3,8 @@ from typing import Dict
 
 from core.base_classes import Package
 from utils import logger as log
-from utils.config import (
-    PackageState,
-    Catalog,
-    JiraLane,
-    DEFAULT_PROMOTION_DAY,
-    DEFAULT_PROMOTION_INTERVAL,
-    Present)
+from utils.config import Catalog, PackageState, JiraLane, Present
+from utils.config import conf
 
 logger = log.get_logger(__file__)
 
@@ -20,9 +15,12 @@ class Promoter:
         self.jira_pkgs_dict = jira_packages
 
     def promote(self):
-        if not datetime.now().strftime("%A") == DEFAULT_PROMOTION_DAY:
+        if (
+            not datetime.now().strftime("%A")
+            == conf.DEFAULT_PROMOTION_DAY
+        ):
             logger.warning(
-                f"Will not promote packages, as it's not {DEFAULT_PROMOTION_DAY}"
+                f"Will not promote packages, as it's not {conf.DEFAULT_PROMOTION_DAY}"
             )
         else:
             self._date_promotions()
@@ -37,13 +35,17 @@ class Promoter:
                     jira_pkg.jira_lane.name.replace("TO_", "")
                 )
 
-                logger.debug(f"Package {jira_pkg} in promotion lane. Promoting to {jira_pkg.catalog}")
+                logger.debug(
+                    f"Package {jira_pkg} in promotion lane. Promoting to {jira_pkg.catalog}"
+                )
 
                 jira_pkg.state = PackageState.UPDATE
                 jira_pkg.promote_date = datetime.now()
                 jira_pkg.jira_lane = JiraLane.catalog_to_lane(jira_pkg.catalog)
             elif jira_pkg.jira_lane != JiraLane.catalog_to_lane(jira_pkg.catalog):
-                logger.debug(f"Catalog and JiraLane Missmatch for package {jira_pkg}. Resetting catalog.")
+                logger.debug(
+                    f"Catalog and JiraLane Missmatch for package {jira_pkg}. Resetting catalog."
+                )
                 jira_pkg.catalog = Catalog.jira_lane_to_catalog(jira_pkg.jira_lane)
                 jira_pkg.state = PackageState.UPDATE
 
@@ -53,7 +55,9 @@ class Promoter:
                     if key not in Package.ignored_compare_keys():
                         if munki_package != jira_pkg:
                             # Not all values of the existing jira ticket and the local version match. Therefore update.
-                            logger.debug(f"Updating munki pkg {munki_package} values as {key} do not match: {munki_package.__dict__.get(key)} != {value}")
+                            logger.debug(
+                                f"Updating munki pkg {munki_package} values as {key} do not match: {munki_package.__dict__.get(key)} != {value}"
+                            )
                             munki_package.state = PackageState.UPDATE
                             setattr(munki_package, key, value)
                             return
@@ -68,7 +72,7 @@ class Promoter:
         for jira_pkg in self.jira_pkgs_dict.values():
             if (
                 datetime.now() - jira_pkg.promote_date
-            ).days > DEFAULT_PROMOTION_INTERVAL:
+            ).days > conf.DEFAULT_PROMOTION_INTERVAL:
                 # number of days in catalog exceeds limit
                 if jira_pkg.is_autopromote:
                     # only promote if autopromote is enabled
