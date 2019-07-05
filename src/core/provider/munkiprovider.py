@@ -9,12 +9,7 @@ from uuid import uuid4
 
 from core.base_classes import Provider, Package
 from utils import logger as l
-from utils.config import (
-    PackageState,
-    JiraLane,
-    Catalog,
-    Present,
-    JiraAutopromote)
+from utils.config import PackageState, JiraLane, Catalog, Present, JiraAutopromote
 from utils.config import conf
 from utils.exceptions import MunkiItemInMultipleCatalogs
 
@@ -182,5 +177,10 @@ class MunkiRepoProvider(Provider):
         """
         cmd = ["python2", conf.MAKECATALOGS, conf.REPO_PATH]
         logger.info("Running makecatalogs.")
-        subprocess.run(cmd, check=True)
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            logger.error(
+                f"Running makecatalogs failed with code {e.returncode}. {str(e)}"
+            )
         logger.info("Makecatalogs completed.")
