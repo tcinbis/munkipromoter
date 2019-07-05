@@ -15,10 +15,7 @@ class Promoter:
         self.jira_pkgs_dict = jira_packages
 
     def promote(self):
-        if (
-            not datetime.now().strftime("%A")
-            == conf.DEFAULT_PROMOTION_DAY
-        ):
+        if not datetime.now().strftime("%A") == conf.DEFAULT_PROMOTION_DAY:
             logger.warning(
                 f"Will not promote packages, as it's not {conf.DEFAULT_PROMOTION_DAY}"
             )
