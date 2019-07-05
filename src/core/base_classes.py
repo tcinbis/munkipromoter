@@ -1,13 +1,13 @@
 from __future__ import annotations
-import copy
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
-from typing import List, Type, Dict
+from typing import Type, Dict
 from uuid import UUID
 
-from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane
 from utils import logger as log
+from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane
 
 logger = log.get_logger(__file__)
 
@@ -99,3 +99,10 @@ class Package:
     @property
     def key(self):
         return self.name + str(self.version)
+
+    @staticmethod
+    def ignored_compare_keys():
+        """
+        :return: List of keys which should be ignored when comparing packages
+        """
+        return ["promote_date", "jira_id", "munki_uuid", "provider", "state"]

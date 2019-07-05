@@ -1,11 +1,11 @@
 import logging
-from logging import handlers
 import os
 import sys
+from logging import handlers
 
-from utils.config import LOG_LEVEL, LOG_BACKUP_COUNT, LOG_DIR
+from utils.config import conf
 
-logfile_main = os.path.join(LOG_DIR, "munkipromoter.log")
+logfile_main = os.path.join(conf.LOG_DIR, "munkipromoter.log")
 
 
 def get_logger(name, formatter="default"):
@@ -27,7 +27,7 @@ def get_logger(name, formatter="default"):
 
     # File Handler
     file_handler = handlers.RotatingFileHandler(
-        logfile_main, mode="w", backupCount=LOG_BACKUP_COUNT
+        logfile_main, mode="w", backupCount=conf.LOG_BACKUP_COUNT
     )
 
     if formatter is "default":
@@ -57,7 +57,7 @@ def get_logger(name, formatter="default"):
     else:
         raise ValueError("Formatter must be simple or default")
 
-    logger.setLevel(LOG_LEVEL)
+    logger.setLevel(conf.LOG_LEVEL)
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
 
