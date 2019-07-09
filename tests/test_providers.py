@@ -1,9 +1,10 @@
 from random import random
 from unittest.mock import Mock
 
+import pytest
 from core.provider.jiraprovider import JiraBoardProvider
 from jira import Issue
-from utils.config import ISSUE_FIELDS
+from utils.config import conf
 from utils.exceptions import JiraIssueMissingFields
 
 
@@ -30,8 +31,17 @@ class TestJiraBoardProvider:
         test_one_package.jira_id = None
         assert not JiraBoardProvider.check_jira_issue_exists(test_one_package)
 
-    def test__jira_issue_to_package_list(self):
-        pass
+    def test__jira_issue_to_package_list(self, jira_board_provider):
+        issue_mock = Mock()
+        issue_mock.fields = None
+
+        with pytest.raises(AttributeError):
+            jira_board_provider._jira_issue_to_package(issue_mock)
+
+        issue_mock.fields
+
+        jira_board_provider._jira_issue_to_package(issue_mock)
+
 
     def test__jira_issue_to_package(self, jira_board_provider):
         """
@@ -42,7 +52,7 @@ class TestJiraBoardProvider:
         issue = Issue(None, None)
         issue.fields = Mock()
 
-        for attribute in ISSUE_FIELDS:
+        for attribute in conf.ISSUE_FIELDS:
             issue.fields.__setattr__(attribute, str(random()))
 
         try:

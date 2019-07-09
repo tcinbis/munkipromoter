@@ -17,14 +17,14 @@ class MunkiPromoterConfig:
 
         @property
         def CATALOGS_PATH(self):
-            return os.getenv(
-                "MUNKIPROMOTER_CATALOGS_PATH", os.path.join(self.REPO_PATH, "catalogs")
+            return os.path.join(
+                self.REPO_PATH, os.getenv("MUNKIPROMOTER_CATALOGS_PATH", "catalogs")
             )
 
         @property
         def PKGS_INFO_PATH(self):
-            return os.getenv(
-                "MUNKIPROMOTER_PKGS_INFO_PATH", os.path.join(self.REPO_PATH, "pkgsinfo")
+            return os.path.join(
+                self.REPO_PATH, os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", "pkgsinfo")
             )
 
         DEBUG_PKGS_INFO_SAVE_PATH = os.getenv(
