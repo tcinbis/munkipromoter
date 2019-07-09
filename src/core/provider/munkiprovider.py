@@ -43,12 +43,31 @@ class MunkiRepoProvider(Provider):
 
                 for item in munki_packages:
                     try:
-                        if "promotion_date" in item:
-                            promotion_date = item.get("promote_date")
+                        # If we find something like this in our pkginfo we will use the provided information instead
+                        # Otherwise fallback to default values.
+                        # <key>munkipromote</key>
+                        # 	<dict>
+                        # 		<key>promotiondate</key>
+                        # 		<string>2019-07-16</string>
+                        # 		<key>autopromote</key>
+                        # 		<true/>
+                        # 	</dict>
+
+                        promote_info = item.get("munkipromote")
+                        if promote_info and "promotiondate" in promote_info:
+                            promotion_date = datetime.strptime(promote_info.get("promotiondate"),"%Y-%m-%d")
                         else:
                             promotion_date = datetime.now() + timedelta(
                                 days=conf.DEFAULT_PROMOTION_INTERVAL
                             )
+
+                        if promote_info and "autopromote" in promote_info:
+                            if promote_info.get("autopromote"):
+                                autopromote = JiraAutopromote.PROMOTE
+                            else:
+                                autopromote = JiraAutopromote.NOPROMOTE
+                        else:
+                            autopromote = JiraAutopromote.PROMOTE
 
                         if len(item.get("catalogs")) > 1:
                             raise MunkiItemInMultipleCatalogs(item)
@@ -56,13 +75,13 @@ class MunkiRepoProvider(Provider):
                             item_catalog = Catalog.str_to_catalog(
                                 item.get("catalogs")[0]
                             )
-                        # TODO: Check if promotion promote_date in pkginfo plist
+
                         p = Package(
                             name=item.get("name"),
                             version=item.get("version"),
                             catalog=item_catalog,
                             promote_date=promotion_date,
-                            is_autopromote=JiraAutopromote.PROMOTE,
+                            is_autopromote=autopromote,
                             is_present=Present.PRESENT,
                             provider=MunkiRepoProvider,
                             jira_id=None,
