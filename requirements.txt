@@ -7,4 +7,5 @@ pytest==4.6.3
 sentry-sdk==0.9.5
 sphinx==2.1.2
 sphinx_rtd_theme==0.4.3
+pytest-cov==2.7.1
 coverage==4.5.3
