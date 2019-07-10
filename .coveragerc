@@ -1,3 +1,2 @@
 [run]
-include = src/*
-omit = *tests*, *venv*, *src/munki_promoter.egg-info*
+omit = *venv*, */__init__.py, */tests/*, */setup.py
