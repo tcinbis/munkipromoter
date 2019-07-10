@@ -1,0 +1,3 @@
+[run]
+include = src/*
+omit = *tests*, *venv*, *src/munki_promoter.egg-info*
