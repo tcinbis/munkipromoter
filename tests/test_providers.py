@@ -38,11 +38,6 @@ class TestJiraBoardProvider:
         with pytest.raises(AttributeError):
             jira_board_provider._jira_issue_to_package(issue_mock)
 
-        issue_mock.fields
-
-        jira_board_provider._jira_issue_to_package(issue_mock)
-
-
     def test__jira_issue_to_package(self, jira_board_provider):
         """
         Test whether exceptions are handled/raised correctly.
