@@ -7,6 +7,8 @@ class TestUtils(unittest.TestCase):
     def test_logger(self):
         logger = log.get_logger(__file__)
         assert len(logger.handlers) == 2
+        logger2 = log.get_logger(__file__)
+        assert logger == logger2
         logger.handlers = list()
         logger = log.get_logger(__file__, "simple")
         assert len(logger.handlers) == 2
