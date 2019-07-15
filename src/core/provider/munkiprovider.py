@@ -25,8 +25,8 @@ class MunkiRepoProvider(Provider):
         """
         The munki repository needs to be mounted when trying to connect.
         """
-        if os.path.ismount(conf.REPO_PATH):
-            logger.debug(f"Repo at {conf.REPO_PATH} mounted.")
+        if os.path.ismount(conf.REPO_PATH) or os.path.exists(conf.REPO_PATH):
+            logger.debug(f"Repo at {conf.REPO_PATH} mounted or exists.")
             return True
         else:
             logger.critical(f"Repo mount point {conf.REPO_PATH} not mounted.")

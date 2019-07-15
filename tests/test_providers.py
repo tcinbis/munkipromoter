@@ -88,8 +88,13 @@ class TestJiraBoardProvider:
 
 
 class TestMunkiRepoProvider:
-    def test_connect_fail(self, jira_board_provider):
-        pass
+    def test_connect_fail(self, munki_repo_provider):
+        conf.__setattr__("REPO_PATH", "/some/directory/which/does/not/exist")
+        assert not munki_repo_provider.connect()
+        conf.enable_test_repo()
+        print(conf.REPO_PATH)
+        assert munki_repo_provider.connect()
+        conf.restore_defaults()
 
     def test_load(self, munki_repo_provider):
         munki_repo_provider.load()
