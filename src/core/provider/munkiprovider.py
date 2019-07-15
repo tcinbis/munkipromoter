@@ -116,9 +116,10 @@ class MunkiRepoProvider(Provider):
                     self._pkg_info_files.update({pkg_info.get("name"): d})
 
     def load(self):
-        self._load_packages()
-        self._load_pkg_infos()
-        self.is_loaded = True
+        if self.connect():
+            self._load_packages()
+            self._load_pkg_infos()
+            self.is_loaded = True
 
     def update(self, package: Package):
         # make a deep copy of the package to prevent changes in other instances

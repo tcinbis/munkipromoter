@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from enum import Enum, auto
 
 
@@ -130,7 +131,35 @@ class MunkiPromoterConfig:
         MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
 
 
-conf = MunkiPromoterConfig()
+class MunkiPromoterTestConfig(MunkiPromoterConfig):
+    """
+    This class has all the same attributes as the MunkiPromoterConfig but adds/sets required values for testing.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.__setattr__(
+            "TEST_REPO_PATH",
+            os.getenv(
+                "MUNKIPROMOTER_TEST_REPO_PATH",
+                os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    "tests/data",
+                ),
+            ),
+        )
+
+    def enable_testing_mode(self):
+        self.instance.REPO_PATH = self.instance.TEST_REPO_PATH
+        self.instance.MAKECATALOGS_PARAMS = "--skip-pkg-check"
+
+
+@property
+def conf():
+    if "pytest" in sys.modules:
+        return MunkiPromoterTestConfig()
+    else:
+        return MunkiPromoterConfig()
 
 
 class JiraEnum(Enum):

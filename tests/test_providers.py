@@ -106,5 +106,5 @@ class TestMunkiRepoProvider:
     def test__jira_issue_to_package(self, jira_board_provider):
         pass
 
-    def test_update(self):
-        pass
+    def test_update(self, munki_repo_provider):
+        munki_repo_provider.load()
