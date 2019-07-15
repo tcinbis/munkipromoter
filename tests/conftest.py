@@ -1,6 +1,11 @@
+import json
+import os
+import plistlib
 from datetime import datetime
 
 import pytest
+from jira.resources import cls_for_resource
+
 from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
@@ -12,6 +17,19 @@ from utils.config import (
     JiraAutopromote,
     conf,
 )
+
+
+def load_jira_test_issue():
+    with open("jira_dump/firefox_jira_issue.txt", "r") as infile:
+        dump = json.load(infile)
+        return cls_for_resource(dump["self"])(None, None, dump)
+
+
+def load_munki_test_plist():
+    with open(
+        "data/pkgsinfo/apps/firefox/en/Firefox ESR EN-60.8.0.plist", "rb"
+    ) as infile:
+        return plistlib.load(infile)
 
 
 @pytest.fixture
