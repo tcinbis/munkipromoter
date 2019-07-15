@@ -14,6 +14,13 @@ class MunkiPromoterConfig:
 
     class __MunkiPromoterConfig:
         REPO_PATH = os.getenv("MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo_test")
+        TEST_REPO_PATH = os.getenv(
+            "MUNKIPROMOTER_TEST_REPO_PATH",
+            os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                "tests/data",
+            ),
+        )
 
         @property
         def CATALOGS_PATH(self):
@@ -122,6 +129,13 @@ class MunkiPromoterConfig:
 
     def __setattr__(self, key, value):
         setattr(self.instance, key, value)
+
+    @staticmethod
+    def restore_defaults():
+        MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
+
+    def enable_test_repo(self):
+        self.instance.REPO_PATH = self.instance.TEST_REPO_PATH
 
 
 conf = MunkiPromoterConfig()
