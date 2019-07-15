@@ -41,6 +41,8 @@ class MunkiPromoterConfig:
             "MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs"
         )
 
+        MAKECATALOGS_PARAMS = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PARAMS", "")
+
         # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
         JIRA_CONNECTION_INFO = {
             "server": os.getenv(
@@ -134,8 +136,9 @@ class MunkiPromoterConfig:
     def restore_defaults():
         MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
 
-    def enable_test_repo(self):
+    def enable_testing_mode(self):
         self.instance.REPO_PATH = self.instance.TEST_REPO_PATH
+        self.instance.MAKECATALOGS_PARAMS = "--skip-pkg-check"
 
 
 conf = MunkiPromoterConfig()

@@ -194,7 +194,7 @@ class MunkiRepoProvider(Provider):
         """
         Run makecatalogs and check whether the return code is 0.
         """
-        cmd = ["python2", conf.MAKECATALOGS, conf.REPO_PATH]
+        cmd = ["python2", conf.MAKECATALOGS, conf.MAKECATALOGS_PARAMS, conf.REPO_PATH]
         logger.info("Running makecatalogs.")
         try:
             subprocess.run(cmd, check=True)
