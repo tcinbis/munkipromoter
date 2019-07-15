@@ -1,21 +1,18 @@
 import json
-import os
 import plistlib
 from datetime import datetime
 
 import pytest
-from jira.resources import cls_for_resource
-
 from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
+from jira.resources import cls_for_resource
 from utils.config import (
     Catalog,
     Present,
     JiraLane,
     PackageState,
     JiraAutopromote,
-    conf,
 )
 
 
@@ -30,12 +27,6 @@ def load_munki_test_plist():
         "data/pkgsinfo/apps/firefox/en/Firefox ESR EN-60.8.0.plist", "rb"
     ) as infile:
         return plistlib.load(infile)
-
-
-@pytest.fixture
-def config():
-    return conf
-
 
 @pytest.fixture
 def jira_board_provider():
