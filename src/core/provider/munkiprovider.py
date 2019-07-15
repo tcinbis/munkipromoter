@@ -26,10 +26,10 @@ class MunkiRepoProvider(Provider):
         The munki repository needs to be mounted when trying to connect.
         """
         if os.path.ismount(conf.REPO_PATH) or os.path.exists(conf.REPO_PATH):
-            logger.debug(f"Repo at {conf.REPO_PATH} mounted or exists.")
+            logger.debug(f"Repo {conf.REPO_PATH} mounted or exists.")
             return True
         else:
-            logger.critical(f"Repo mount point {conf.REPO_PATH} not mounted.")
+            logger.critical(f"Repo {conf.REPO_PATH} not mounted or does not exist.")
             return False
 
     def _load_packages(self):
@@ -116,7 +116,7 @@ class MunkiRepoProvider(Provider):
                     self._pkg_info_files.update({pkg_info.get("name"): d})
 
     def load(self):
-        if self.connect():
+        if self.is_loaded or self.connect():
             self._load_packages()
             self._load_pkg_infos()
             self.is_loaded = True

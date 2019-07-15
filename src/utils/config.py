@@ -126,9 +126,8 @@ class MunkiPromoterConfig:
     def __setattr__(self, key, value):
         setattr(self.instance, key, value)
 
-    @staticmethod
-    def restore_defaults():
-        MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
+    def restore_defaults(self):
+        self.__init__()
 
 
 class MunkiPromoterTestConfig(MunkiPromoterConfig):
