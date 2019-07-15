@@ -32,17 +32,15 @@ class Provider:
 
     def get(self) -> Dict:
         """
-        If the providers load method was already called this method will return all received packages in a list.
+        If the providers load method was already called this method will return all received packages in a dict.
         Otherwise it will first call load and then return the results.
-        :return: list of Packages offered/received from the providers source.
+        :return: dict of Packages offered/received from the providers source.
         """
         if not self.is_loaded:
             logger.debug("Provider not yet loaded. Loading now...")
             self.load()
             logger.debug("Loading complete.")
         return self._packages_dict
-        # only return a copy of the internal list, to later compare if changes were made.
-        # return copy.deepcopy(self._packages_dict)
 
     def _get(self, package_key: str) -> Package:
         return self.get().get(package_key)
