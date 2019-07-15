@@ -55,7 +55,9 @@ class MunkiRepoProvider(Provider):
 
                         promote_info = item.get("munkipromote")
                         if promote_info and "promotiondate" in promote_info:
-                            promotion_date = datetime.strptime(promote_info.get("promotiondate"),"%Y-%m-%d")
+                            promotion_date = datetime.strptime(
+                                promote_info.get("promotiondate"), "%Y-%m-%d"
+                            )
                         else:
                             promotion_date = datetime.now() + timedelta(
                                 days=conf.DEFAULT_PROMOTION_INTERVAL
