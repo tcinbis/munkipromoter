@@ -149,8 +149,6 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
                 ),
             ),
         )
-
-    def enable_testing_mode(self):
         self.instance.REPO_PATH = self.instance.TEST_REPO_PATH
         self.instance.MAKECATALOGS_PARAMS = "--skip-pkg-check"
 

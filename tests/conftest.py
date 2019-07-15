@@ -7,13 +7,7 @@ from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
 from jira.resources import cls_for_resource
-from utils.config import (
-    Catalog,
-    Present,
-    JiraLane,
-    PackageState,
-    JiraAutopromote,
-)
+from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote, conf
 
 
 def load_jira_test_issue():
@@ -27,6 +21,13 @@ def load_munki_test_plist():
         "data/pkgsinfo/apps/firefox/en/Firefox ESR EN-60.8.0.plist", "rb"
     ) as infile:
         return plistlib.load(infile)
+
+
+@pytest.fixture
+def config():
+    conf.restore_defaults()
+    return conf
+
 
 @pytest.fixture
 def jira_board_provider():
