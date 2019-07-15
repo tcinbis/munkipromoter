@@ -54,8 +54,6 @@ def get_logger(name, formatter="default"):
         )
     elif formatter is "simple":
         stream_handler.setFormatter(logging.Formatter("%(message)s"))
-    else:
-        raise ValueError("Formatter must be simple or default")
 
     logger.setLevel(conf.LOG_LEVEL)
     logger.addHandler(file_handler)
