@@ -16,6 +16,10 @@ from utils.config import (
 
 
 class MunkiPromoterTestConfig(MunkiPromoterConfig):
+    """
+    This class has all the same attributes as the MunkiPromoterConfig but adds/sets required values for testing.
+    """
+
     def __init__(self):
         super().__init__()
         self.__setattr__(
