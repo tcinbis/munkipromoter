@@ -143,7 +143,9 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
             os.getenv(
                 "MUNKIPROMOTER_TEST_REPO_PATH",
                 os.path.join(
-                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    os.path.dirname(
+                        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                    ),
                     "tests/data",
                 ),
             ),
@@ -154,12 +156,7 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
         self.instance.MAKECATALOGS_PARAMS = "--skip-pkg-check"
 
 
-@property
-def conf():
-    if "pytest" in sys.modules:
-        return MunkiPromoterTestConfig()
-    else:
-        return MunkiPromoterConfig()
+conf = MunkiPromoterTestConfig() if "pytest" in sys.modules else MunkiPromoterConfig()
 
 
 class JiraEnum(Enum):

@@ -1,6 +1,6 @@
 import pytest
 from utils import logger as log
-from utils.config import JiraLane, Catalog, JiraAutopromote
+from utils.config import JiraLane, Catalog, JiraAutopromote, conf
 
 
 class TestUtils:
@@ -16,10 +16,10 @@ class TestUtils:
         with pytest.raises(ValueError):
             assert log.get_logger(__file__, "wrong_formatter")
 
-    def test_set_and_get_config(self, config):
-        assert config.JIRA_LABELS_FIELD == "labels"
-        config.JIRA_LABELS_FIELD = "label"
-        assert config.JIRA_LABELS_FIELD == "label"
+    def test_set_and_get_config(self):
+        assert conf.JIRA_LABELS_FIELD == "labels"
+        conf.JIRA_LABELS_FIELD = "label"
+        assert conf.JIRA_LABELS_FIELD == "label"
 
     def test_jira_lane(self):
         assert JiraLane.TO_DEVELOPMENT.is_promotion_lane
@@ -31,7 +31,9 @@ class TestUtils:
 
     def test_catalog(self):
         assert Catalog.jira_lane_to_catalog(JiraLane.DEVELOPMENT) == Catalog.DEVELOPMENT
-        assert Catalog.jira_lane_to_catalog(JiraLane.TO_DEVELOPMENT) == Catalog.DEVELOPMENT
+        assert (
+            Catalog.jira_lane_to_catalog(JiraLane.TO_DEVELOPMENT) == Catalog.DEVELOPMENT
+        )
 
         assert Catalog.DEVELOPMENT.next_catalog == Catalog.TESTING
         assert Catalog.TESTING.next_catalog == Catalog.PRODUCTION
@@ -44,4 +46,6 @@ class TestUtils:
         assert not JiraAutopromote.NOPROMOTE
 
     def test_jira_enum(self):
-        assert JiraLane.DEVELOPMENT.to_jira_rest_dict() == {'id': JiraLane.DEVELOPMENT.value}
+        assert JiraLane.DEVELOPMENT.to_jira_rest_dict() == {
+            "id": JiraLane.DEVELOPMENT.value
+        }
