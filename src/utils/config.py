@@ -14,13 +14,6 @@ class MunkiPromoterConfig:
 
     class __MunkiPromoterConfig:
         REPO_PATH = os.getenv("MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo_test")
-        TEST_REPO_PATH = os.getenv(
-            "MUNKIPROMOTER_TEST_REPO_PATH",
-            os.path.join(
-                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-                "tests/data",
-            ),
-        )
 
         @property
         def CATALOGS_PATH(self):
@@ -135,10 +128,6 @@ class MunkiPromoterConfig:
     @staticmethod
     def restore_defaults():
         MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
-
-    def enable_testing_mode(self):
-        self.instance.REPO_PATH = self.instance.TEST_REPO_PATH
-        self.instance.MAKECATALOGS_PARAMS = "--skip-pkg-check"
 
 
 conf = MunkiPromoterConfig()

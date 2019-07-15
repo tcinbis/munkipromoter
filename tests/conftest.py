@@ -1,10 +1,42 @@
+import os
 from datetime import datetime
 
 import pytest
 from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
-from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote
+from utils.config import (
+    Catalog,
+    Present,
+    JiraLane,
+    PackageState,
+    JiraAutopromote,
+    MunkiPromoterConfig,
+)
+
+
+class MunkiPromoterTestConfig(MunkiPromoterConfig):
+    def __init__(self):
+        super().__init__()
+        self.__setattr__(
+            "TEST_REPO_PATH",
+            os.getenv(
+                "MUNKIPROMOTER_TEST_REPO_PATH",
+                os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    "tests/data",
+                ),
+            ),
+        )
+
+    def enable_testing_mode(self):
+        self.instance.REPO_PATH = self.instance.TEST_REPO_PATH
+        self.instance.MAKECATALOGS_PARAMS = "--skip-pkg-check"
+
+
+@pytest.fixture
+def config():
+    return MunkiPromoterTestConfig()
 
 
 @pytest.fixture

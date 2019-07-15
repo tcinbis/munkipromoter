@@ -4,7 +4,6 @@ from unittest.mock import Mock
 import pytest
 from core.provider.jiraprovider import JiraBoardProvider
 from jira import Issue
-from utils.config import conf
 from utils.exceptions import JiraIssueMissingFields
 
 
@@ -38,7 +37,7 @@ class TestJiraBoardProvider:
         with pytest.raises(AttributeError):
             jira_board_provider._jira_issue_to_package(issue_mock)
 
-    def test__jira_issue_to_package(self, jira_board_provider):
+    def test__jira_issue_to_package(self, jira_board_provider, config):
         """
         Test whether exceptions are handled/raised correctly.
         :param jira_board_provider:
@@ -47,7 +46,7 @@ class TestJiraBoardProvider:
         issue = Issue(None, None)
         issue.fields = Mock()
 
-        for attribute in conf.ISSUE_FIELDS:
+        for attribute in config.ISSUE_FIELDS:
             issue.fields.__setattr__(attribute, str(random()))
 
         try:
@@ -88,13 +87,12 @@ class TestJiraBoardProvider:
 
 
 class TestMunkiRepoProvider:
-    def test_connect_fail(self, munki_repo_provider):
-        conf.__setattr__("REPO_PATH", "/some/directory/which/does/not/exist")
+    def test_connect_fail(self, munki_repo_provider, config):
+        config.REPO_PATH = "/some/directory/which/does/not/exist"
         assert not munki_repo_provider.connect()
-        conf.enable_testing_mode()
-        print(conf.REPO_PATH)
+        config.enable_testing_mode()
         assert munki_repo_provider.connect()
-        conf.restore_defaults()
+        config.restore_defaults()
 
     def test_load(self, munki_repo_provider):
         munki_repo_provider.load()
