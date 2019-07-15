@@ -19,7 +19,7 @@ def setup():
 
 def _setup_argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--munki-repo", type=str, dest="REPO_PATH")
+    parser.add_argument("-m", "--munki-repo", type=str, dest="REPO_PATH", default=conf.REPO_PATH)
     parser.add_argument("-v", "--verbose", action="count", dest="LOG_LEVEL", default=1)
     return parser
 
