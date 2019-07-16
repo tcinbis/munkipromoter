@@ -1,5 +1,7 @@
 import json
 import plistlib
+import random
+import string
 from datetime import datetime
 
 import pytest
@@ -83,3 +85,27 @@ def test_two_packages(request) -> ["Package"]:
             PackageState.NEW,
         ),
     ]
+
+
+def get_random_string(string_length=10):
+    """Generate a random string of fixed length"""
+    letters = string.ascii_lowercase
+    return "".join(random.choice(letters) for i in range(string_length))
+
+
+@pytest.fixture
+def random_package() -> Package:
+    yield Package(
+        name=get_random_string(10),
+        version=Package.str_to_version(str(random.uniform(0, 100))),
+        catalog=Catalog(random.choices([e.value for e in Catalog])[0]),
+        promote_date=datetime.now(),
+        is_autopromote=JiraAutopromote(
+            random.choices([e.value for e in JiraAutopromote])[0]
+        ),
+        is_present=Present(random.choices([e.value for e in Present])[0]),
+        provider=JiraBoardProvider,
+        jira_id=get_random_string(9),
+        jira_lane=JiraLane(random.choices([e.value for e in JiraLane])[0]),
+        state=PackageState(random.choices([e.value for e in PackageState])[0]),
+    )
