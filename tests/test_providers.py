@@ -4,13 +4,15 @@ from random import random
 from unittest.mock import Mock
 
 import pytest
+from jira import Issue
+
 from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
-from jira import Issue
 from utils.config import PackageState, Present
 from utils.exceptions import JiraIssueMissingFields
 
 
+@pytest.mark.usefixtures("run_makecatalogs_before")
 class TestJiraBoardProvider:
     def test_connect_fail(self, jira_board_provider):
         # These parameters are supposed to fail to test, whether exceptions are handled correctly.
@@ -90,6 +92,7 @@ class TestJiraBoardProvider:
         #     jira._jira.create_issue.assert_called_once_with(fields=issue_dict)
 
 
+@pytest.mark.usefixtures("run_makecatalogs_before")
 class TestMunkiRepoProvider:
     def test_connect_fail(self, munki_repo_provider, config):
         config.REPO_PATH = "/some/directory/which/does/not/exist"
