@@ -7,6 +7,7 @@ import pytest
 from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
 from jira import Issue
+from utils.config import PackageState, Present
 from utils.exceptions import JiraIssueMissingFields
 
 
@@ -108,7 +109,7 @@ class TestMunkiRepoProvider:
     def test__jira_issue_to_package(self, jira_board_provider):
         pass
 
-    def test_update(self, munki_repo_provider, config):
+    def test_update(self, munki_repo_provider):
         munki_repo_provider.load()
         packages = copy.deepcopy(munki_repo_provider.get())
 
@@ -134,3 +135,18 @@ class TestMunkiRepoProvider:
         munki_package = munki_repo_provider.get().get(test_key)  # type: Package
 
         assert not p.is_exact_match(munki_package)
+
+    def test_update_missing_package(self, munki_repo_provider, random_package):
+        munki_repo_provider.load()
+
+        munki_repo_provider.update(random_package)
+        munki_package = munki_repo_provider._get(random_package.key)
+
+        # when inserting/updating a package which is not present in the munki repo the following attributes need
+        # to be set for the package which is passed to the update method AND the package which is actually inserted
+        # into the internal dictionary containing all the packages.
+        assert (
+            random_package.state is PackageState.UPDATE
+            and random_package.is_present is Present.MISSING
+            and munki_package.state is PackageState.NEW
+        )
