@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 from core.base_classes import Provider, Package
-from utils import logger as l
+from utils import logger as log
 from utils.config import PackageState, JiraLane, Catalog, Present, JiraAutopromote
 from utils.config import conf
 from utils.exceptions import MunkiItemInMultipleCatalogs
 
-logger = l.get_logger(__file__)
+logger = log.get_logger(__file__)
 
 
 class MunkiRepoProvider(Provider):
@@ -40,6 +40,8 @@ class MunkiRepoProvider(Provider):
                 munki_packages = plistlib.load(
                     open(os.path.join(conf.CATALOGS_PATH, filename), "rb")
                 )
+
+                self._packages_dict.clear()
 
                 for item in munki_packages:
                     try:
@@ -140,10 +142,10 @@ class MunkiRepoProvider(Provider):
 
         for key, value in package_copy.__dict__.items():
             if (
-                key is not "promote_date"
-                and key is not "jira_id"
-                and key is not "munki_uuid"
-                and key is not "provider"
+                key != "promote_date"
+                and key != "jira_id"
+                and key != "munki_uuid"
+                and key != "provider"
             ):
                 if p.__dict__.get(key) != value:
                     # Not all values of the existing jira ticket and the local version match. Therefore update.
