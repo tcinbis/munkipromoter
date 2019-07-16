@@ -151,6 +151,7 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
         )
         self.instance.REPO_PATH = self.instance.TEST_REPO_PATH
         self.instance.MAKECATALOGS_PARAMS = "--skip-pkg-check"
+        self.instance.JIRA_DUMP_PATH = os.path.join(os.path.dirname(__file__), "../../tests/jira_dump")
 
 
 conf = MunkiPromoterTestConfig() if "pytest" in sys.modules else MunkiPromoterConfig()
