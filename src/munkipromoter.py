@@ -38,7 +38,7 @@ class MunkiPromoter:
             "-v", "--verbose", action="count", dest="LOG_LEVEL", default=1
         )
         parser.add_argument(
-            "-d", "--dry-run", action='store_true', dest="DRY_RUN", default=conf.DRY_RUN
+            "-n", "--dry-run", action='store_true', dest="DRY_RUN", default=conf.DRY_RUN
         )
         return parser
 
