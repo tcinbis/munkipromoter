@@ -8,6 +8,7 @@ from jira import Issue
 
 from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
+from core.provider.munkiprovider import MunkiRepoProvider
 from utils.config import PackageState, Present
 from utils.exceptions import JiraIssueMissingFields
 
@@ -153,3 +154,7 @@ class TestMunkiRepoProvider:
             and random_package.is_present is Present.MISSING
             and munki_package.state is PackageState.NEW
         )
+
+    def test_make_catalogs_subprocess_error(self, config):
+        config.REPO_PATH = "/some/path/which/does/not/exist"
+        MunkiRepoProvider.make_catalogs()
