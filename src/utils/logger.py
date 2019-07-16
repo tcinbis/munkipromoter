@@ -30,14 +30,14 @@ def get_logger(name, formatter="default"):
         logfile_main, mode="w", backupCount=conf.LOG_BACKUP_COUNT
     )
 
-    if formatter is "default":
+    if formatter == "default":
         file_handler.setFormatter(
             logging.Formatter(
                 "%(asctime)s - %(levelname)s - %(filename)s,%(lineno)d:\t%(message)s",
                 datefmt="%b %d %Y %H:%M:%S %Z",
             )
         )
-    elif formatter is "simple":
+    elif formatter == "simple":
         file_handler.setFormatter(logging.Formatter("%(message)s"))
     else:
         raise ValueError("Formatter must be simple or default")
@@ -45,14 +45,14 @@ def get_logger(name, formatter="default"):
     # Stream Handler
     stream_handler = logging.StreamHandler(sys.stdout)
 
-    if formatter is "default":
+    if formatter == "default":
         stream_handler.setFormatter(
             logging.Formatter(
                 "%(asctime)s - %(levelname)s - %(filename)s,%(lineno)d:\t%(message)s",
                 datefmt="%b %d %Y %H:%M:%S %Z",
             )
         )
-    elif formatter is "simple":
+    elif formatter == "simple":
         stream_handler.setFormatter(logging.Formatter("%(message)s"))
 
     logger.setLevel(conf.LOG_LEVEL)

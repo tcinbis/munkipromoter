@@ -7,18 +7,12 @@ from typing import List, Dict
 import requests
 from core.base_classes import Provider, Package
 from jira import JIRA, Issue
-from utils import logger as l
-from utils.config import (
-    PackageState,
-    JiraLane,
-    Catalog,
-    Present,
-    JiraAutopromote,
-)
+from utils import logger as log
+from utils.config import PackageState, JiraLane, Catalog, Present, JiraAutopromote
 from utils.config import conf
 from utils.exceptions import JiraIssueMissingFields
 
-logger = l.get_logger(__file__)
+logger = log.get_logger(__file__)
 
 
 class JiraBoardProvider(Provider):
@@ -36,7 +30,7 @@ class JiraBoardProvider(Provider):
                 return True
         except requests.exceptions.ConnectionError as e:
             logger.critical(
-                f"Couldn't connect to Jira instance: {connection_params.get('server')}."
+                f"Could not connect to Jira instance: {connection_params.get('server')}, \n because of {e}."
             )
             return False
 
@@ -59,7 +53,9 @@ class JiraBoardProvider(Provider):
                     search_result = self._jira.search_issues(
                         query, startAt=start_at, maxResults=500
                     )
-                self._packages_dict = self._jira_issue_to_package_dict(cumulative_results)
+                self._packages_dict = self._jira_issue_to_package_dict(
+                    cumulative_results
+                )
                 return
 
             self._packages_dict = self._jira_issue_to_package_dict(search_result)
