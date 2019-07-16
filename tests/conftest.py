@@ -5,10 +5,11 @@ import string
 from datetime import datetime
 
 import pytest
+from jira.resources import cls_for_resource
+
 from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
-from jira.resources import cls_for_resource
 from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote, conf
 
 
@@ -39,6 +40,11 @@ def jira_board_provider():
 @pytest.fixture
 def munki_repo_provider():
     return MunkiRepoProvider("test_instance")
+
+
+@pytest.fixture
+def run_makecatalogs_before(munki_repo_provider):
+    munki_repo_provider.make_catalogs()
 
 
 @pytest.fixture(params=["10"])
