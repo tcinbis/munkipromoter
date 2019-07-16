@@ -1,5 +1,5 @@
 import json
-import plistlib
+import os
 import random
 import string
 from datetime import datetime
@@ -12,17 +12,10 @@ from jira.resources import cls_for_resource
 from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote, conf
 
 
-def load_jira_test_issue():
-    with open("jira_dump/firefox_jira_issue.txt", "r") as infile:
+def load_jira_test_issue(jira_dump_path):
+    with open(os.path.join(jira_dump_path, "firefox_jira_issue.txt"), "r") as infile:
         dump = json.load(infile)
         return cls_for_resource(dump["self"])(None, None, dump)
-
-
-def load_munki_test_plist():
-    with open(
-        "data/pkgsinfo/apps/firefox/en/Firefox ESR EN-60.8.0.plist", "rb"
-    ) as infile:
-        return plistlib.load(infile)
 
 
 @pytest.fixture
