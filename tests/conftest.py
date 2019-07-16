@@ -20,7 +20,6 @@ from core.base_classes import Package
 from core.promotion import Promoter
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
-from munkipromoter import MunkiPromoter
 from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote, conf
 
 
@@ -49,11 +48,6 @@ def munki_repo_provider():
 @pytest.fixture
 def run_makecatalogs_before(munki_repo_provider):
     munki_repo_provider.make_catalogs()
-
-
-@pytest.fixture
-def munkipromoter():
-    return MunkiPromoter()
 
 
 @pytest.fixture(params=["10"])
