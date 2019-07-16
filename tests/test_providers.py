@@ -1,13 +1,18 @@
+import copy
+from datetime import datetime
 from random import random
 from unittest.mock import Mock
 
 import pytest
-from core.provider.jiraprovider import JiraBoardProvider
 from jira import Issue
-from utils.config import conf
+
+from core.base_classes import Package
+from core.provider.jiraprovider import JiraBoardProvider
+from utils.config import PackageState, Present
 from utils.exceptions import JiraIssueMissingFields
 
 
+@pytest.mark.usefixtures("run_makecatalogs_before")
 class TestJiraBoardProvider:
     def test_connect_fail(self, jira_board_provider):
         # These parameters are supposed to fail to test, whether exceptions are handled correctly.
@@ -38,7 +43,7 @@ class TestJiraBoardProvider:
         with pytest.raises(AttributeError):
             jira_board_provider._jira_issue_to_package(issue_mock)
 
-    def test__jira_issue_to_package(self, jira_board_provider):
+    def test__jira_issue_to_package(self, jira_board_provider, config):
         """
         Test whether exceptions are handled/raised correctly.
         :param jira_board_provider:
@@ -47,7 +52,7 @@ class TestJiraBoardProvider:
         issue = Issue(None, None)
         issue.fields = Mock()
 
-        for attribute in conf.ISSUE_FIELDS:
+        for attribute in config.ISSUE_FIELDS:
             issue.fields.__setattr__(attribute, str(random()))
 
         try:
@@ -87,9 +92,13 @@ class TestJiraBoardProvider:
         #     jira._jira.create_issue.assert_called_once_with(fields=issue_dict)
 
 
+@pytest.mark.usefixtures("run_makecatalogs_before")
 class TestMunkiRepoProvider:
-    def test_connect_fail(self, jira_board_provider):
-        pass
+    def test_connect_fail(self, munki_repo_provider, config):
+        config.REPO_PATH = "/some/directory/which/does/not/exist"
+        assert not munki_repo_provider.connect()
+        config.restore_defaults()
+        assert munki_repo_provider.connect()
 
     def test_load(self, munki_repo_provider):
         munki_repo_provider.load()
@@ -103,5 +112,44 @@ class TestMunkiRepoProvider:
     def test__jira_issue_to_package(self, jira_board_provider):
         pass
 
-    def test_update(self):
-        pass
+    def test_update(self, munki_repo_provider):
+        munki_repo_provider.load()
+        packages = copy.deepcopy(munki_repo_provider.get())
+
+        # after loading our testing repo, we should have more than 0 packages
+        assert len(packages) != 0
+
+        test_key = list(packages.keys())[0]
+        p = packages.get(test_key)  # type: Package
+        p.catalog = None
+        munki_repo_provider.update(p)
+
+        for key, package in munki_repo_provider.get().items():
+            # after changing the value of a not ignored package field the update should be propagated and be represented
+            # in the new dictionary we get from our munki provider
+            assert packages.get(key).is_exact_match(package, ["state"])
+
+        munki_repo_provider.load()
+        packages = copy.deepcopy(munki_repo_provider.get())
+        p = packages.get(test_key)  # type: Package
+        p.promote_date = datetime.now()
+        munki_repo_provider.update(p)
+
+        munki_package = munki_repo_provider.get().get(test_key)  # type: Package
+
+        assert not p.is_exact_match(munki_package)
+
+    def test_update_missing_package(self, munki_repo_provider, random_package):
+        munki_repo_provider.load()
+
+        munki_repo_provider.update(random_package)
+        munki_package = munki_repo_provider._get(random_package.key)
+
+        # when inserting/updating a package which is not present in the munki repo the following attributes need
+        # to be set for the package which is passed to the update method AND the package which is actually inserted
+        # into the internal dictionary containing all the packages.
+        assert (
+            random_package.state is PackageState.UPDATE
+            and random_package.is_present is Present.MISSING
+            and munki_package.state is PackageState.NEW
+        )

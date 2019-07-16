@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
-from typing import Type, Dict
+from typing import Type, Dict, List
 from uuid import UUID
 
 from utils import logger as log
@@ -32,17 +32,15 @@ class Provider:
 
     def get(self) -> Dict:
         """
-        If the providers load method was already called this method will return all received packages in a list.
+        If the providers load method was already called this method will return all received packages in a dict.
         Otherwise it will first call load and then return the results.
-        :return: list of Packages offered/received from the providers source.
+        :return: dict of Packages offered/received from the providers source.
         """
         if not self.is_loaded:
             logger.debug("Provider not yet loaded. Loading now...")
             self.load()
             logger.debug("Loading complete.")
         return self._packages_dict
-        # only return a copy of the internal list, to later compare if changes were made.
-        # return copy.deepcopy(self._packages_dict)
 
     def _get(self, package_key: str) -> Package:
         return self.get().get(package_key)
@@ -86,13 +84,6 @@ class Package:
     def str_to_version(version_str: str) -> PackageVersion:
         return PackageVersion(version_str)
 
-    def update(self):
-        """
-        Call the update method of the provider which created the package.
-        :return: None
-        """
-        self.provider.update(self)
-
     def __str__(self):
         return f"{self.name} {self.version} {self.catalog.name}"
 
@@ -106,3 +97,18 @@ class Package:
         :return: List of keys which should be ignored when comparing packages
         """
         return ["promote_date", "jira_id", "munki_uuid", "provider", "state"]
+
+    def is_exact_match(self, package: Package, exclude_keys: List = None) -> bool:
+        """
+        Compare ALL fields of a package to another package to check whether we have found an exact match.
+        :param package: The package we want to compare us to.
+        :param exclude_keys: Ignore the following keys during comparison
+        :return: True if all values are the same, False otherwise
+        """
+        for key, value in package.__dict__.items():
+            if (exclude_keys and key not in exclude_keys) or not exclude_keys:
+                # only check if the key is in exclude_keys if we are sure that it is not None. In case it is None we
+                # want to compare all keys anyways.
+                if self.__dict__.get(key) != value:
+                    return False
+        return True

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from enum import Enum, auto
 
 
@@ -33,6 +34,8 @@ class MunkiPromoterConfig:
         MAKECATALOGS = os.getenv(
             "MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs"
         )
+
+        MAKECATALOGS_PARAMS = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PARAMS", "")
 
         # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
         JIRA_CONNECTION_INFO = {
@@ -123,8 +126,37 @@ class MunkiPromoterConfig:
     def __setattr__(self, key, value):
         setattr(self.instance, key, value)
 
+    def restore_defaults(self):
+        self.__init__()
 
-conf = MunkiPromoterConfig()
+
+class MunkiPromoterTestConfig(MunkiPromoterConfig):
+    """
+    This class has all the same attributes as the MunkiPromoterConfig but adds/sets required values for testing.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.__setattr__(
+            "TEST_REPO_PATH",
+            os.getenv(
+                "MUNKIPROMOTER_TEST_REPO_PATH",
+                os.path.join(
+                    os.path.dirname(
+                        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                    ),
+                    "tests/data",
+                ),
+            ),
+        )
+        self.instance.REPO_PATH = self.instance.TEST_REPO_PATH
+        self.instance.MAKECATALOGS_PARAMS = "--skip-pkg-check"
+        self.instance.JIRA_DUMP_PATH = os.path.join(
+            os.path.dirname(__file__), "../../tests/jira_dump"
+        )
+
+
+conf = MunkiPromoterTestConfig() if "pytest" in sys.modules else MunkiPromoterConfig()
 
 
 class JiraEnum(Enum):
