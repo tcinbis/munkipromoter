@@ -7,18 +7,12 @@ from typing import List, Dict
 import requests
 from core.base_classes import Provider, Package
 from jira import JIRA, Issue
-from utils import logger as l
-from utils.config import (
-    PackageState,
-    JiraLane,
-    Catalog,
-    Present,
-    JiraAutopromote,
-)
+from utils import logger as log
+from utils.config import PackageState, JiraLane, Catalog, Present, JiraAutopromote
 from utils.config import conf
 from utils.exceptions import JiraIssueMissingFields
 
-logger = l.get_logger(__file__)
+logger = log.get_logger(__file__)
 
 
 class JiraBoardProvider(Provider):
@@ -26,7 +20,6 @@ class JiraBoardProvider(Provider):
         super().__init__(name, dry_run)
         # noinspection PyTypeChecker
         self._jira = None  # type: JIRA
-        self.connect()
 
     def connect(self, connection_params=conf.JIRA_CONNECTION_INFO):
         try:
@@ -37,32 +30,35 @@ class JiraBoardProvider(Provider):
                 return True
         except requests.exceptions.ConnectionError as e:
             logger.critical(
-                f"Couldn't connect to Jira instance: {conf.JIRA_CONNECTION_INFO.get('server')}."
+                f"Could not connect to Jira instance: {connection_params.get('server')}, \n because of {e}."
             )
             return False
 
     def load(self):
-        query = f"project={conf.JIRA_PROJECT_KEY}"
-        search_result = self._jira.search_issues(query, maxResults=500)
-        total_issues = search_result.total
-        self.is_loaded = True
+        if self.is_loaded or self.connect():
+            query = f"project={conf.JIRA_PROJECT_KEY}"
+            search_result = self._jira.search_issues(query, maxResults=500)
+            total_issues = search_result.total
+            self.is_loaded = True
 
-        if total_issues != len(search_result):
-            # we could only fetch some tickets and need to fetch more
-            logger.debug("Fetching remaining Jira Tickets.")
-            cumulative_results = list()
+            if total_issues != len(search_result):
+                # we could only fetch some tickets and need to fetch more
+                logger.debug("Fetching remaining Jira Tickets.")
+                cumulative_results = list()
 
-            while len(cumulative_results) != total_issues:
-                cumulative_results.extend(search_result.iterable)
-                start_at = search_result.startAt + len(search_result)
-                search_result.clear()
-                search_result = self._jira.search_issues(
-                    query, startAt=start_at, maxResults=500
+                while len(cumulative_results) != total_issues:
+                    cumulative_results.extend(search_result.iterable)
+                    start_at = search_result.startAt + len(search_result)
+                    search_result.clear()
+                    search_result = self._jira.search_issues(
+                        query, startAt=start_at, maxResults=500
+                    )
+                self._packages_dict = self._jira_issue_to_package_dict(
+                    cumulative_results
                 )
-            self._packages_dict = self._jira_issue_to_package_dict(cumulative_results)
-            return
+                return
 
-        self._packages_dict = self._jira_issue_to_package_dict(search_result)
+            self._packages_dict = self._jira_issue_to_package_dict(search_result)
 
     @staticmethod
     def check_jira_issue_exists(package: Package) -> bool:

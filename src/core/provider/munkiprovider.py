@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 from core.base_classes import Provider, Package
-from utils import logger as l
+from utils import logger as log
 from utils.config import PackageState, JiraLane, Catalog, Present, JiraAutopromote
 from utils.config import conf
 from utils.exceptions import MunkiItemInMultipleCatalogs
 
-logger = l.get_logger(__file__)
+logger = log.get_logger(__file__)
 
 
 class MunkiRepoProvider(Provider):
@@ -25,15 +25,17 @@ class MunkiRepoProvider(Provider):
         """
         The munki repository needs to be mounted when trying to connect.
         """
-        if os.path.ismount(conf.REPO_PATH):
-            logger.debug(f"Repo at {conf.REPO_PATH} mounted.")
+        if os.path.ismount(conf.REPO_PATH) or os.path.exists(conf.REPO_PATH):
+            logger.debug(f"Repo {conf.REPO_PATH} mounted or exists.")
             return True
         else:
-            logger.critical(f"Repo mount point {conf.REPO_PATH} not mounted.")
+            logger.critical(f"Repo {conf.REPO_PATH} not mounted or does not exist.")
             return False
 
     def _load_packages(self):
         logger.debug(f"Loading packages from repo: {conf.REPO_PATH}")
+        # clear internal packages dict, before loading for the first time OR again
+        self._packages_dict.clear()
         for filename in os.listdir(conf.CATALOGS_PATH):
             if not (filename.startswith(".") or filename == "all"):
                 # Ignore hidden files
@@ -55,7 +57,9 @@ class MunkiRepoProvider(Provider):
 
                         promote_info = item.get("munkipromote")
                         if promote_info and "promotiondate" in promote_info:
-                            promotion_date = datetime.strptime(promote_info.get("promotiondate"),"%Y-%m-%d")
+                            promotion_date = datetime.strptime(
+                                promote_info.get("promotiondate"), "%Y-%m-%d"
+                            )
                         else:
                             promotion_date = datetime.now() + timedelta(
                                 days=conf.DEFAULT_PROMOTION_INTERVAL
@@ -114,9 +118,10 @@ class MunkiRepoProvider(Provider):
                     self._pkg_info_files.update({pkg_info.get("name"): d})
 
     def load(self):
-        self._load_packages()
-        self._load_pkg_infos()
-        self.is_loaded = True
+        if self.is_loaded or self.connect():
+            self._load_packages()
+            self._load_pkg_infos()
+            self.is_loaded = True
 
     def update(self, package: Package):
         # make a deep copy of the package to prevent changes in other instances
@@ -137,10 +142,10 @@ class MunkiRepoProvider(Provider):
 
         for key, value in package_copy.__dict__.items():
             if (
-                key is not "promote_date"
-                and key is not "jira_id"
-                and key is not "munki_uuid"
-                and key is not "provider"
+                key != "promote_date"
+                and key != "jira_id"
+                and key != "munki_uuid"
+                and key != "provider"
             ):
                 if p.__dict__.get(key) != value:
                     # Not all values of the existing jira ticket and the local version match. Therefore update.
@@ -194,7 +199,7 @@ class MunkiRepoProvider(Provider):
         """
         Run makecatalogs and check whether the return code is 0.
         """
-        cmd = ["python2", conf.MAKECATALOGS, conf.REPO_PATH]
+        cmd = ["python2", conf.MAKECATALOGS, conf.MAKECATALOGS_PARAMS, conf.REPO_PATH]
         logger.info("Running makecatalogs.")
         try:
             subprocess.run(cmd, check=True)
