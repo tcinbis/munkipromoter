@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
-from typing import Type, Dict
+from typing import Type, Dict, List
 from uuid import UUID
 
 from utils import logger as log
@@ -104,3 +104,18 @@ class Package:
         :return: List of keys which should be ignored when comparing packages
         """
         return ["promote_date", "jira_id", "munki_uuid", "provider", "state"]
+
+    def is_exact_match(self, package: Package, exclude_keys: List = None) -> bool:
+        """
+        Compare ALL fields of a package to another package to check whether we have found an exact match.
+        :param package: The package we want to compare us to.
+        :param exclude_keys: Ignore the following keys during comparison
+        :return: True if all values are the same, False otherwise
+        """
+        for key, value in package.__dict__.items():
+            if (exclude_keys and key not in exclude_keys) or not exclude_keys:
+                # only check if the key is in exclude_keys if we are sure that it is not None. In case it is None we
+                # want to compare all keys anyways.
+                if self.__dict__.get(key) != value:
+                    return False
+        return True
