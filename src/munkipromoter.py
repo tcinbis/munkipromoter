@@ -14,6 +14,9 @@ from utils.config import conf
 
 
 class MunkiPromoter:
+    def __init__(self):
+        self.setup()
+
     def setup(self):
         args = self._setup_argparser().parse_args()
         args.LOG_LEVEL = 70 - (10 * args.LOG_LEVEL) if args.LOG_LEVEL > 0 else 0
@@ -34,6 +37,9 @@ class MunkiPromoter:
         parser.add_argument(
             "-v", "--verbose", action="count", dest="LOG_LEVEL", default=1
         )
+        parser.add_argument(
+            "-d", "--dry-run", action='store_true', dest="DRY_RUN", default=conf.DRY_RUN
+        )
         return parser
 
     def run(self):
@@ -52,12 +58,6 @@ class MunkiPromoter:
         __j.commit()
         __m.commit()
 
-    @staticmethod
-    def start():
-        munki_promoter = MunkiPromoter()
-        munki_promoter.setup()
-        munki_promoter.run()
-
 
 if __name__ == "__main__":
-    MunkiPromoter.start()
+    MunkiPromoter().run()

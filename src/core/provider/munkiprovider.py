@@ -24,7 +24,7 @@ logger = log.get_logger(__file__)
 
 
 class MunkiRepoProvider(Provider):
-    def __init__(self, name, dry_run=False):
+    def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
         super().__init__(name, dry_run)
         self._pkg_info_files = dict(dict())
 
