@@ -1,3 +1,10 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 13:02.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:04
+
 import json
 import os
 import random
@@ -13,6 +20,7 @@ from core.base_classes import Package
 from core.promotion import Promoter
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
+from munkipromoter import MunkiPromoter
 from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote, conf
 
 
