@@ -1,3 +1,10 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 12:55.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:03
+
 from __future__ import annotations
 
 import copy
@@ -5,8 +12,9 @@ from datetime import datetime
 from typing import List, Dict
 
 import requests
-from core.base_classes import Provider, Package
 from jira import JIRA, Issue
+
+from core.base_classes import Provider, Package
 from utils import logger as log
 from utils.config import PackageState, JiraLane, Catalog, Present, JiraAutopromote
 from utils.config import conf
