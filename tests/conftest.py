@@ -23,12 +23,6 @@ from core.provider.munkiprovider import MunkiRepoProvider
 from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote, conf
 
 
-def load_jira_test_issue(jira_dump_path):
-    with open(os.path.join(jira_dump_path, "firefox_jira_issue.txt"), "r") as infile:
-        dump = json.load(infile)
-        return cls_for_resource(dump["self"])(None, None, dump)
-
-
 @pytest.fixture
 def config():
     conf.restore_defaults()
@@ -121,10 +115,19 @@ def random_package() -> Package:
 
 
 @pytest.fixture
-def set_up_promoter(config, jira_board_provider, munki_repo_provider):
+def jira_test_issues(config):
+    with open(
+        os.path.join(config.JIRA_DUMP_PATH, "firefox_jira_issue.txt"), "r"
+    ) as infile:
+        dump = json.load(infile)
+        return cls_for_resource(dump["self"])(None, None, dump)
+
+
+@pytest.fixture
+def set_up_promoter(jira_board_provider, munki_repo_provider, jira_test_issues):
     jira_board_provider._jira = Mock()
     jira_board_provider.is_loaded = True
-    jira_issue = [load_jira_test_issue(config.JIRA_DUMP_PATH)]
+    jira_issue = [jira_test_issues]
     result_list = ResultList(jira_issue, _total=len(jira_issue))
     jira_board_provider._jira.search_issues.return_value = result_list
     jira_board_provider.load()

@@ -10,12 +10,17 @@
 import argparse
 import logging
 
+from core.promotion import Promoter
+from core.provider.jiraprovider import JiraBoardProvider
+from core.provider.munkiprovider import MunkiRepoProvider
 from utils.config import conf
 
 
 class MunkiPromoter:
     def __init__(self):
         self.setup()
+        self._j = JiraBoardProvider("jira")
+        self._m = MunkiRepoProvider("munki")
 
     def setup(self):
         args = self._setup_argparser().parse_args()
@@ -43,20 +48,13 @@ class MunkiPromoter:
         return parser
 
     def run(self):
-        from core.promotion import Promoter
-        from core.provider.jiraprovider import JiraBoardProvider
-        from core.provider.munkiprovider import MunkiRepoProvider
+        self._j.update_jira_from_repo(self._m.get())
 
-        __j = JiraBoardProvider("test1")
-        __m = MunkiRepoProvider("test1")
-
-        __j.update_jira_from_repo(__m.get())
-
-        promoter = Promoter(__m.get(), __j.get())
+        promoter = Promoter(self._m.get(), self._j.get())
         promoter.promote()
 
-        __j.commit()
-        __m.commit()
+        self._j.commit()
+        self._m.commit()
 
 
 if __name__ == "__main__":
