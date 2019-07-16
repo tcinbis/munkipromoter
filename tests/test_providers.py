@@ -122,9 +122,30 @@ class TestJiraBoardProvider:
 
         jira_package = jira_board_provider._get(random_package.key)
 
-        assert random_package.key in jira_board_provider.get() and random_package.key not in jira_packages
+        assert (
+            random_package.key in jira_board_provider.get()
+            and random_package.key not in jira_packages
+        )
         assert random_package.is_exact_match(jira_package, ["state"])
         assert jira_package.state == PackageState.NEW
+
+    def test_update_jira_from_repo(self, munki_repo_provider, jira_board_provider):
+        munki_repo_provider.load()
+        munki_packages = copy.deepcopy(munki_repo_provider.get())
+
+        jira_board_provider._jira = Mock()
+        jira_board_provider.is_loaded = True
+        jira_issue = []
+        result_list = ResultList(jira_issue, _total=len(jira_issue))
+        jira_board_provider._jira.search_issues.return_value = result_list
+        jira_board_provider.load()
+
+        assert len(munki_repo_provider.get()) != 0
+        assert len(jira_board_provider.get()) == 0
+
+        jira_board_provider.update_jira_from_repo(munki_packages)
+
+        assert len(jira_board_provider.get()) != 0
 
 
 @pytest.mark.usefixtures("run_makecatalogs_before")
