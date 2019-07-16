@@ -1,2 +1,13 @@
 [run]
 omit = *venv*, */__init__.py, */tests/*, */setup.py
+branch = True
+
+[html]
+directory = htmlcov
+title = MunkiPromoter v2 Coverage Report
+
+[report]
+exclude_lines = pass
+precision = 2
+show_missing = True
+fail_under = 85
