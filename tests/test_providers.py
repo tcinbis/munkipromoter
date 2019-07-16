@@ -14,11 +14,11 @@ import pytest
 from jira import Issue
 from jira.client import ResultList
 
-from core.base_classes import Package
+from core.base_classes import Package, Provider
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
 from utils.config import PackageState, Present
-from utils.exceptions import JiraIssueMissingFields
+from utils.exceptions import JiraIssueMissingFields, ProviderDoesNotImplement
 
 
 @pytest.mark.usefixtures("run_makecatalogs_before")
@@ -208,3 +208,14 @@ class TestMunkiRepoProvider:
     def test_make_catalogs_subprocess_error(self, config):
         config.REPO_PATH = "/some/path/which/does/not/exist"
         MunkiRepoProvider.make_catalogs()
+
+
+def test_provider_does_not_implement_exception():
+    class DummyProvider(Provider):
+        def connect(self) -> bool:
+            raise ProviderDoesNotImplement()
+
+    provider = DummyProvider("dummy")
+
+    with pytest.raises(ProviderDoesNotImplement):
+        provider.connect()
