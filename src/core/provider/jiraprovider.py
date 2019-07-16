@@ -136,7 +136,7 @@ class JiraBoardProvider(Provider):
             logger.debug(f"Jira update called for {package}, but no changes detected.")
         else:
             package.state = PackageState.NEW
-            if package not in self._packages_dict:
+            if package.key not in self._packages_dict:
                 logger.debug(f"Creating new jira ticket for {package}")
                 self._packages_dict.update({package.key: package})
 
