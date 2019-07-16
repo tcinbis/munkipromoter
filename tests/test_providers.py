@@ -1,7 +1,10 @@
+import copy
+from datetime import datetime
 from random import random
 from unittest.mock import Mock
 
 import pytest
+from core.base_classes import Package
 from core.provider.jiraprovider import JiraBoardProvider
 from jira import Issue
 from utils.exceptions import JiraIssueMissingFields
@@ -105,5 +108,29 @@ class TestMunkiRepoProvider:
     def test__jira_issue_to_package(self, jira_board_provider):
         pass
 
-    def test_update(self, munki_repo_provider):
+    def test_update(self, munki_repo_provider, config):
         munki_repo_provider.load()
+        packages = copy.deepcopy(munki_repo_provider.get())
+
+        # after loading our testing repo, we should have more than 0 packages
+        assert len(packages) != 0
+
+        test_key = list(packages.keys())[0]
+        p = packages.get(test_key)  # type: Package
+        p.catalog = None
+        munki_repo_provider.update(p)
+
+        for key, package in munki_repo_provider.get().items():
+            # after changing the value of a not ignored package field the update should be propagated and be represented
+            # in the new dictionary we get from our munki provider
+            assert packages.get(key).is_exact_match(package, ["state"])
+
+        munki_repo_provider.load()
+        packages = copy.deepcopy(munki_repo_provider.get())
+        p = packages.get(test_key)  # type: Package
+        p.promote_date = datetime.now()
+        munki_repo_provider.update(p)
+
+        munki_package = munki_repo_provider.get().get(test_key)  # type: Package
+
+        assert not p.is_exact_match(munki_package)
