@@ -1,10 +1,28 @@
+import copy
 import operator
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from core.base_classes import Package, PackageVersion
 from core.provider.jiraprovider import JiraBoardProvider
 from utils.config import Catalog, JiraLane, Present, JiraAutopromote
+
+
+class TestPackage:
+    def test_ignored_compare_keys(self):
+        assert [
+            "promote_date",
+            "jira_id",
+            "munki_uuid",
+            "provider",
+            "state",
+        ] == Package.ignored_compare_keys()
+
+    def test_is_exact_match(self, random_package):
+        assert random_package.is_exact_match(random_package)
+        p = copy.deepcopy(random_package)
+        p.promote_date = datetime.now() + timedelta(days=5)
+        assert not random_package.is_exact_match(p)
 
 
 def test_package_equality():

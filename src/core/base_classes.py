@@ -84,13 +84,6 @@ class Package:
     def str_to_version(version_str: str) -> PackageVersion:
         return PackageVersion(version_str)
 
-    def update(self):
-        """
-        Call the update method of the provider which created the package.
-        :return: None
-        """
-        self.provider.update(self)
-
     def __str__(self):
         return f"{self.name} {self.version} {self.catalog.name}"
 
