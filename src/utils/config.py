@@ -42,6 +42,8 @@ class MunkiPromoterConfig:
             "MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs"
         )
 
+        DRY_RUN = os.getenv("MUNKIPROMOTER_DRY_RUN", False)
+
         MAKECATALOGS_PARAMS = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PARAMS", "")
 
         # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
@@ -161,6 +163,7 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
         self.instance.JIRA_DUMP_PATH = os.path.join(
             os.path.dirname(__file__), "../../tests/jira_dump"
         )
+        self.instance.DRY_RUN = True
 
 
 conf = MunkiPromoterTestConfig() if "pytest" in sys.modules else MunkiPromoterConfig()
