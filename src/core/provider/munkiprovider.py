@@ -34,14 +34,14 @@ class MunkiRepoProvider(Provider):
 
     def _load_packages(self):
         logger.debug(f"Loading packages from repo: {conf.REPO_PATH}")
+        # clear internal packages dict, before loading for the first time OR again
+        self._packages_dict.clear()
         for filename in os.listdir(conf.CATALOGS_PATH):
             if not (filename.startswith(".") or filename == "all"):
                 # Ignore hidden files
                 munki_packages = plistlib.load(
                     open(os.path.join(conf.CATALOGS_PATH, filename), "rb")
                 )
-
-                self._packages_dict.clear()
 
                 for item in munki_packages:
                     try:
