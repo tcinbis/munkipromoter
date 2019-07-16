@@ -51,6 +51,11 @@ def run_makecatalogs_before(munki_repo_provider):
     munki_repo_provider.make_catalogs()
 
 
+@pytest.fixture
+def munkipromoter():
+    return MunkiPromoter()
+
+
 @pytest.fixture(params=["10"])
 def test_one_package(request) -> Package:
     yield Package(
@@ -132,9 +137,10 @@ def set_up_promoter(config, jira_board_provider, munki_repo_provider):
 
     munki_repo_provider.load()
     munki_repo_provider._packages_dict = {
-        k: v for k, v in munki_repo_provider._packages_dict.items() if "EN60.8.0" in k
+        # TODO: Document why we do this and what it does.
+        k: v
+        for k, v in munki_repo_provider.get().items()
+        if "EN60.8.0" in k
     }
 
-    return Promoter(
-        munki_repo_provider._packages_dict, jira_board_provider._packages_dict
-    )
+    return Promoter(munki_repo_provider.get(), jira_board_provider.get())
