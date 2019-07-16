@@ -5,6 +5,7 @@
 #
 #  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:04
 
+
 class PromoterException(Exception):
     """This exception class will be extended by all sub exceptions which are special to this project."""
 
