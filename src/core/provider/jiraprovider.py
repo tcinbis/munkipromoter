@@ -1,3 +1,10 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 12:55.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:03
+
 from __future__ import annotations
 
 import copy
@@ -5,8 +12,9 @@ from datetime import datetime
 from typing import List, Dict
 
 import requests
-from core.base_classes import Provider, Package
 from jira import JIRA, Issue
+
+from core.base_classes import Provider, Package
 from utils import logger as log
 from utils.config import PackageState, JiraLane, Catalog, Present, JiraAutopromote
 from utils.config import conf
@@ -16,7 +24,7 @@ logger = log.get_logger(__file__)
 
 
 class JiraBoardProvider(Provider):
-    def __init__(self, name, dry_run=False):
+    def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
         super().__init__(name, dry_run)
         # noinspection PyTypeChecker
         self._jira = None  # type: JIRA
@@ -70,6 +78,11 @@ class JiraBoardProvider(Provider):
         return bool(package.jira_id)
 
     def _jira_issue_to_package_dict(self, issues: List[Issue]) -> Dict:
+        """
+        Wrapper method around the :func:`_jira_issue_to_package` method which handles a list of `Issue`.
+        :param issues: `List` containing `Issue` to be converted to `Package` objects
+        :return: `Dict` containing the newly created `Package` objects
+        """
         packages = dict()
         for issue in issues:
             p = self._jira_issue_to_package(issue)
@@ -128,7 +141,7 @@ class JiraBoardProvider(Provider):
             logger.debug(f"Jira update called for {package}, but no changes detected.")
         else:
             package.state = PackageState.NEW
-            if package not in self._packages_dict:
+            if package.key not in self._packages_dict:
                 logger.debug(f"Creating new jira ticket for {package}")
                 self._packages_dict.update({package.key: package})
 
