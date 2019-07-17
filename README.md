@@ -1,6 +1,4 @@
-# Munki Promoter
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/763edf5e399945378a3b8fd649576a6d)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=tcinbis/munkipromoter&utm_campaign=Badge_Coverage)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/763edf5e399945378a3b8fd649576a6d)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tcinbis/munkipromoter&amp;utm_campaign=Badge_Grade)
+# Munki Promoter [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/763edf5e399945378a3b8fd649576a6d)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=tcinbis/munkipromoter&utm_campaign=Badge_Coverage)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/763edf5e399945378a3b8fd649576a6d)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tcinbis/munkipromoter&amp;utm_campaign=Badge_Grade)[![Build Status](https://travis-ci.com/tcinbis/munkipromoter.svg?token=UG4L2xzc4VqB7GwMRNRu&branch=master)](https://travis-ci.com/tcinbis/munkipromoter)
 ## Quick start
 
 ### Dependencies
