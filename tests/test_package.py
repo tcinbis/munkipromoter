@@ -1,8 +1,16 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 12:55.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:04
+
 import copy
 import operator
 from datetime import datetime, timedelta
 
 import pytest
+
 from core.base_classes import Package, PackageVersion
 from core.provider.jiraprovider import JiraBoardProvider
 from utils.config import Catalog, JiraLane, Present, JiraAutopromote
