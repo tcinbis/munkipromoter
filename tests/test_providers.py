@@ -17,6 +17,7 @@ from jira.client import ResultList
 from core.base_classes import Package, Provider
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
+from tests.conftest import is_exact_match
 from utils.config import PackageState, Present
 from utils.exceptions import JiraIssueMissingFields, ProviderDoesNotImplement
 
@@ -102,7 +103,7 @@ class TestJiraBoardProvider:
         for key, package in jira_board_provider.get().items():
             # after changing the value of a not ignored package field the update should be propagated and be represented
             # in the new dictionary we get from our munki provider
-            assert packages.get(key).is_exact_match(package, ["state"])
+            assert is_exact_match(packages.get(key), package, ["state"])
 
     def test_update_new_package(
         self, jira_board_provider, jira_test_issues, random_package
@@ -126,7 +127,7 @@ class TestJiraBoardProvider:
             random_package.key in jira_board_provider.get()
             and random_package.key not in jira_packages
         )
-        assert random_package.is_exact_match(jira_package, ["state"])
+        assert is_exact_match(random_package, jira_package, ["state"])
         assert jira_package.state == PackageState.NEW
 
     def test_update_jira_from_repo(self, munki_repo_provider, jira_board_provider):
@@ -178,7 +179,7 @@ class TestMunkiRepoProvider:
         for key, package in munki_repo_provider.get().items():
             # after changing the value of a not ignored package field the update should be propagated and be represented
             # in the new dictionary we get from our munki provider
-            assert packages.get(key).is_exact_match(package, ["state"])
+            assert is_exact_match(packages.get(key), package, ["state"])
 
         munki_repo_provider.load()
         packages = copy.deepcopy(munki_repo_provider.get())
@@ -188,7 +189,7 @@ class TestMunkiRepoProvider:
 
         munki_package = munki_repo_provider.get().get(test_key)  # type: Package
 
-        assert not p.is_exact_match(munki_package)
+        assert not is_exact_match(p, munki_package)
 
     def test_update_missing_package(self, munki_repo_provider, random_package):
         munki_repo_provider.load()

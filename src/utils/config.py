@@ -49,11 +49,11 @@ class MunkiPromoterConfig:
         # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
         JIRA_CONNECTION_INFO = {
             "server": os.getenv(
-                "MUNKIPROMOTER_REPO_PATH", "https://deployment-jira.its.unibas.ch"
+                "MUNKIPROMOTER_JIRA_URL", "INSERT YOUR DEFAULT SERVER URL HERE"
             ),
             "basic_auth": (
-                os.getenv("MUNKIPROMOTER_JIRA_USER", "***REMOVED***"),
-                os.getenv("MUNKIPROMOTER_JIRA_PASSWORD", "***REMOVED***"),
+                os.getenv("MUNKIPROMOTER_JIRA_USER", "INSERT YOUR JIRA USERNAME HERE"),
+                os.getenv("MUNKIPROMOTER_JIRA_PASSWORD", "INSERT YOUR JIRA PASSWORD HERE"),
             ),
         }
 

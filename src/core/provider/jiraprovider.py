@@ -78,6 +78,11 @@ class JiraBoardProvider(Provider):
         return bool(package.jira_id)
 
     def _jira_issue_to_package_dict(self, issues: List[Issue]) -> Dict:
+        """
+        Wrapper method around the :func:`_jira_issue_to_package` method which handles a list of `Issue`.
+        :param issues: `List` containing `Issue` to be converted to `Package` objects
+        :return: `Dict` containing the newly created `Package` objects
+        """
         packages = dict()
         for issue in issues:
             p = self._jira_issue_to_package(issue)
@@ -206,3 +211,9 @@ class JiraBoardProvider(Provider):
                 logger.debug(f"Adding munki package {munki_package} to jira.")
                 munki_package.state = PackageState.NEW
                 self._packages_dict.update({munki_key: munki_package})
+                continue
+
+            existing_issue = self._get(munki_key)
+            if existing_issue.is_present == Present.MISSING:
+                existing_issue.is_present = Present.PRESENT
+                existing_issue.state = PackageState.UPDATE
