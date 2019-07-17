@@ -13,3 +13,16 @@ script:
 
 after_success:
   - python-codacy-coverage -r coverage.xml
+
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GH_TOKEN
+  keep-history: true
+  repo: munkipromoter-docs
+  target-branch: master
+  verbose: false
+  local_dir: docs/_build
+  on:
+    branch: master
