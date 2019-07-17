@@ -1,10 +1,19 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 12:55.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:04
+
 import copy
 import operator
 from datetime import datetime, timedelta
 
 import pytest
+
 from core.base_classes import Package, PackageVersion
 from core.provider.jiraprovider import JiraBoardProvider
+from tests.conftest import is_exact_match
 from utils.config import Catalog, JiraLane, Present, JiraAutopromote
 
 
@@ -19,10 +28,10 @@ class TestPackage:
         ] == Package.ignored_compare_keys()
 
     def test_is_exact_match(self, random_package):
-        assert random_package.is_exact_match(random_package)
+        assert is_exact_match(random_package, random_package)
         p = copy.deepcopy(random_package)
         p.promote_date = datetime.now() + timedelta(days=5)
-        assert not random_package.is_exact_match(p)
+        assert not is_exact_match(random_package, p)
 
     def test_package_equality(self):
         """Identical packages should be equal."""

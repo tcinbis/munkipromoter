@@ -1,3 +1,10 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 15:23.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 15:23
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -7,13 +14,13 @@ from typing import Type, Dict, List
 from uuid import UUID
 
 from utils import logger as log
-from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane
+from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane, conf
 
 logger = log.get_logger(__file__)
 
 
 class Provider:
-    def __init__(self, name: str, dry_run: bool = False):
+    def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
         self.name = name
         self.is_loaded = False
         self._packages = list()
@@ -97,18 +104,3 @@ class Package:
         :return: List of keys which should be ignored when comparing packages
         """
         return ["promote_date", "jira_id", "munki_uuid", "provider", "state"]
-
-    def is_exact_match(self, package: Package, exclude_keys: List = None) -> bool:
-        """
-        Compare ALL fields of a package to another package to check whether we have found an exact match.
-        :param package: The package we want to compare us to.
-        :param exclude_keys: Ignore the following keys during comparison
-        :return: True if all values are the same, False otherwise
-        """
-        for key, value in package.__dict__.items():
-            if (exclude_keys and key not in exclude_keys) or not exclude_keys:
-                # only check if the key is in exclude_keys if we are sure that it is not None. In case it is None we
-                # want to compare all keys anyways.
-                if self.__dict__.get(key) != value:
-                    return False
-        return True
