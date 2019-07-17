@@ -1,4 +1,5 @@
 # Munki Promoter
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/763edf5e399945378a3b8fd649576a6d)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=tcinbis/munkipromoter&utm_campaign=Badge_Coverage)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/763edf5e399945378a3b8fd649576a6d)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tcinbis/munkipromoter&amp;utm_campaign=Badge_Grade)
 ## Quick start
 
@@ -10,7 +11,7 @@ To install all required packages just run `pip3 install -r requirements.txt`.
 
 ### Tox
 >[Tox](https://tox.readthedocs.io/en/latest/index.html) aims to automate and standardize testing in Python. 
-It is part of a larger vision of easing the packaging, testing and release process of Python software.
+>It is part of a larger vision of easing the packaging, testing and release process of Python software.
 
 To test future compatibility a basic tox configuration is also included in this repo. By simply running `tox` in the
 main directory the test can be started.
