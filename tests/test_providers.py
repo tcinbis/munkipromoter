@@ -1,3 +1,10 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 12:55.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:04
+
 import copy
 from datetime import datetime
 from random import random
@@ -5,11 +12,13 @@ from unittest.mock import Mock
 
 import pytest
 from jira import Issue
+from jira.client import ResultList
 
-from core.base_classes import Package
+from core.base_classes import Package, Provider
 from core.provider.jiraprovider import JiraBoardProvider
+from core.provider.munkiprovider import MunkiRepoProvider
 from utils.config import PackageState, Present
-from utils.exceptions import JiraIssueMissingFields
+from utils.exceptions import JiraIssueMissingFields, ProviderDoesNotImplement
 
 
 @pytest.mark.usefixtures("run_makecatalogs_before")
@@ -25,11 +34,15 @@ class TestJiraBoardProvider:
         # When a connection is not possible the method should return False and do not throw a exception.
         assert not jira_board_provider.connect(connection_params=param)
 
-    def test_load(self):
-        pass
+    def test_load(self, jira_board_provider, jira_test_issues):
+        jira_board_provider._jira = Mock()
+        jira_board_provider.is_loaded = True
+        jira_issue = [jira_test_issues]
+        result_list = ResultList(jira_issue, _total=len(jira_issue))
+        jira_board_provider._jira.search_issues.return_value = result_list
+        jira_board_provider.load()
 
-    def test_get(self):
-        pass
+        assert len(jira_board_provider.get()) != 0
 
     def test_check_jira_issue_exists(self, jira_board_provider, test_one_package):
         assert JiraBoardProvider.check_jira_issue_exists(test_one_package)
@@ -67,29 +80,72 @@ class TestJiraBoardProvider:
         except JiraIssueMissingFields:
             assert True
 
-    def test_update(self):
-        pass
-        # def test_update(self, test_one_package):
-        #     jira = JiraBoardProvider(Mock())
-        #     jira._jira = MagicMock()
-        #     jira.update(test_one_package)
-        #
-        #     issue_dict = {
-        #         JIRA_PROJECT_FIELD: JIRA_PROJECT_KEY,
-        #         JIRA_ISSUE_TYPE_FIELD: JIRA_ISSUE_TYPE,
-        #         JIRA_SUMMARY_FIELD: str(test_one_package),
-        #         JIRA_SOFTWARE_NAME_FIELD: test_one_package.name,
-        #         JIRA_SOFTWARE_VERSION_FIELD: test_one_package.version.vstring,
-        #         JIRA_DUEDATE_FIELD: test_one_package.promote_date.strftime("%Y-%m-%d"),
-        #         JIRA_DESCRIPTION_FIELD: test_one_package.name,
-        #         JIRA_CATALOG_FIELD: [test_one_package.catalog.value],
-        #         JIRA_AUTOPROMOTE_FIELD: JIRA_AUTOPROMOTE.get(
-        #             test_one_package.is_autopromote
-        #         ),
-        #         JIRA_PRESENT_FIELD: [test_one_package.is_present.value],
-        #     }
-        #
-        #     jira._jira.create_issue.assert_called_once_with(fields=issue_dict)
+    def test_update(self, jira_board_provider, jira_test_issues):
+
+        jira_board_provider._jira = Mock()
+        jira_board_provider.is_loaded = True
+        jira_issue = [jira_test_issues]
+        result_list = ResultList(jira_issue, _total=len(jira_issue))
+        jira_board_provider._jira.search_issues.return_value = result_list
+        jira_board_provider.load()
+
+        packages = copy.deepcopy(jira_board_provider.get())
+
+        # after loading our testing repo, we should have more than 0 packages
+        assert len(packages) != 0
+
+        test_key = list(packages.keys())[0]
+        p = packages.get(test_key)  # type: Package
+        p.catalog = None
+        jira_board_provider.update(p)
+
+        for key, package in jira_board_provider.get().items():
+            # after changing the value of a not ignored package field the update should be propagated and be represented
+            # in the new dictionary we get from our munki provider
+            assert packages.get(key).is_exact_match(package, ["state"])
+
+    def test_update_new_package(
+        self, jira_board_provider, jira_test_issues, random_package
+    ):
+        jira_board_provider._jira = Mock()
+        jira_board_provider.is_loaded = True
+        jira_issue = [jira_test_issues]
+        result_list = ResultList(jira_issue, _total=len(jira_issue))
+        jira_board_provider._jira.search_issues.return_value = result_list
+        jira_board_provider.load()
+
+        jira_packages = copy.deepcopy(jira_board_provider.get())
+
+        # because we want to simulate a new package it can not have a jira id already
+        random_package.jira_id = None
+        jira_board_provider.update(random_package)
+
+        jira_package = jira_board_provider._get(random_package.key)
+
+        assert (
+            random_package.key in jira_board_provider.get()
+            and random_package.key not in jira_packages
+        )
+        assert random_package.is_exact_match(jira_package, ["state"])
+        assert jira_package.state == PackageState.NEW
+
+    def test_update_jira_from_repo(self, munki_repo_provider, jira_board_provider):
+        munki_repo_provider.load()
+        munki_packages = copy.deepcopy(munki_repo_provider.get())
+
+        jira_board_provider._jira = Mock()
+        jira_board_provider.is_loaded = True
+        jira_issue = []
+        result_list = ResultList(jira_issue, _total=len(jira_issue))
+        jira_board_provider._jira.search_issues.return_value = result_list
+        jira_board_provider.load()
+
+        assert len(munki_repo_provider.get()) != 0
+        assert len(jira_board_provider.get()) == 0
+
+        jira_board_provider.update_jira_from_repo(munki_packages)
+
+        assert len(jira_board_provider.get()) != 0
 
 
 @pytest.mark.usefixtures("run_makecatalogs_before")
@@ -102,17 +158,12 @@ class TestMunkiRepoProvider:
 
     def test_load(self, munki_repo_provider):
         munki_repo_provider.load()
+        assert len(munki_repo_provider.get()) != 0
 
     def test_get(self):
         pass
 
-    def test__jira_issue_to_package_list(self):
-        pass
-
-    def test__jira_issue_to_package(self, jira_board_provider):
-        pass
-
-    def test_update(self, munki_repo_provider):
+    def test_update_existing_package(self, munki_repo_provider):
         munki_repo_provider.load()
         packages = copy.deepcopy(munki_repo_provider.get())
 
@@ -153,3 +204,18 @@ class TestMunkiRepoProvider:
             and random_package.is_present is Present.MISSING
             and munki_package.state is PackageState.NEW
         )
+
+    def test_make_catalogs_subprocess_error(self, config):
+        config.REPO_PATH = "/some/path/which/does/not/exist"
+        MunkiRepoProvider.make_catalogs()
+
+
+def test_provider_does_not_implement_exception():
+    class DummyProvider(Provider):
+        def connect(self) -> bool:
+            raise ProviderDoesNotImplement()
+
+    provider = DummyProvider("dummy")
+
+    with pytest.raises(ProviderDoesNotImplement):
+        provider.connect()

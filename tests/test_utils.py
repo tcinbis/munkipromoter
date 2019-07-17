@@ -1,4 +1,12 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 12:55.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:04
+
 import pytest
+
 from utils import logger as log
 from utils.config import JiraLane, Catalog, JiraAutopromote
 
