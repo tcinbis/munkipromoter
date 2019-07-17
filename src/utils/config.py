@@ -1,3 +1,10 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 12:55.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:04
+
 from __future__ import annotations
 
 import os
@@ -34,6 +41,8 @@ class MunkiPromoterConfig:
         MAKECATALOGS = os.getenv(
             "MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs"
         )
+
+        DRY_RUN = os.getenv("MUNKIPROMOTER_DRY_RUN", False)
 
         MAKECATALOGS_PARAMS = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PARAMS", "")
 
@@ -154,6 +163,7 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
         self.instance.JIRA_DUMP_PATH = os.path.join(
             os.path.dirname(__file__), "../../tests/jira_dump"
         )
+        self.instance.DRY_RUN = True
 
 
 conf = MunkiPromoterTestConfig() if "pytest" in sys.modules else MunkiPromoterConfig()
