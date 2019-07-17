@@ -24,12 +24,27 @@ logger = log.get_logger(__file__)
 
 
 class JiraBoardProvider(Provider):
+    """
+    Connects to a specific jira server and represents the state of the issues
+    in the jira board by showing them as `Package`
+    """
+
     def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
+        """
+        Initializes a `JiraBoardProvider` object with a given name.
+        :param name: `str` Name of the provider
+        :param dry_run: `bool` If true, none of the changes will be commited in `commit`
+        """
         super().__init__(name, dry_run)
         # noinspection PyTypeChecker
         self._jira = None  # type: JIRA
 
     def connect(self, connection_params=conf.JIRA_CONNECTION_INFO):
+        """
+        Connects to a jira instance by using the configured connection information
+        :param connection_params: Parameters to connect to the jira api
+        :return: `bool` True if the connection as successful
+        """
         try:
             self._jira = JIRA(**connection_params)
 
@@ -43,6 +58,12 @@ class JiraBoardProvider(Provider):
             return False
 
     def load(self):
+        """
+        If a successful connection to the jira instance is possible all issues for a given project key are loaded.
+        Issues are loaded in batches, if the project has more issues than the batch size, the issues are loaded
+        continously.
+        After loading the issues, these are converted into a `Package` with `_jira_issue_to_package_dict`.
+        """
         if self.is_loaded or self.connect():
             query = f"project={conf.JIRA_PROJECT_KEY}"
             search_result = self._jira.search_issues(query, maxResults=500)
@@ -91,6 +112,12 @@ class JiraBoardProvider(Provider):
         return packages
 
     def _jira_issue_to_package(self, issue: Issue) -> Package:
+        """
+        Converts a given issue into a `Package` object. Before converting the issue is verified to contain
+        all needed fields.
+        :param issue: The jira issue converted to a `Package`
+        :return: `Package` representing the issue
+        """
         fields_dict = issue.fields.__dict__  # type: dict
 
         if all(field in fields_dict for field in conf.ISSUE_FIELDS):
@@ -126,6 +153,11 @@ class JiraBoardProvider(Provider):
             raise JiraIssueMissingFields()
 
     def update(self, package: Package):
+        """
+        Searches for a package in jira and updates it according to the package given in the argument.
+        If no jira issue exists matching the given package it is created.
+        :param package: `Package` object to be written to jira
+        """
         package = copy.deepcopy(package)
         if JiraBoardProvider.check_jira_issue_exists(package):
             # Ticket with this id already exists.
@@ -146,6 +178,11 @@ class JiraBoardProvider(Provider):
                 self._packages_dict.update({package.key: package})
 
     def commit(self) -> bool:
+        """
+        Checks if the program runs as a dry run and if this is not the case, all previously made changes
+        are commited to jira.
+        :return: `bool` True if the run was not a dry run and changes were commited.
+        """
         if not self._dry_run:
             for package in self.get().values():
 
@@ -205,6 +242,13 @@ class JiraBoardProvider(Provider):
         return False
 
     def update_jira_from_repo(self, munki_packages: Dict):
+        """
+        Updates the jira board based on the munki packages in two ways.
+        If a package exists in munki, but not in jira, then a issue is created.
+        If a issue exists in jira which is specified to be missing in munki, but it was added to munki,
+        then the missing attribute of jira is set to not missing.
+        :param munki_packages: `Dict` of all munki packages
+        """
         for munki_key, munki_package in munki_packages.items():
             munki_package = copy.deepcopy(munki_package)
             if not self._get(munki_key):
