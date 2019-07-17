@@ -118,7 +118,7 @@ def random_package() -> Package:
 @pytest.fixture
 def jira_test_issues(config):
     with open(
-        os.path.join(config.JIRA_DUMP_PATH, "firefox_jira_issue.txt"), "r"
+        os.path.join(config.JIRA_DUMP_PATH, "firefox_jira_issue.json"), "r"
     ) as infile:
         dump = json.load(infile)
         return cls_for_resource(dump["self"])(None, None, dump)
