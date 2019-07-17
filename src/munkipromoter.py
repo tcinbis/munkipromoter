@@ -32,6 +32,8 @@ class MunkiPromoter:
             # passing the config values from the commandline interface to our config class.
             conf.__setattr__(flag, value)
 
+        # sentry_sdk.init("https://***REMOVED***@sentry.io/***REMOVED***")
+
     @staticmethod
     def _setup_argparser():
         parser = argparse.ArgumentParser()
