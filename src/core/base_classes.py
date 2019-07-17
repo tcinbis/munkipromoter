@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
-from typing import Type, Dict, List
+from typing import Type, Dict
 from uuid import UUID
 
 from utils import logger as log
