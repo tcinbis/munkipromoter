@@ -1,3 +1,10 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 12:55.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 13:03
+
 from __future__ import annotations
 
 import copy
@@ -17,7 +24,7 @@ logger = log.get_logger(__file__)
 
 
 class MunkiRepoProvider(Provider):
-    def __init__(self, name, dry_run=False):
+    def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
         super().__init__(name, dry_run)
         self._pkg_info_files = dict(dict())
 

@@ -1,3 +1,10 @@
+#  Gmacht mit ❤️ in Basel
+#
+#  Copyright (c) 2019 University of Basel
+#  Last modified 16/07/2019, 15:23.
+#
+#  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 15:23
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -7,13 +14,13 @@ from typing import Type, Dict, List
 from uuid import UUID
 
 from utils import logger as log
-from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane
+from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane, conf
 
 logger = log.get_logger(__file__)
 
 
 class Provider:
-    def __init__(self, name: str, dry_run: bool = False):
+    def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
         self.name = name
         self.is_loaded = False
         self._packages = list()
