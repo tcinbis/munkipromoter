@@ -22,7 +22,5 @@ deploy:
   keep-history: true
   repo: munkipromoter-docs
   target-branch: master
-  verbose: false
-  local_dir: docs/_build
   on:
     branch: master
