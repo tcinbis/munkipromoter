@@ -4,7 +4,6 @@
 ### Dependencies
 To install all required packages just run `pip3 install -r requirements.txt`.
 
-
 ## Development & Testing
 
 ### Tox

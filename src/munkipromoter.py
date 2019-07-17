@@ -32,9 +32,8 @@ class MunkiPromoter:
             # passing the config values from the commandline interface to our config class.
             conf.__setattr__(flag, value)
 
-        # sentry_sdk.init("https://***REMOVED***@sentry.io/***REMOVED***")
-
-    def _setup_argparser(self):
+    @staticmethod
+    def _setup_argparser():
         parser = argparse.ArgumentParser()
         parser.add_argument(
             "-m", "--munki-repo", type=str, dest="REPO_PATH", default=conf.REPO_PATH
@@ -44,6 +43,19 @@ class MunkiPromoter:
         )
         parser.add_argument(
             "-n", "--dry-run", action="store_true", dest="DRY_RUN", default=conf.DRY_RUN
+        )
+        parser.add_argument(
+            "-j", "--jira-server", type=str, dest="JIRA_URL", default=conf.JIRA_URL
+        )
+        parser.add_argument(
+            "-u", "--user", type=str, dest="JIRA_USER", default=conf.JIRA_USER
+        )
+        parser.add_argument(
+            "-p",
+            "--password",
+            type=str,
+            dest="JIRA_PASSWORD",
+            default=conf.JIRA_PASSWORD,
         )
         return parser
 

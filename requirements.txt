@@ -1,9 +1,9 @@
 requests==2.22.0
 tqdm==4.32.2
 pytest==5.0.1
-# Because the jira package on pypi is still version 2.0.0 instead of 2.0.1rc1 (since 19.12.2018) we manually checkout
+# Because the jira package on pypi is still version 2.0.0 instead of 2.0.1rc2 (since 13.03.2019) we manually checkout
 # the commit for version 2.0.1rc1
--e git://github.com/pycontribs/jira.git@72f2f6b181004fd0dff0b4946f427b83b9c0c68a#egg=jira
+-e git://github.com/pycontribs/jira.git@bb37c2e65675e7877b9fb4dc120e020422160584#egg=jira
 sentry-sdk==0.10.1
 sphinx==2.1.2
 sphinx_rtd_theme==0.4.3
@@ -11,3 +11,4 @@ pytest-cov==2.7.1
 coverage==4.5.3
 tox==3.13.2
 codacy-coverage==1.3.11
+flake8==3.7.8

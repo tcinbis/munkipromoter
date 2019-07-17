@@ -46,16 +46,24 @@ class MunkiPromoterConfig:
 
         MAKECATALOGS_PARAMS = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PARAMS", "")
 
-        # Store Jira connection information in a dict. We can then create a connection by invoking JIRA(**JIRA_CONNECTION_INFO)
-        JIRA_CONNECTION_INFO = {
-            "server": os.getenv(
-                "MUNKIPROMOTER_JIRA_URL", "INSERT YOUR DEFAULT SERVER URL HERE"
-            ),
-            "basic_auth": (
-                os.getenv("MUNKIPROMOTER_JIRA_USER", "INSERT YOUR JIRA USERNAME HERE"),
-                os.getenv("MUNKIPROMOTER_JIRA_PASSWORD", "INSERT YOUR JIRA PASSWORD HERE"),
-            ),
-        }
+        JIRA_URL = os.getenv(
+            "MUNKIPROMOTER_JIRA_URL", "INSERT YOUR DEFAULT SERVER URL HERE"
+        )
+        JIRA_USER = os.getenv(
+            "MUNKIPROMOTER_JIRA_USER", "INSERT YOUR JIRA USERNAME HERE"
+        )
+        JIRA_PASSWORD = os.getenv(
+            "MUNKIPROMOTER_JIRA_PASSWORD", "INSERT YOUR JIRA PASSWORD HERE"
+        )
+
+        @property
+        def JIRA_CONNECTION_INFO(self):
+            # Store Jira connection information in a dict. We can then create a connection by invoking
+            # JIRA(**JIRA_CONNECTION_INFO)
+            return {
+                "server": self.JIRA_URL,
+                "basic_auth": (self.JIRA_USER, self.JIRA_PASSWORD),
+            }
 
         JIRA_PROJECT_KEY = os.getenv("MUNKIPROMOTER_JIRA_PROJECT_KEY", "SWPM")
         JIRA_ISSUE_TYPE = os.getenv("MUNKIPROMOTER_JIRA_ISSUE_TYPE", "Story")
