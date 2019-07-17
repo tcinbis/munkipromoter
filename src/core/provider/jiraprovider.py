@@ -78,6 +78,11 @@ class JiraBoardProvider(Provider):
         return bool(package.jira_id)
 
     def _jira_issue_to_package_dict(self, issues: List[Issue]) -> Dict:
+        """
+        Wrapper method around the :func:`_jira_issue_to_package` method which handles a list of `Issue`.
+        :param issues: `List` containing `Issue` to be converted to `Package` objects
+        :return: `Dict` containing the newly created `Package` objects
+        """
         packages = dict()
         for issue in issues:
             p = self._jira_issue_to_package(issue)
