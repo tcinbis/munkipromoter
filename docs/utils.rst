@@ -1,10 +1,10 @@
-utils package
+Utilities package
 =================
 
 Submodules
 ----------
 
-utils.config module
+Config module
 -----------------------
 
 .. automodule:: utils.config
@@ -12,7 +12,7 @@ utils.config module
    :undoc-members:
    :show-inheritance:
 
-utils.exceptions module
+Exceptions module
 ---------------------------
 
 .. automodule:: utils.exceptions
@@ -20,19 +20,10 @@ utils.exceptions module
    :undoc-members:
    :show-inheritance:
 
-utils.logger module
+Logger module
 -----------------------
 
 .. automodule:: utils.logger
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: utils
    :members:
    :undoc-members:
    :show-inheritance:

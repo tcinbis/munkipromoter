@@ -1,4 +1,4 @@
-core package
+Core package
 ================
 
 Subpackages
@@ -11,7 +11,7 @@ Subpackages
 Submodules
 ----------
 
-core.base\_classes module
+Base\_classes module
 -----------------------------
 
 .. automodule:: core.base_classes
@@ -19,7 +19,7 @@ core.base\_classes module
    :undoc-members:
    :show-inheritance:
 
-core.promotion module
+Promotion module
 -------------------------
 
 .. automodule:: core.promotion
