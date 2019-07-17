@@ -6,7 +6,7 @@ Main Packages
    core
    utils
 
-munkipromoter module
+Munki Promoter module
 ------------------------
 
 .. automodule:: munkipromoter

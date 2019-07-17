@@ -1,7 +1,7 @@
 Provider Package
 =========================
 
-core.provider.jiraprovider module
+Jira Provider module
 -------------------------------------
 
 .. automodule:: core.provider.jiraprovider
@@ -10,7 +10,7 @@ core.provider.jiraprovider module
    :show-inheritance:
    :private-members:
 
-core.provider.munkiprovider module
+Munki Provider module
 --------------------------------------
 
 .. automodule:: core.provider.munkiprovider
