@@ -32,7 +32,7 @@ class MunkiPromoter:
             # passing the config values from the commandline interface to our config class.
             conf.__setattr__(flag, value)
 
-        # sentry_sdk.init("https://***REMOVED***@sentry.io/***REMOVED***")
+        # sentry_sdk.init("https://YOUR-SENTRY-PROJECT-CONFIG0@sentry.io/HERE")
 
     @staticmethod
     def _setup_argparser():
