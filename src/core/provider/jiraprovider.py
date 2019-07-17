@@ -211,3 +211,9 @@ class JiraBoardProvider(Provider):
                 logger.debug(f"Adding munki package {munki_package} to jira.")
                 munki_package.state = PackageState.NEW
                 self._packages_dict.update({munki_key: munki_package})
+                continue
+
+            existing_issue = self._get(munki_key)
+            if existing_issue.is_present == Present.MISSING:
+                existing_issue.is_present = Present.PRESENT
+                existing_issue.state = PackageState.UPDATE

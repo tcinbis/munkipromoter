@@ -54,17 +54,16 @@ class Promoter:
                 jira_pkg.state = PackageState.UPDATE
 
             munki_package = self.munki_pkgs_dict.get(jira_pkg.key)
-            if munki_package:
+            if munki_package and munki_package != jira_pkg:
                 for key, value in jira_pkg.__dict__.items():
                     if key not in Package.ignored_compare_keys():
-                        if munki_package != jira_pkg:
+                        if munki_package.__dict__.get(key) != value:
                             # Not all values of the existing jira ticket and the local version match. Therefore update.
                             logger.debug(
                                 f"Updating munki pkg {munki_package} values as {key} do not match: {munki_package.__dict__.get(key)} != {value}"
                             )
                             munki_package.state = PackageState.UPDATE
                             setattr(munki_package, key, value)
-                            return
             else:
                 jira_pkg.present = Present.MISSING
 
