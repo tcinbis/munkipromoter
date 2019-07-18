@@ -298,6 +298,7 @@ class Present(JiraEnum):
     """
     This enum models the jira field whether a munki package exists for a jira issue.
     """
+
     PRESENT = "12010"
     MISSING = None
 
@@ -309,6 +310,7 @@ class PackageState(JiraEnum):
     NEW = New package
     UPDATE = Changes
     """
+
     DEFAULT = auto()
     NEW = auto()
     UPDATE = auto()
@@ -319,6 +321,7 @@ class JiraAutopromote(JiraEnum):
     This enum models if a package will be autopromoted or not. It can be called as a bool and will return true if
     the value is PROMOTE.
     """
+
     PROMOTE = conf._JIRA_AUTOPROMOTE_TRUE
     NOPROMOTE = conf._JIRA_AUTOPROMOTE_FALSE
 

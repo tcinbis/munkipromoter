@@ -226,6 +226,7 @@ class TestMunkiRepoProvider:
 
 def test_provider_does_not_implement_exception():
     """Tests the exceptions if a provider is used which is not implemented"""
+
     class DummyProvider(Provider):
         def connect(self) -> bool:
             raise ProviderDoesNotImplement()
