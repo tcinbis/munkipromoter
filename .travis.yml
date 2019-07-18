@@ -24,6 +24,6 @@ deploy:
   keep-history: true
   repo: tcinbis/munkipromoter-docs
   target-branch: master
-  local_dir: docs/source/html
+  local_dir: docs/docs
   on:
     branch: master
