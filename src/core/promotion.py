@@ -37,8 +37,8 @@ class Promoter:
     def promote(self):
         """
         The starting point of the promotion. If the day of execution is the same as the configured
-        promotion date the `_date_promotions` are conducted.
-        Afterwards always the `_lane_promotions` are performed.
+        promotion date the :func:`_date_promotions` are conducted.
+        Afterwards always the :func:`_lane_promotions` are performed.
         """
         if not datetime.now().strftime("%A") == conf.DEFAULT_PROMOTION_DAY:
             logger.warning(

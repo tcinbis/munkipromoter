@@ -23,7 +23,7 @@ class MunkiPromoter:
 
     def __init__(self):
         """
-        Initializes a MunkiPromoter with a jira and a munki provider. Additionally `setup` is called.
+        Initializes a MunkiPromoter with a jira and a munki provider. Additionally :func:`setup` is called.
         """
         self.setup()
         self._j = JiraBoardProvider("jira")
@@ -49,7 +49,7 @@ class MunkiPromoter:
         """
         Initializes a argument parser that takes 6 optional arguments.
 
-        :return: `argparse.ArgumentParser` with the given arguments.
+        :return: :func:`argparse.ArgumentParser` with the given arguments.
         """
         parser = argparse.ArgumentParser()
         parser.add_argument(

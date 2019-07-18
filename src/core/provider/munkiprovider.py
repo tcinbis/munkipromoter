@@ -34,7 +34,7 @@ class MunkiRepoProvider(Provider):
         Initializes a `MunkiRepoProvider` object with a given name.
 
         :param name: `str` Name of the provider
-        :param dry_run: `bool` If true, none of the changes will be commited in `commit`
+        :param dry_run: `bool` If true, none of the changes will be committed in `commit`
         """
         super().__init__(name, dry_run)
         self._pkg_info_files = dict(dict())
@@ -147,8 +147,8 @@ class MunkiRepoProvider(Provider):
 
     def load(self):
         """
-        Starts the loading of the packages and the pkg info by calling `_load_pkg_infos` and
-        `_load_packages` if they are not yet loaded and if the connection to the munki repository
+        Starts the loading of the packages and the pkg info by calling :func:`_load_pkg_infos` and
+        :func:`_load_packages` if they are not yet loaded and if the connection to the munki repository
         exists.
         """
         if self.is_loaded or self.connect():
@@ -198,7 +198,7 @@ class MunkiRepoProvider(Provider):
         Checks if the program runs as a dry run and if this is not the case, all previously made changes
         are added to the munki repository.
 
-        :return: `bool` True if the run was not a dry run and changes were commited.
+        :return: `bool` True if the run was not a dry run and changes were committed.
         """
         if not self._dry_run:
             for package in self._packages_dict.values():
