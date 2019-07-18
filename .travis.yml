@@ -22,5 +22,6 @@ deploy:
   keep-history: true
   repo: munkipromoter-docs
   target-branch: master
+  verbose: true
   on:
     branch: master
