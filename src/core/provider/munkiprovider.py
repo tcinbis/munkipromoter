@@ -24,13 +24,24 @@ logger = log.get_logger(__file__)
 
 
 class MunkiRepoProvider(Provider):
+    """
+    Connects to a specific munki repository and represents the state of the munki packages
+    by showing them as `Package`
+    """
+
     def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
+        """
+        Initializes a `MunkiRepoProvider` object with a given name.
+        :param name: `str` Name of the provider
+        :param dry_run: `bool` If true, none of the changes will be commited in `commit`
+        """
         super().__init__(name, dry_run)
         self._pkg_info_files = dict(dict())
 
     def connect(self):
         """
-        The munki repository needs to be mounted when trying to connect.
+        Checks if the munki repository is mounted on the executing device.
+        :return: True if the repository is mounted
         """
         if os.path.ismount(conf.REPO_PATH) or os.path.exists(conf.REPO_PATH):
             logger.debug(f"Repo {conf.REPO_PATH} mounted or exists.")
@@ -40,6 +51,11 @@ class MunkiRepoProvider(Provider):
             return False
 
     def _load_packages(self):
+        """
+        Loads all available munki packages as a `Dict` of `Package` by converting the information
+        of all plists from the munki repository.
+        Each key for which there is no information in the plist is set to the default value.
+        """
         logger.debug(f"Loading packages from repo: {conf.REPO_PATH}")
         # clear internal packages dict, before loading for the first time OR again
         self._packages_dict.clear()
@@ -106,6 +122,9 @@ class MunkiRepoProvider(Provider):
                         logger.error(e)
 
     def _load_pkg_infos(self):
+        """
+        Saves all the pkg info in form of the plists in the `MunkiRepoProvider`.
+        """
         for dirpath, dirnames, filenames in os.walk(conf.PKGS_INFO_PATH):
             for file in filenames:
                 if file.startswith("."):
@@ -125,12 +144,22 @@ class MunkiRepoProvider(Provider):
                     self._pkg_info_files.update({pkg_info.get("name"): d})
 
     def load(self):
+        """
+        Starts the loading of the packages and the pkg info by calling `_load_pkg_infos` and
+        `_load_packages` if they are not yet loaded and if the connection to the munki repository
+        exists.
+        """
         if self.is_loaded or self.connect():
             self._load_packages()
             self._load_pkg_infos()
             self.is_loaded = True
 
     def update(self, package: Package):
+        """
+        Searches for a package in munki and updates it according to the package given in the argument.
+        If no munki package exists matching the given package it is labeled as missing.
+        :param package: `Package` object to be updated in the munki repo
+        """
         # make a deep copy of the package to prevent changes in other instances
         package_copy = copy.deepcopy(package)
 
@@ -162,6 +191,11 @@ class MunkiRepoProvider(Provider):
         logger.debug(f"Munki update called for {package}, but no changes detected.")
 
     def commit(self) -> bool:
+        """
+        Checks if the program runs as a dry run and if this is not the case, all previously made changes
+        are added to the munki repository.
+        :return: `bool` True if the run was not a dry run and changes were commited.
+        """
         if not self._dry_run:
             for package in self._packages_dict.values():
                 if package.state == PackageState.UPDATE:
