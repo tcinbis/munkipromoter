@@ -13,6 +13,8 @@ script:
 
 after_success:
   - python-codacy-coverage -r coverage.xml
+  - cd docs
+  - make html
 
 
 deploy:
@@ -22,6 +24,6 @@ deploy:
   keep-history: true
   repo: tcinbis/munkipromoter-docs
   target-branch: master
-  local_dir: docs/_build
+  local_dir: docs/_build/html
   on:
     branch: master
