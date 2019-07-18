@@ -243,8 +243,7 @@ class JiraBoardProvider(Provider):
                     ),
                     conf.JIRA_DESCRIPTION_FIELD: package.name,
                     conf.JIRA_CATALOG_FIELD: package.catalog.to_jira_rest_dict(),
-                    conf.JIRA_AUTOPROMOTE_FIELD:
-                        package.is_autopromote.to_jira_rest_dict(),
+                    conf.JIRA_AUTOPROMOTE_FIELD: package.is_autopromote.to_jira_rest_dict(),  # noqa: B950
                     conf.JIRA_PRESENT_FIELD: [
                         package.is_present.to_jira_rest_dict()
                     ],
