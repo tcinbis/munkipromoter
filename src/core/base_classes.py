@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from distutils.version import LooseVersion
-from typing import Type, Dict, List
+from typing import Type, Dict
 from uuid import UUID
 
 from utils import logger as log
@@ -20,6 +20,10 @@ logger = log.get_logger(__file__)
 
 
 class Provider:
+    """
+    Abstract interface to model a package information provider.
+    """
+
     def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
         self.name = name
         self.is_loaded = False
@@ -35,6 +39,9 @@ class Provider:
         pass
 
     def load(self) -> None:
+        """
+        Loads the information or packages of the provider implementation
+        """
         pass
 
     def get(self) -> Dict:
@@ -50,6 +57,11 @@ class Provider:
         return self._packages_dict
 
     def _get(self, package_key: str) -> Package:
+        """
+        Gets a package based on the package key.
+        :param package_key: unique identifier for the package
+        :return: `Package` the package that was searched
+        """
         return self.get().get(package_key)
 
     def update(self, package: Package):
@@ -75,6 +87,9 @@ class PackageVersion(LooseVersion):
 
 @dataclass(order=True)
 class Package:
+    """
+    The general representation of package information. Either jira issues or munki packages can be represented.
+    """
     name: str = field(repr=True, compare=True)
     version: PackageVersion = field(repr=True, compare=True)
     catalog: Catalog = field(repr=True, compare=True)
@@ -89,13 +104,26 @@ class Package:
 
     @staticmethod
     def str_to_version(version_str: str) -> PackageVersion:
+        """
+        Converts a version `str` into a `PackageVersion`
+        :param version_str: the version as `str`
+        :return: the version as `PackageVersion`
+        """
         return PackageVersion(version_str)
 
     def __str__(self):
+        """
+        The string representation of a `Package`
+        :return: the name, version and catalog of the package
+        """
         return f"{self.name} {self.version} {self.catalog.name}"
 
     @property
     def key(self):
+        """
+        The unique identifier of a package consisting of the name and the version
+        :return: `str` with name and version
+        """
         return self.name + str(self.version)
 
     @staticmethod
