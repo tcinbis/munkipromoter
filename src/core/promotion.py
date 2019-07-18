@@ -27,6 +27,7 @@ class Promoter:
     def __init__(self, munki_packages: Dict, jira_packages: Dict):
         """
         Initializes a promoter object which contains the munki and the jira packages.
+
         :param munki_packages: `Dict` the munki packages
         :param jira_packages: `Dict` the jira packages
         """
@@ -50,7 +51,7 @@ class Promoter:
 
     def _lane_promotions(self):
         """
-        If a jira pacakge is in a promotion lane (TO_*CATALOG*), it is moved to the appropriate
+        If a jira package is in a promotion lane (TO_*CATALOG*), it is moved to the appropriate
         catalog (*CATALOG*).
         Additionally the respective munki package is searched and updated according to the jira
         package. If the munki package does not exist in the munki_repository it is marked as missing

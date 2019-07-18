@@ -26,14 +26,16 @@ logger = log.get_logger(__file__)
 class JiraBoardProvider(Provider):
     """
     Connects to a specific jira server and represents the state of the issues
-    in the jira board by showing them as `Package`
+    in the jira board by showing them as `Package`. It handles changes to the packages itself and uploads relevant
+    information to the corresponding jira issue.
     """
 
     def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
         """
         Initializes a `JiraBoardProvider` object with a given name.
+
         :param name: `str` Name of the provider
-        :param dry_run: `bool` If true, none of the changes will be commited in `commit`
+        :param dry_run: `bool` If true, none of the changes will be committed in :func:`commit`
         """
         super().__init__(name, dry_run)
         # noinspection PyTypeChecker
@@ -42,8 +44,10 @@ class JiraBoardProvider(Provider):
     def connect(self, connection_params=conf.JIRA_CONNECTION_INFO):
         """
         Connects to a jira instance by using the configured connection information
-        :param connection_params: Parameters to connect to the jira api
-        :return: `bool` True if the connection as successful
+
+        :param connection_params: Parameters to connect to the jira api, if no explicit parameters a given it will use
+        the values defined in the config.py file
+        :return: `bool` True if the connection was successful
         """
         try:
             self._jira = JIRA(**connection_params)
@@ -61,8 +65,8 @@ class JiraBoardProvider(Provider):
         """
         If a successful connection to the jira instance is possible all issues for a given project key are loaded.
         Issues are loaded in batches, if the project has more issues than the batch size, the issues are loaded
-        continously.
-        After loading the issues, these are converted into a `Package` with `_jira_issue_to_package_dict`.
+        continuously.
+        After loading the issues, these are converted into a `Package` with :func:`_jira_issue_to_package_dict`.
         """
         if self.is_loaded or self.connect():
             query = f"project={conf.JIRA_PROJECT_KEY}"
@@ -93,14 +97,16 @@ class JiraBoardProvider(Provider):
     def check_jira_issue_exists(package: Package) -> bool:
         """
         Checks whether a given package already exists in the Jira Board or not.
+
         :param package: The package to check whether it exists in Jira.
-        :return: True if the package has a Jira ID and False if not
+        :return: `True` if the package has a Jira ID and `False` if not
         """
         return bool(package.jira_id)
 
     def _jira_issue_to_package_dict(self, issues: List[Issue]) -> Dict:
         """
         Wrapper method around the :func:`_jira_issue_to_package` method which handles a list of `Issue`.
+
         :param issues: `List` containing `Issue` to be converted to `Package` objects
         :return: `Dict` containing the newly created `Package` objects
         """
@@ -114,7 +120,9 @@ class JiraBoardProvider(Provider):
     def _jira_issue_to_package(self, issue: Issue) -> Package:
         """
         Converts a given issue into a `Package` object. Before converting the issue is verified to contain
-        all needed fields.
+        all needed fields. In case the package is missing certain fields defined in `conf.ISSUE_FIELDS`,
+        `JiraIssueMissingFields` is raised.
+
         :param issue: The jira issue converted to a `Package`
         :return: `Package` representing the issue
         """
@@ -156,6 +164,15 @@ class JiraBoardProvider(Provider):
         """
         Searches for a package in jira and updates it according to the package given in the argument.
         If no jira issue exists matching the given package it is created.
+
+        To prevent `PackageState` changes in propagating to other `Provider` instances a deepcopy is created at the
+        beginning of the method.
+
+        In case the package already exists we can check if we need to update certain values. In this case the
+        `PackageState` is set to `PackageState.UPDATE`.
+
+        Otherwise if we want to create a new one the state is set to `PackageState.NEW`.
+
         :param package: `Package` object to be written to jira
         """
         package = copy.deepcopy(package)
@@ -180,14 +197,13 @@ class JiraBoardProvider(Provider):
     def commit(self) -> bool:
         """
         Checks if the program runs as a dry run and if this is not the case, all previously made changes
-        are commited to jira.
-        :return: `bool` True if the run was not a dry run and changes were commited.
+        are committed to jira.
+        :return: `bool` True if the run was not a dry run and changes were committed.
         """
         if not self._dry_run:
             for package in self.get().values():
 
                 issue_dict = {
-                    # TODO: Add/Set status
                     conf.JIRA_SOFTWARE_NAME_FIELD: package.name,
                     conf.JIRA_SOFTWARE_VERSION_FIELD: str(package.version),
                     conf.JIRA_DUEDATE_FIELD: package.promote_date.strftime("%Y-%m-%d"),
@@ -247,6 +263,7 @@ class JiraBoardProvider(Provider):
         If a package exists in munki, but not in jira, then a issue is created.
         If a issue exists in jira which is specified to be missing in munki, but it was added to munki,
         then the missing attribute of jira is set to not missing.
+
         :param munki_packages: `Dict` of all munki packages
         """
         for munki_key, munki_package in munki_packages.items():
