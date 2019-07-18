@@ -21,7 +21,14 @@ from core.base_classes import Package
 from core.promotion import Promoter
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
-from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote, conf
+from utils.config import (
+    Catalog,
+    Present,
+    JiraLane,
+    PackageState,
+    JiraAutopromote,
+    conf,
+)
 
 
 @pytest.fixture
@@ -146,14 +153,16 @@ def set_up_promoter(jira_board_provider, munki_repo_provider, jira_test_issues):
 
 def is_exact_match(p1: Package, p2: Package, exclude_keys: List = None) -> bool:
     """
-    Compare ALL fields of a package to another package to check whether we have found an exact match.
+    Compare ALL fields of a package to another package to check whether we have
+    found an exact match.
     :param p2: The package we want to compare us to.
     :param exclude_keys: Ignore the following keys during comparison
     :return: True if all values are the same, False otherwise
     """
     for key, value in p2.__dict__.items():
         if (exclude_keys and key not in exclude_keys) or not exclude_keys:
-            # only check if the key is in exclude_keys if we are sure that it is not None. In case it is None we
+            # only check if the key is in exclude_keys if we are sure that it is
+            # not None. In case it is None we
             # want to compare all keys anyways.
             if p1.__dict__.get(key) != value:
                 return False

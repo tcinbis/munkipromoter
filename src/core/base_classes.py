@@ -14,7 +14,14 @@ from typing import Type, Dict
 from uuid import UUID
 
 from utils import logger as log
-from utils.config import PackageState, Catalog, JiraAutopromote, Present, JiraLane, conf
+from utils.config import (
+    PackageState,
+    Catalog,
+    JiraAutopromote,
+    Present,
+    JiraLane,
+    conf,
+)
 
 logger = log.get_logger(__file__)
 
@@ -33,9 +40,11 @@ class Provider:
 
     def connect(self) -> bool:
         """
-        Check whether a connection is already established or try to establish a new one.
+        Check whether a connection is already established or try to establish a
+        new one.
 
-        :return: True if the connection was already established or a new one could be created. Otherwise False
+        :return: True if the connection was already established or a new one
+        could be created. Otherwise False
         """
         pass
 
@@ -47,7 +56,8 @@ class Provider:
 
     def get(self) -> Dict:
         """
-        If the providers load method was already called this method will return all received packages in a dict.
+        If the providers load method was already called this method will return
+        all received packages in a dict.
         Otherwise it will first call load and then return the results.
 
         :return: dict of Packages offered/received from the providers source.
@@ -61,7 +71,7 @@ class Provider:
     def _get(self, package_key: str) -> Package:
         """
         Gets a package based on the package key.
-        
+
         :param package_key: unique identifier for the package
         :return: `Package` the package that was searched
         """
@@ -69,7 +79,8 @@ class Provider:
 
     def update(self, package: Package):
         """
-        Updates the information of a package if it already exists or will create a new package.
+        Updates the information of a package if it already exists or will create
+        a new package.
         All parameters are expected to be passed through **kwargs.
 
         :return: True if successful or False if not.
@@ -78,7 +89,8 @@ class Provider:
 
     def commit(self) -> bool:
         """
-        This method finally commits all changes to the providers API in case _dry_run is set to false.
+        This method finally commits all changes to the providers API in case
+        _dry_run is set to false.
         Otherwise no changes will be send to the provider.
 
         :return: True in case the changes were committed otherwise False
@@ -93,7 +105,8 @@ class PackageVersion(LooseVersion):
 @dataclass(order=True)
 class Package:
     """
-    The general representation of package information. Either jira issues or munki packages can be represented.
+    The general representation of package information. Either jira issues or
+    munki packages can be represented.
     """
 
     name: str = field(repr=True, compare=True)
@@ -105,7 +118,9 @@ class Package:
     provider: Type[Provider] = field(repr=False, compare=False)
     jira_id: str = field(repr=False, compare=False)
     jira_lane: JiraLane = field(repr=False, compare=True)
-    state: PackageState = field(default=PackageState.DEFAULT, repr=False, compare=False)
+    state: PackageState = field(
+        default=PackageState.DEFAULT, repr=False, compare=False
+    )
     munki_uuid: UUID = field(repr=False, default=None, compare=False)
 
     @staticmethod
@@ -129,7 +144,8 @@ class Package:
     @property
     def key(self):
         """
-        The unique identifier of a package consisting of the name and the version
+        The unique identifier of a package consisting of the name and the
+        version
 
         :return: `str` with name and version
         """

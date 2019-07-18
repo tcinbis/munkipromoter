@@ -14,25 +14,30 @@ from enum import Enum, auto
 
 class MunkiPromoterConfig:
     """
-    This class stores all relevant configuration and will try to load them from the local environment, before falling
-    back to the predefined default values.
-    As the class is supposed to be consistent throughout the project the singleton pattern is used to ensure only one
-    instance with the same information exists.
+    This class stores all relevant configuration and will try to load them from
+    the local environment, before falling back to the predefined default values.
+    As the class is supposed to be consistent throughout the project the
+    singleton pattern is used to ensure only one instance with the same
+    information exists.
     """
 
     class __MunkiPromoterConfig:
-        REPO_PATH = os.getenv("MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo_test")
+        REPO_PATH = os.getenv(
+            "MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo_test"
+        )
 
         @property
         def CATALOGS_PATH(self):
             return os.path.join(
-                self.REPO_PATH, os.getenv("MUNKIPROMOTER_CATALOGS_PATH", "catalogs")
+                self.REPO_PATH,
+                os.getenv("MUNKIPROMOTER_CATALOGS_PATH", "catalogs"),
             )
 
         @property
         def PKGS_INFO_PATH(self):
             return os.path.join(
-                self.REPO_PATH, os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", "pkgsinfo")
+                self.REPO_PATH,
+                os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", "pkgsinfo"),
             )
 
         DEBUG_PKGS_INFO_SAVE_PATH = os.getenv(
@@ -58,7 +63,8 @@ class MunkiPromoterConfig:
 
         @property
         def JIRA_CONNECTION_INFO(self):
-            # Store Jira connection information in a dict. We can then create a connection by invoking
+            # Store Jira connection information in a dict. We can then create a
+            # connection by invoking
             # JIRA(**JIRA_CONNECTION_INFO)
             return {
                 "server": self.JIRA_URL,
@@ -99,7 +105,8 @@ class MunkiPromoterConfig:
         )
 
         JIRA_DEVELOPMENT_TRANSITION_NAME = os.getenv(
-            "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME", "all to development"
+            "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME",
+            "all to development",
         )
         JIRA_TESTING_TRANSITION_NAME = os.getenv(
             "MUNKIPROMOTER_JIRA_TESTING_TRANSITION_NAME", "all to test"
@@ -135,7 +142,9 @@ class MunkiPromoterConfig:
 
     def __init__(self):
         if not MunkiPromoterConfig.instance:
-            MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
+            MunkiPromoterConfig.instance = (
+                MunkiPromoterConfig.__MunkiPromoterConfig()
+            )
 
     def __getattr__(self, item):
         return getattr(self.instance, item)
@@ -149,7 +158,8 @@ class MunkiPromoterConfig:
 
 class MunkiPromoterTestConfig(MunkiPromoterConfig):
     """
-    This class has all the same attributes as the MunkiPromoterConfig but adds/sets required values for testing.
+    This class has all the same attributes as the MunkiPromoterConfig but
+    adds/sets required values for testing.
     """
 
     def __init__(self):
@@ -160,7 +170,9 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
                 "MUNKIPROMOTER_TEST_REPO_PATH",
                 os.path.join(
                     os.path.dirname(
-                        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                        os.path.dirname(
+                            os.path.dirname(os.path.abspath(__file__))
+                        )
                     ),
                     "tests/data",
                 ),
@@ -174,14 +186,19 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
         self.instance.DRY_RUN = True
 
 
-conf = MunkiPromoterTestConfig() if "pytest" in sys.modules else MunkiPromoterConfig()
+conf = (
+    MunkiPromoterTestConfig()
+    if "pytest" in sys.modules
+    else MunkiPromoterConfig()
+)
 
 
 class JiraEnum(Enum):
     def to_jira_rest_dict(self):
         """
-        When submitting a field to the Jira API it usually requires a dictionary with a  key called id and the
-        corresponding value of this id. This method simply returns a dict with such key and the value stored in the
+        When submitting a field to the Jira API it usually requires a dictionary
+        with a  key called id and the corresponding value of this id. This
+        method simply returns a dict with such key and the value stored in the
         enum instance.
         :return: Dictionary with id key and id value.
         """
@@ -226,7 +243,8 @@ class JiraLane(JiraEnum):
 
 class Catalog(JiraEnum):
     """
-    This enum models the different available catalogs in jira and their jira field id.
+    This enum models the different available catalogs in jira and their jira
+    field id.
     """
 
     DEVELOPMENT = "12007"
@@ -296,7 +314,8 @@ class Catalog(JiraEnum):
 
 class Present(JiraEnum):
     """
-    This enum models the jira field whether a munki package exists for a jira issue.
+    This enum models the jira field whether a munki package exists for a jira
+    issue.
     """
 
     PRESENT = "12010"
@@ -318,7 +337,8 @@ class PackageState(JiraEnum):
 
 class JiraAutopromote(JiraEnum):
     """
-    This enum models if a package will be autopromoted or not. It can be called as a bool and will return true if
+    This enum models if a package will be autopromoted or not. It can be called
+    as a bool and will return true if
     the value is PROMOTE.
     """
 

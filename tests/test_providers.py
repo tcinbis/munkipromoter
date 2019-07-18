@@ -26,14 +26,16 @@ from utils.exceptions import JiraIssueMissingFields, ProviderDoesNotImplement
 class TestJiraBoardProvider:
     def test_connect_fail(self, jira_board_provider):
         """Test if the jira connect does handle its exceptions correctly."""
-        # These parameters are supposed to fail to test, whether exceptions are handled correctly.
+        # These parameters are supposed to fail to test, whether exceptions are
+        # handled correctly.
         param = {
             "server": "http://your-jira.com",
             "basic_auth": ("your-user", "secret_passw0rd123"),
             "max_retries": 0,
         }
 
-        # When a connection is not possible the method should return False and do not throw a exception.
+        # When a connection is not possible the method should return False and
+        # do not throw a exception.
         assert not jira_board_provider.connect(connection_params=param)
 
     def test_load(self, jira_board_provider, jira_test_issues):
@@ -47,15 +49,21 @@ class TestJiraBoardProvider:
 
         assert len(jira_board_provider.get()) != 0
 
-    def test_check_jira_issue_exists(self, jira_board_provider, test_one_package):
-        """Tests if the `JiraBoardProvider.check_jira_issue_exists` works correctly."""
+    def test_check_jira_issue_exists(
+        self, jira_board_provider, test_one_package
+    ):
+        """
+        Tests if the `JiraBoardProvider.check_jira_issue_exists` works
+        correctly.
+        """
         assert JiraBoardProvider.check_jira_issue_exists(test_one_package)
         test_one_package.jira_id = None
         assert not JiraBoardProvider.check_jira_issue_exists(test_one_package)
 
     def test__jira_issue_to_package_list(self, jira_board_provider):
         """
-        Tests if the `JiraBoardProvider._jira_issue_to_package` throws the correct exception if issue fields are
+        Tests if the `JiraBoardProvider._jira_issue_to_package` throws the
+        correct exception if issue fields are
         missing
         """
         issue_mock = Mock()
@@ -107,8 +115,9 @@ class TestJiraBoardProvider:
         jira_board_provider.update(p)
 
         for key, package in jira_board_provider.get().items():
-            # after changing the value of a not ignored package field the update should be propagated and be represented
-            # in the new dictionary we get from our munki provider
+            # after changing the value of a not ignored package field the update
+            # should be propagated and be represented in the new dictionary we
+            # get from our munki provider
             assert is_exact_match(packages.get(key), package, ["state"])
 
     def test_update_new_package(
@@ -124,7 +133,8 @@ class TestJiraBoardProvider:
 
         jira_packages = copy.deepcopy(jira_board_provider.get())
 
-        # because we want to simulate a new package it can not have a jira id already
+        # because we want to simulate a new package it can not have a jira id
+        # already
         random_package.jira_id = None
         jira_board_provider.update(random_package)
 
@@ -137,7 +147,9 @@ class TestJiraBoardProvider:
         assert is_exact_match(random_package, jira_package, ["state"])
         assert jira_package.state == PackageState.NEW
 
-    def test_update_jira_from_repo(self, munki_repo_provider, jira_board_provider):
+    def test_update_jira_from_repo(
+        self, munki_repo_provider, jira_board_provider
+    ):
         """Tests update of jira from munki"""
         munki_repo_provider.load()
         munki_packages = copy.deepcopy(munki_repo_provider.get())
@@ -188,8 +200,9 @@ class TestMunkiRepoProvider:
         munki_repo_provider.update(p)
 
         for key, package in munki_repo_provider.get().items():
-            # after changing the value of a not ignored package field the update should be propagated and be represented
-            # in the new dictionary we get from our munki provider
+            # after changing the value of a not ignored package field the update
+            # should be propagated and be represented in the new dictionary we
+            # get from our munki provider
             assert is_exact_match(packages.get(key), package, ["state"])
 
         munki_repo_provider.load()
@@ -209,8 +222,9 @@ class TestMunkiRepoProvider:
         munki_repo_provider.update(random_package)
         munki_package = munki_repo_provider._get(random_package.key)
 
-        # when inserting/updating a package which is not present in the munki repo the following attributes need
-        # to be set for the package which is passed to the update method AND the package which is actually inserted
+        # when inserting/updating a package which is not present in the munki
+        # repo the following attributes need to be set for the package which is
+        # passed to the update method AND the package which is actually inserted
         # into the internal dictionary containing all the packages.
         assert (
             random_package.state is PackageState.UPDATE
