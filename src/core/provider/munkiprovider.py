@@ -32,6 +32,7 @@ class MunkiRepoProvider(Provider):
     def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
         """
         Initializes a `MunkiRepoProvider` object with a given name.
+
         :param name: `str` Name of the provider
         :param dry_run: `bool` If true, none of the changes will be commited in `commit`
         """
@@ -41,6 +42,7 @@ class MunkiRepoProvider(Provider):
     def connect(self):
         """
         Checks if the munki repository is mounted on the executing device.
+
         :return: True if the repository is mounted
         """
         if os.path.ismount(conf.REPO_PATH) or os.path.exists(conf.REPO_PATH):
@@ -158,6 +160,7 @@ class MunkiRepoProvider(Provider):
         """
         Searches for a package in munki and updates it according to the package given in the argument.
         If no munki package exists matching the given package it is labeled as missing.
+
         :param package: `Package` object to be updated in the munki repo
         """
         # make a deep copy of the package to prevent changes in other instances
@@ -194,6 +197,7 @@ class MunkiRepoProvider(Provider):
         """
         Checks if the program runs as a dry run and if this is not the case, all previously made changes
         are added to the munki repository.
+
         :return: `bool` True if the run was not a dry run and changes were commited.
         """
         if not self._dry_run:

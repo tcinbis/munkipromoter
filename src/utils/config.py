@@ -204,6 +204,7 @@ class JiraLane(JiraEnum):
     def catalog_to_lane(catalog: Catalog) -> JiraLane:
         """
         Converts a `Catalog` to a `JiraLane`
+
         :param catalog: `Catalog` to be converted
         :return: the matching `JiraLane`
         """
@@ -215,6 +216,7 @@ class JiraLane(JiraEnum):
     def is_promotion_lane(self):
         """
         `Bool` property of the `JiraLane`.
+
         :return:  True if the `JiraLane` is a promotion lane (TO *catalog*)
         """
         if "TO" in self.name:
@@ -235,6 +237,7 @@ class Catalog(JiraEnum):
     def str_to_catalog(catalog_string: str) -> Catalog:
         """
         Converts a `str` to a `Catalog` if it exists.
+
         :param catalog_string: `str` the catalog
         :return: `Catalog` the catalog
         """
@@ -249,6 +252,7 @@ class Catalog(JiraEnum):
     def jira_lane_to_catalog(jira_lane: JiraLane) -> Catalog:
         """
         Convert a `JiraLane` to a `Catalog`
+
         :param jira_lane: `JiraLane` the jira lane to convert
         :return: `Catalog` the respective catalog
         """
@@ -259,6 +263,7 @@ class Catalog(JiraEnum):
         """
         Property of a catalog. The order of the catalogs is DEV -> TEST -> PROD.
         If the next catalog is called for PROD, PROD is returned.
+
         :return: `Catalog` the subsequent catalog
         """
         catalog_order = {
@@ -276,8 +281,9 @@ class Catalog(JiraEnum):
     @property
     def transition_id(self) -> str:
         """
-        Property of the Catalog. Returns the transistion id as a string.
-        :return:
+        Property of the Catalog. Returns the transition id as a string.
+
+        :return: id of the given catalog in jira as `str`
         """
         transition_dict = {
             Catalog.DEVELOPMENT: conf.JIRA_DEVELOPMENT_TRANSITION_NAME,

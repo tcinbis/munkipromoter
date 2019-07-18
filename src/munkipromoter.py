@@ -32,7 +32,6 @@ class MunkiPromoter:
     def setup(self):
         """
         Parses all input arguments and sets the respective config values.
-        :return:
         """
         args = self._setup_argparser().parse_args()
         args.LOG_LEVEL = 70 - (10 * args.LOG_LEVEL) if args.LOG_LEVEL > 0 else 0
@@ -49,6 +48,7 @@ class MunkiPromoter:
     def _setup_argparser():
         """
         Initializes a argument parser that takes 6 optional arguments.
+
         :return: `argparse.ArgumentParser` with the given arguments.
         """
         parser = argparse.ArgumentParser()

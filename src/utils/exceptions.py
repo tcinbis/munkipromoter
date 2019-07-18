@@ -37,6 +37,7 @@ class JiraIssueMissingFields(PromoterException):
 
 class MunkiItemInMultipleCatalogs(PromoterException):
     """This munki item is in multiple catalogs at once."""
+
     def __init__(self, munki_item):
         super().__init__()
         self.provider = "Munki"

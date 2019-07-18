@@ -23,6 +23,7 @@ def get_logger(name, formatter="default"):
     If this method is called multiple times, each time the same logger instance is returned.
     By doing this it does not matter where the logger is instantiated and all loggers with the same name write into the
     same file.
+
     :param name: The name the logger should have. If the same as another these are two times the same loggers.
     :param formatter: Either 'default' (information: time, loglevel, filename, message) or 'simple' (only message)
     :return: The logger instance

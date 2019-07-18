@@ -34,6 +34,7 @@ class Provider:
     def connect(self) -> bool:
         """
         Check whether a connection is already established or try to establish a new one.
+
         :return: True if the connection was already established or a new one could be created. Otherwise False
         """
         pass
@@ -48,6 +49,7 @@ class Provider:
         """
         If the providers load method was already called this method will return all received packages in a dict.
         Otherwise it will first call load and then return the results.
+
         :return: dict of Packages offered/received from the providers source.
         """
         if not self.is_loaded:
@@ -59,6 +61,7 @@ class Provider:
     def _get(self, package_key: str) -> Package:
         """
         Gets a package based on the package key.
+        
         :param package_key: unique identifier for the package
         :return: `Package` the package that was searched
         """
@@ -68,6 +71,7 @@ class Provider:
         """
         Updates the information of a package if it already exists or will create a new package.
         All parameters are expected to be passed through **kwargs.
+
         :return: True if successful or False if not.
         """
         pass
@@ -76,6 +80,7 @@ class Provider:
         """
         This method finally commits all changes to the providers API in case _dry_run is set to false.
         Otherwise no changes will be send to the provider.
+
         :return: True in case the changes were committed otherwise False
         """
         pass
@@ -90,6 +95,7 @@ class Package:
     """
     The general representation of package information. Either jira issues or munki packages can be represented.
     """
+
     name: str = field(repr=True, compare=True)
     version: PackageVersion = field(repr=True, compare=True)
     catalog: Catalog = field(repr=True, compare=True)
@@ -106,6 +112,7 @@ class Package:
     def str_to_version(version_str: str) -> PackageVersion:
         """
         Converts a version `str` into a `PackageVersion`
+
         :param version_str: the version as `str`
         :return: the version as `PackageVersion`
         """
@@ -114,6 +121,7 @@ class Package:
     def __str__(self):
         """
         The string representation of a `Package`
+
         :return: the name, version and catalog of the package
         """
         return f"{self.name} {self.version} {self.catalog.name}"
@@ -122,6 +130,7 @@ class Package:
     def key(self):
         """
         The unique identifier of a package consisting of the name and the version
+
         :return: `str` with name and version
         """
         return self.name + str(self.version)
