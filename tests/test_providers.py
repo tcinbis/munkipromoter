@@ -25,6 +25,7 @@ from utils.exceptions import JiraIssueMissingFields, ProviderDoesNotImplement
 @pytest.mark.usefixtures("run_makecatalogs_before")
 class TestJiraBoardProvider:
     def test_connect_fail(self, jira_board_provider):
+        """Test if the jira connect does handle its exceptions correctly."""
         # These parameters are supposed to fail to test, whether exceptions are handled correctly.
         param = {
             "server": "http://your-jira.com",
@@ -36,6 +37,7 @@ class TestJiraBoardProvider:
         assert not jira_board_provider.connect(connection_params=param)
 
     def test_load(self, jira_board_provider, jira_test_issues):
+        """Tests if the loading of jira packages is working."""
         jira_board_provider._jira = Mock()
         jira_board_provider.is_loaded = True
         jira_issue = [jira_test_issues]
@@ -46,11 +48,16 @@ class TestJiraBoardProvider:
         assert len(jira_board_provider.get()) != 0
 
     def test_check_jira_issue_exists(self, jira_board_provider, test_one_package):
+        """Tests if the `JiraBoardProvider.check_jira_issue_exists` works correctly."""
         assert JiraBoardProvider.check_jira_issue_exists(test_one_package)
         test_one_package.jira_id = None
         assert not JiraBoardProvider.check_jira_issue_exists(test_one_package)
 
     def test__jira_issue_to_package_list(self, jira_board_provider):
+        """
+        Tests if the `JiraBoardProvider._jira_issue_to_package` throws the correct exception if issue fields are
+        missing
+        """
         issue_mock = Mock()
         issue_mock.fields = None
 
@@ -60,8 +67,6 @@ class TestJiraBoardProvider:
     def test__jira_issue_to_package(self, jira_board_provider, config):
         """
         Test whether exceptions are handled/raised correctly.
-        :param jira_board_provider:
-        :return:
         """
         issue = Issue(None, None)
         issue.fields = Mock()
@@ -82,6 +87,7 @@ class TestJiraBoardProvider:
             assert True
 
     def test_update(self, jira_board_provider, jira_test_issues):
+        """Tests the update of the jira packages"""
 
         jira_board_provider._jira = Mock()
         jira_board_provider.is_loaded = True
@@ -108,6 +114,7 @@ class TestJiraBoardProvider:
     def test_update_new_package(
         self, jira_board_provider, jira_test_issues, random_package
     ):
+        """Test the update if a new package is inserted"""
         jira_board_provider._jira = Mock()
         jira_board_provider.is_loaded = True
         jira_issue = [jira_test_issues]
@@ -131,6 +138,7 @@ class TestJiraBoardProvider:
         assert jira_package.state == PackageState.NEW
 
     def test_update_jira_from_repo(self, munki_repo_provider, jira_board_provider):
+        """Tests update of jira from munki"""
         munki_repo_provider.load()
         munki_packages = copy.deepcopy(munki_repo_provider.get())
 
@@ -152,12 +160,14 @@ class TestJiraBoardProvider:
 @pytest.mark.usefixtures("run_makecatalogs_before")
 class TestMunkiRepoProvider:
     def test_connect_fail(self, munki_repo_provider, config):
+        """Tests the connection fail of the munki provider"""
         config.REPO_PATH = "/some/directory/which/does/not/exist"
         assert not munki_repo_provider.connect()
         config.restore_defaults()
         assert munki_repo_provider.connect()
 
     def test_load(self, munki_repo_provider):
+        """Tests the load of the munki repo provider"""
         munki_repo_provider.load()
         assert len(munki_repo_provider.get()) != 0
 
@@ -165,6 +175,7 @@ class TestMunkiRepoProvider:
         pass
 
     def test_update_existing_package(self, munki_repo_provider):
+        """Tests the update of an existing package"""
         munki_repo_provider.load()
         packages = copy.deepcopy(munki_repo_provider.get())
 
@@ -192,6 +203,7 @@ class TestMunkiRepoProvider:
         assert not is_exact_match(p, munki_package)
 
     def test_update_missing_package(self, munki_repo_provider, random_package):
+        """Tests the update of a missing package"""
         munki_repo_provider.load()
 
         munki_repo_provider.update(random_package)
@@ -207,11 +219,13 @@ class TestMunkiRepoProvider:
         )
 
     def test_make_catalogs_subprocess_error(self, config):
+        """Tests the make catalog if the repo path is wrong"""
         config.REPO_PATH = "/some/path/which/does/not/exist"
         MunkiRepoProvider.make_catalogs()
 
 
 def test_provider_does_not_implement_exception():
+    """Tests the exceptions if a provider is used which is not implemented"""
     class DummyProvider(Provider):
         def connect(self) -> bool:
             raise ProviderDoesNotImplement()

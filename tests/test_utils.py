@@ -13,6 +13,7 @@ from utils.config import JiraLane, Catalog, JiraAutopromote
 
 class TestUtils:
     def test_logger(self):
+        """Tests the logger instantiation"""
         logger = log.get_logger(__file__)
         assert len(logger.handlers) == 2
         logger2 = log.get_logger(__file__)
@@ -25,11 +26,13 @@ class TestUtils:
             assert log.get_logger(__file__, "wrong_formatter")
 
     def test_set_and_get_config(self, config):
+        """Tests the setting and getting of config fields"""
         assert config.JIRA_LABELS_FIELD == "labels"
         config.JIRA_LABELS_FIELD = "label"
         assert config.JIRA_LABELS_FIELD == "label"
 
     def test_jira_lane(self):
+        """Tests the jira lane enum"""
         assert JiraLane.TO_DEVELOPMENT.is_promotion_lane
         assert JiraLane.TO_TESTING.is_promotion_lane
         assert JiraLane.TO_PRODUCTION.is_promotion_lane
@@ -38,6 +41,7 @@ class TestUtils:
         assert not JiraLane.PRODUCTION.is_promotion_lane
 
     def test_catalog(self):
+        """Tests the jira catalog enum"""
         assert Catalog.jira_lane_to_catalog(JiraLane.DEVELOPMENT) == Catalog.DEVELOPMENT
         assert (
             Catalog.jira_lane_to_catalog(JiraLane.TO_DEVELOPMENT) == Catalog.DEVELOPMENT
@@ -50,10 +54,12 @@ class TestUtils:
         assert Catalog.DEVELOPMENT.transition_id == "all to development"
 
     def test_autopromote(self):
+        """Tests the jira autopromote enum"""
         assert JiraAutopromote.PROMOTE
         assert not JiraAutopromote.NOPROMOTE
 
     def test_jira_enum(self):
+        """Tests the jira enum"""
         assert JiraLane.DEVELOPMENT.to_jira_rest_dict() == {
             "id": JiraLane.DEVELOPMENT.value
         }
