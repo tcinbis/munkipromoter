@@ -22,6 +22,6 @@ deploy:
   keep-history: true
   repo: tcinbis/munkipromoter-docs
   target-branch: master
-  verbose: true
+  local_dir: docs/_build
   on:
     branch: master
