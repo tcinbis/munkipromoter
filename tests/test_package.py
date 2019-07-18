@@ -19,6 +19,9 @@ from utils.config import Catalog, JiraLane, Present, JiraAutopromote
 
 class TestPackage:
     def test_ignored_compare_keys(self):
+        """
+        Tests the values of the ignored keys.
+        """
         assert [
             "promote_date",
             "jira_id",
@@ -28,6 +31,10 @@ class TestPackage:
         ] == Package.ignored_compare_keys()
 
     def test_is_exact_match(self, random_package):
+        """
+        Tests if two equal packages are recognized as equal.
+        :param random_package:
+        """
         assert is_exact_match(random_package, random_package)
         p = copy.deepcopy(random_package)
         p.promote_date = datetime.now() + timedelta(days=5)
@@ -87,4 +94,8 @@ class TestPackage:
         ["10", "11", "63.21.2a", "63.21.2b", "123.21.2a", "2019b", "12.2,3.ä"],
     )
     def test_str_to_version(self, version):
+        """
+        Tests the conversion of `Package.str_to_version`
+        :param version: `str` version
+        """
         assert isinstance(Package.str_to_version(version), PackageVersion)

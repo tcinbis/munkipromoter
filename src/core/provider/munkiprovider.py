@@ -16,7 +16,13 @@ from uuid import uuid4
 
 from core.base_classes import Provider, Package
 from utils import logger as log
-from utils.config import PackageState, JiraLane, Catalog, Present, JiraAutopromote
+from utils.config import (
+    PackageState,
+    JiraLane,
+    Catalog,
+    Present,
+    JiraAutopromote,
+)
 from utils.config import conf
 from utils.exceptions import MunkiItemInMultipleCatalogs
 
@@ -24,24 +30,47 @@ logger = log.get_logger(__file__)
 
 
 class MunkiRepoProvider(Provider):
+    """
+    Connects to a specific munki repository and represents the state of the
+    munki packages by showing them as `Package`
+    """
+
     def __init__(self, name: str, dry_run: bool = conf.DRY_RUN):
+        """
+        Initializes a `MunkiRepoProvider` object with a given name.
+
+        :param name: `str` Name of the provider
+        :param dry_run: `bool` If true, none of the changes will be committed in
+        `commit`
+        """
         super().__init__(name, dry_run)
         self._pkg_info_files = dict(dict())
 
     def connect(self):
         """
-        The munki repository needs to be mounted when trying to connect.
+        Checks if the munki repository is mounted on the executing device.
+
+        :return: True if the repository is mounted
         """
         if os.path.ismount(conf.REPO_PATH) or os.path.exists(conf.REPO_PATH):
             logger.debug(f"Repo {conf.REPO_PATH} mounted or exists.")
             return True
         else:
-            logger.critical(f"Repo {conf.REPO_PATH} not mounted or does not exist.")
+            logger.critical(
+                f"Repo {conf.REPO_PATH} not mounted or does not exist."
+            )
             return False
 
     def _load_packages(self):
+        """
+        Loads all available munki packages as a `Dict` of `Package` by
+        converting the information of all plists from the munki repository.
+        Each key for which there is no information in the plist is set to the
+        default value.
+        """
         logger.debug(f"Loading packages from repo: {conf.REPO_PATH}")
-        # clear internal packages dict, before loading for the first time OR again
+        # clear internal packages dict, before loading for the first time OR
+        # again
         self._packages_dict.clear()
         for filename in os.listdir(conf.CATALOGS_PATH):
             if not (filename.startswith(".") or filename == "all"):
@@ -52,7 +81,8 @@ class MunkiRepoProvider(Provider):
 
                 for item in munki_packages:
                     try:
-                        # If we find something like this in our pkginfo we will use the provided information instead
+                        # If we find something like this in our pkginfo we will
+                        # use the provided information instead
                         # Otherwise fallback to default values.
                         # <key>munkipromote</key>
                         # 	<dict>
@@ -106,7 +136,10 @@ class MunkiRepoProvider(Provider):
                         logger.error(e)
 
     def _load_pkg_infos(self):
-        for dirpath, dirnames, filenames in os.walk(conf.PKGS_INFO_PATH):
+        """
+        Saves all the pkg info in form of the plists in the `MunkiRepoProvider`.
+        """
+        for dirpath, _dirnames, filenames in os.walk(conf.PKGS_INFO_PATH):
             for file in filenames:
                 if file.startswith("."):
                     continue
@@ -114,7 +147,8 @@ class MunkiRepoProvider(Provider):
                 pkg_info_path = os.path.join(dirpath, file)
                 pkg_info = plistlib.load(open(pkg_info_path, "rb"))
 
-                # at index 0 we store the actual plist and at index 1 the path to that plist file is stored.
+                # at index 0 we store the actual plist and at index 1 the path
+                # to that plist file is stored.
                 d = {pkg_info.get("version"): (pkg_info, pkg_info_path)}
 
                 if self._pkg_info_files.get(pkg_info.get("name")):
@@ -125,18 +159,34 @@ class MunkiRepoProvider(Provider):
                     self._pkg_info_files.update({pkg_info.get("name"): d})
 
     def load(self):
+        """
+        Starts the loading of the packages and the pkg info by calling
+        :func:`_load_pkg_infos` and
+        :func:`_load_packages` if they are not yet loaded and if the connection
+        to the munki repository
+        exists.
+        """
         if self.is_loaded or self.connect():
             self._load_packages()
             self._load_pkg_infos()
             self.is_loaded = True
 
     def update(self, package: Package):
+        """
+        Searches for a package in munki and updates it according to the package
+        given in the argument.
+        If no munki package exists matching the given package it is labeled as
+        missing.
+
+        :param package: `Package` object to be updated in the munki repo
+        """
         # make a deep copy of the package to prevent changes in other instances
         package_copy = copy.deepcopy(package)
 
         if package.key not in self._packages_dict:
-            # The package is not present in the Munki repo therefore it must be missing locally
-            # also update the referenced package such that jira will be informed
+            # The package is not present in the Munki repo therefore it must be
+            # missing locally also update the referenced package such that jira
+            # will be informed
             package.state = PackageState.UPDATE
             package.is_present = Present.MISSING
             # the package is new for the munki repo
@@ -155,13 +205,23 @@ class MunkiRepoProvider(Provider):
                 and key != "provider"
             ):
                 if p.__dict__.get(key) != value:
-                    # Not all values of the existing jira ticket and the local version match. Therefore update.
+                    # Not all values of the existing jira ticket and the local
+                    # version match. Therefore update.
                     package_copy.state = PackageState.UPDATE
                     self._packages_dict.update({package_copy.key: package_copy})
                     return
-        logger.debug(f"Munki update called for {package}, but no changes detected.")
+        logger.debug(
+            f"Munki update called for {package}, but no changes detected."
+        )
 
     def commit(self) -> bool:
+        """
+        Checks if the program runs as a dry run and if this is not the case, all
+        previously made changes are added to the munki repository.
+
+        :return: `bool` True if the run was not a dry run and changes were
+        committed.
+        """
         if not self._dry_run:
             for package in self._packages_dict.values():
                 if package.state == PackageState.UPDATE:
@@ -170,8 +230,11 @@ class MunkiRepoProvider(Provider):
                     ).get(str(package.version))
 
                     if pkg_info:
-                        # Plist already exists in Repo so we can continue to update it.
-                        pkg_info.update({"catalogs": [package.catalog.name.lower()]})
+                        # Plist already exists in Repo so we can continue to
+                        # update it.
+                        pkg_info.update(
+                            {"catalogs": [package.catalog.name.lower()]}
+                        )
 
                         f = open(
                             os.path.join(
@@ -186,15 +249,18 @@ class MunkiRepoProvider(Provider):
                         logger.debug(f"Wrote pkg info file at {f.name}")
                         f.close()
                     else:
-                        # Plist does not exist in Repo, and we can not create a new one.
+                        # Plist does not exist in Repo, and we can not create a
+                        # new one.
                         package.state = PackageState.MISSING
                         logger.debug(
-                            f"{package} is missing in {self.name} {self.__class__.__name__}"
+                            f"{package} is missing in {self.name}"
+                            f"{self.__class__.__name__}"
                         )
                         continue
                 elif package.state == PackageState.NEW:
                     logger.debug(
-                        f"Pkg info for {package} not written, because package state is {package.state}"
+                        f"Pkg info for {package} not written, because package "
+                        f"state is {package.state}"
                     )
 
             MunkiRepoProvider.make_catalogs()
@@ -206,12 +272,18 @@ class MunkiRepoProvider(Provider):
         """
         Run makecatalogs and check whether the return code is 0.
         """
-        cmd = ["python2", conf.MAKECATALOGS, conf.MAKECATALOGS_PARAMS, conf.REPO_PATH]
+        cmd = [
+            "python2",
+            conf.MAKECATALOGS,
+            conf.MAKECATALOGS_PARAMS,
+            conf.REPO_PATH,
+        ]
         logger.info("Running makecatalogs.")
         try:
             subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
             logger.error(
-                f"Running makecatalogs failed with code {e.returncode}. {str(e)}"
+                f"Running makecatalogs failed with code {e.returncode}. "
+                f"{str(e)}"
             )
         logger.info("Makecatalogs completed.")

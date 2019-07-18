@@ -12,7 +12,8 @@ from munkipromoter import MunkiPromoter
 
 class TestMunkiPromoter:
     def test_start(self, set_up_promoter):
-        # removing arguments added by pytest which are otherwise interpreted by our argparser
+        # removing arguments added by pytest which are otherwise interpreted by
+        # our argparser
         sys.argv = sys.argv[:1]
         munki_promoter = MunkiPromoter()
         munki_promoter._j = Mock()

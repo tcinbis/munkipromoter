@@ -7,7 +7,8 @@
 
 
 class PromoterException(Exception):
-    """This exception class will be extended by all sub exceptions which are special to this project."""
+    """This exception class will be extended by all sub exceptions which are
+    special to this project."""
 
     def __init__(self):
         super().__init__()
@@ -36,8 +37,14 @@ class JiraIssueMissingFields(PromoterException):
 
 
 class MunkiItemInMultipleCatalogs(PromoterException):
+    """This munki item is in multiple catalogs at once."""
+
     def __init__(self, munki_item):
         super().__init__()
         self.provider = "Munki"
         self.munki_item = munki_item
-        self.message = f"{munki_item.get('name')} with version {munki_item.get('version')} is in more than one catalog. Can't process item."
+        self.message = (
+            f"{munki_item.get('name')} with version "
+            f"{munki_item.get('version')} is in more than one catalog. "
+            f"Can't process item."
+        )
