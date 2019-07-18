@@ -13,9 +13,9 @@ This is the main use case for the _Munki Promoter_.
 It loads packages from a existing Munki Repository, creates or updates the corresponding Jira issues and then checks
 whether a software package can or should be promoted to another catalog. In this general case we decided to go with a 
 three catalog approach.
-  - Development
-  - Testing
-  - Production
+- Development
+- Testing
+- Production
 
 ## Installation and usage
 _Munki Promoter_ currently requires Python version 3.7+ and [Munki tools](https://github.com/munki/munki/releases) to be 
@@ -59,4 +59,4 @@ The results will then be stored in a new folder called `htmlcov`. and published 
 [Codacy](https://app.codacy.com/project/tom.cinbis/munkipromoter/dashboard).
 
 ## Todos
-  - Create and publish an [ANTS](https://github.com/ANTS-Framework)
+- Create and publish an [ANTS](https://github.com/ANTS-Framework)
