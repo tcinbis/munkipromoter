@@ -2,8 +2,7 @@ How To?
 ==============
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 3
 
    config.rst
 

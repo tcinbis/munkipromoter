@@ -15,17 +15,33 @@ Set up Jira Board
 Required Issue fields
 ---------------------
 
-- JIRA_SOFTWARE_NAME_FIELD
+For the *Munki Promoter* to work properly, we need a minimum set of system and
+custom fields for our Jira Issue Type. These fields should be added to the
+`Create`, `Edit` and `View` screen in your project configuration.
 
-- JIRA_DUEDATE_FIELD
+The fields we need are the following:
 
-- JIRA_CATALOG_FIELD
+- Software Name
 
-- JIRA_AUTOPROMOTE_FIELD
+- Software Version
 
-- JIRA_PRESENT_FIELD
+- Due date
 
-- JIRA_SOFTWARE_VERSION_FIELD
+- Catalog
+
+- Autopromote
+
+- Present
+
+Below you can see an example of such an screen with the fields we need to add
+and **most** importantly for **you** the type of field. These types are critical to the
+proper out of the box functioning. In case the types you want to use, differ
+from the ones shown below, you need to manually adjust the
+:meth:`core.provider.jiraprovider.JiraBoardProvider.commit` method.
+
+.. image:: img/jira-screen-field-types.png
+   :scale: 40 %
+   :align: center
 
 Find Jira Customfields
 ----------------------

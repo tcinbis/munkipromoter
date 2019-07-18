@@ -1,6 +1,9 @@
 Provider Package
 =========================
 
+.. toctree::
+   :maxdepth: 3
+
 Jira Provider module
 -------------------------------------
 
