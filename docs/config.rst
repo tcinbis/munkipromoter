@@ -1,8 +1,43 @@
 Configuration
 =============
 
+To make it as easy as possible for someone new to setup his instance of
+*Munki Promoter* all configuration values are stored in one file. This means in
+theory that the average user does not need to touch any of the other files in
+this repository.
+
+To change the value, simply find the correct variable assignment. An example for
+the ``JIRA_AUTOPROMOTE_FIELD`` is shown below.
+In case you are using some sort of virtual environment or a configuration
+management tool such as ANTS_ you can just set the environment variables
+shown in :mod:`utils.config`. Thus no files need to be edited at all.
+Otherwise change the second value in the statement below
+(here: ``customfield_12701``).
+The second value is the one the method :meth:`os.getenv` will return in case the
+key (here: ``MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD``) is not found  in the
+current environment.
+
+.. code-block:: python
+
+   JIRA_AUTOPROMOTE_FIELD = os.getenv(
+      "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD", "customfield_12701"
+   )
+
+
+.. warning::
+   Virtual environments will most certainly have **no** or **other** environment
+   variables than your *normal* session. Therefore make sure that you set the
+   variables in the correct environment. For example first activate your
+   virtualenv before setting the values.
+
+.. _ANTS: https://github.com/ANTS-Framework/ants
+
 Set up Jira Board
 -------------------------
+
+This is an example on how your Jira Board and Issue should look like. Minor
+differences are of course possible (especially with future updates), but the
+core components should be present.
 
 .. image:: img/jira-board-overview.png
    :scale: 20%
