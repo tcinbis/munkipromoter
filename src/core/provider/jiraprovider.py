@@ -77,10 +77,9 @@ class JiraBoardProvider(Provider):
         If a successful connection to the jira instance is possible all issues
         for a given project key are loaded.
         Issues are loaded in batches, if the project has more issues than the
-        batch size, the issues are loaded
-        continuously.
+        batch size, the issues are loaded continuously.
         After loading the issues, these are converted into a `Package` with
-        :func:`_jira_issue_to_package_dict`.
+        :func:`_jira_issue_to_package_dict`
         """
         if self.is_loaded or self.connect():
             query = f"project={conf.JIRA_PROJECT_KEY}"
