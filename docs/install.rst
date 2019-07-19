@@ -1,8 +1,8 @@
 Installation
 ============
 
-Perquisites
------------
+Prerequisites
+-------------
 
 To run *Munki Promoter* please install Python_ 3.7 or above
 
@@ -15,13 +15,20 @@ Clone Repository
 
    git clone https://github.com/tcinbis/munkipromoter.git
 
-
 Create virtual environment
 --------------------------
 
 .. code-block:: bash
 
+   cd munkipromoter
    virtualenv venv --python=python3.7
+
+Activate virtual environment
+----------------------------
+
+.. code-block:: bash
+
+   source venv/bin/activate
 
 
 Install dependencies
@@ -48,7 +55,10 @@ Create log file
    chmod 644 /var/log/munkipromoter.log
 
 .. note::
-   You may need to adjust the filename of the log in case you defined another
+   You may need to use sudo with some commands if the permissions are denied.
+
+.. note::
+   You may need to adjust the filename of the log in case you define another
    name in the configuration :mod:`utils.config`.
 
 
