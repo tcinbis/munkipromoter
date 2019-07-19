@@ -22,41 +22,50 @@ class MunkiPromoterConfig:
     """
 
     class __MunkiPromoterConfig:
-        REPO_PATH = os.getenv(
-            "MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo_test"
-        )
+
+        # The path to the mounted munki repository
+        REPO_PATH = os.getenv("MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo_test")
 
         @property
         def CATALOGS_PATH(self):
+            """The name of the folder in which all possible catalogs are saved."""
             return os.path.join(
-                self.REPO_PATH,
-                os.getenv("MUNKIPROMOTER_CATALOGS_PATH", "catalogs"),
+                self.REPO_PATH, os.getenv("MUNKIPROMOTER_CATALOGS_PATH", "catalogs")
             )
 
         @property
         def PKGS_INFO_PATH(self):
+            """The name of the folder in which all pkgsinfo in form of plists are saved."""
             return os.path.join(
-                self.REPO_PATH,
-                os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", "pkgsinfo"),
+                self.REPO_PATH, os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", "pkgsinfo")
             )
 
         DEBUG_PKGS_INFO_SAVE_PATH = os.getenv(
             "MUNKIPROMOTER_DEBUG_PKGS_INFO_SAVE_PATH", None
         )
+
+        # The path to the makecatalogs command
         MAKECATALOGS = os.getenv(
             "MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs"
         )
 
+        # Bool, if the munkipromoter should run as a dry run without commiting anything
         DRY_RUN = os.getenv("MUNKIPROMOTER_DRY_RUN", False)
 
+        # Optional parameters for the makecatalogs command
         MAKECATALOGS_PARAMS = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PARAMS", "")
 
+        # The url to the jira server. E.g. deployment-jira.organization.test.com
         JIRA_URL = os.getenv(
             "MUNKIPROMOTER_JIRA_URL", "INSERT YOUR DEFAULT SERVER URL HERE"
         )
+
+        # The username of the jira account
         JIRA_USER = os.getenv(
             "MUNKIPROMOTER_JIRA_USER", "INSERT YOUR JIRA USERNAME HERE"
         )
+
+        # The password for the jira account
         JIRA_PASSWORD = os.getenv(
             "MUNKIPROMOTER_JIRA_PASSWORD", "INSERT YOUR JIRA PASSWORD HERE"
         )
@@ -71,6 +80,7 @@ class MunkiPromoterConfig:
                 "basic_auth": (self.JIRA_USER, self.JIRA_PASSWORD),
             }
 
+        # different jira board specific attributes
         JIRA_PROJECT_KEY = os.getenv("MUNKIPROMOTER_JIRA_PROJECT_KEY", "SWPM")
         JIRA_ISSUE_TYPE = os.getenv("MUNKIPROMOTER_JIRA_ISSUE_TYPE", "Story")
 
@@ -105,8 +115,7 @@ class MunkiPromoterConfig:
         )
 
         JIRA_DEVELOPMENT_TRANSITION_NAME = os.getenv(
-            "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME",
-            "all to development",
+            "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME", "all to development"
         )
         JIRA_TESTING_TRANSITION_NAME = os.getenv(
             "MUNKIPROMOTER_JIRA_TESTING_TRANSITION_NAME", "all to test"
@@ -133,6 +142,7 @@ class MunkiPromoterConfig:
             "MUNKIPROMOTER_DEFAULT_PROMOTION_DAY", "Thursday"
         )
 
+        # logger attributes
         LOG_LEVEL = os.getenv("MUNKIPROMOTER_LOG_LEVEL", "DEBUG")
         LOG_BACKUP_COUNT = os.getenv("MUNKIPROMOTER_LOG_BACKUP_COUNT", 3)
         LOG_DIR = os.getenv("MUNKIPROMOTER_LOG_DIR", "/var/log")
@@ -142,9 +152,7 @@ class MunkiPromoterConfig:
 
     def __init__(self):
         if not MunkiPromoterConfig.instance:
-            MunkiPromoterConfig.instance = (
-                MunkiPromoterConfig.__MunkiPromoterConfig()
-            )
+            MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
 
     def __getattr__(self, item):
         return getattr(self.instance, item)
@@ -170,9 +178,7 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
                 "MUNKIPROMOTER_TEST_REPO_PATH",
                 os.path.join(
                     os.path.dirname(
-                        os.path.dirname(
-                            os.path.dirname(os.path.abspath(__file__))
-                        )
+                        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                     ),
                     "tests/data",
                 ),
@@ -186,11 +192,7 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
         self.instance.DRY_RUN = True
 
 
-conf = (
-    MunkiPromoterTestConfig()
-    if "pytest" in sys.modules
-    else MunkiPromoterConfig()
-)
+conf = MunkiPromoterTestConfig() if "pytest" in sys.modules else MunkiPromoterConfig()
 
 
 class JiraEnum(Enum):
