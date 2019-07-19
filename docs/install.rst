@@ -21,6 +21,7 @@ Create virtual environment
 
 .. code-block:: bash
 
+   pip3 install virtualenv
    virtualenv venv --python=python3.7
 
 
