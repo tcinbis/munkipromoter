@@ -45,8 +45,8 @@ Important Features
    :maxdepth: 3
    :caption: Contents:
 
-   howto.rst
-   modules.rst
+   quickstart
+   modules
 
 
 Indices and tables

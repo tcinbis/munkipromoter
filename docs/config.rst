@@ -1,6 +1,9 @@
 Configuration
 =============
 
+.. toctree::
+   :maxdepth: 3
+
 To make it as easy as possible for someone new to setup his instance of
 *Munki Promoter* all configuration values are stored in one file. This means in
 theory that the average user does not need to touch any of the other files in

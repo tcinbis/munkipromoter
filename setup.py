@@ -18,6 +18,7 @@ setup(
     ],
     author_email="tom.cinbis@unibas.ch, tim.koenigl@unibas.ch",
     license="GPLv3",
+    scripts=['src/munkipromoter.py'],
     packages=find_packages(where="src"),
     package_dir={"": "src"},
 )

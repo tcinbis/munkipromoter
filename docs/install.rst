@@ -1,5 +1,5 @@
-Installation & Usage
-====================
+Installation
+============
 
 Perquisites
 -----------
@@ -29,7 +29,7 @@ Install dependencies
 
 .. code-block:: bash
 
-   pip install -r requirements
+   pip install -r requirements.txt
 
 Install *Munki Promoter*
 ------------------------
@@ -51,10 +51,6 @@ Create log file
    You may need to adjust the filename of the log in case you defined another
    name in the configuration :mod:`utils.config`.
 
-Usage
------
 
-
-
-Now everything should be configured in a way such that we can continue with
-installing the required dependencies. :doc:`config`
+Now everything should be installed in a way such that we can continue with the
+configuration. :doc:`config`
