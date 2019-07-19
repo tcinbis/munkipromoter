@@ -15,12 +15,14 @@ Clone Repository
 
    git clone https://github.com/tcinbis/munkipromoter.git
 
+
 Create virtual environment
 --------------------------
 
 .. code-block:: bash
 
    cd munkipromoter
+   pip3 install virtualenv
    virtualenv venv --python=python3.7
 
 Activate virtual environment
