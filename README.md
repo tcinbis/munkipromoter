@@ -50,6 +50,13 @@ code quality and readability. Some of them are explained below.
 To ensure consistency in our code we utilise
 [Black](https://github.com/python/black) as a code formatter.
 
+### Flake8
+
+Our continuous integration will automatically run 
+[Flake8](http://flake8.pycqa.org/en/latest/index.html) and check whether our 
+code complies with our style guide which is almost vanilla PEP8. You can run
+`flake8` locally to test your code changes. 
+
 ### Tox
 
 >[Tox](https://tox.readthedocs.io/en/latest/index.html) aims to automate and

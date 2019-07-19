@@ -52,7 +52,7 @@ Required Issue fields
 
 For the *Munki Promoter* to work properly, we need a minimum set of system and
 custom fields for our Jira Issue Type. These fields should be added to the
-`Create`, `Edit` and `View` screen in your project configuration.
+`Create`, `Edit` and `View` screen in your Jira project configuration.
 
 The fields we need are the following:
 
@@ -77,8 +77,8 @@ Find Jira Customfields
 ----------------------
 
 For the configuration stored in :class:`utils.config.MunkiPromoterConfig` we
-need to know the name of each customfield and the corresponding id of the
-possible values. These information can unfortunately not be queried
+need to know the name of each customfield and the corresponding ID of the
+possible values. This information can unfortunately not be queried
 automatically in an easy way yet. Therefore one must open a Jira Issue in his
 favourite Web Browser (below we used Firefox) and extract these information from
 the html source.
@@ -114,5 +114,31 @@ you would need to set the following configuration options:
 Jira Workflow & Transitions
 ----------------------------
 
+.. image:: img/jira-workflow.png
+   :scale: 35 %
+   :align: center
+
+In the picture above you can see the workflow we utilize by default. Important
+to note is that *Munki Promoter* expects three main states like
+*Development, Testing* and *Production* and in addition to this we also need to
+have three more lanes starting with ``TO``. These lanes are used to tell
+*Munki Promoter* to move all issues within this lane to the next catalog.
+As an example we may have Firefox in version 68 in our `Testing` lane. Because
+we want to immediately move it to production instead of waiting for the usual
+period of time we manually grab the Jira Issue and Drag-and-Drop it into the
+``TO  PRODUCTION`` lane and the next time the promoter runs it will promote the
+package to the `production` catalog.
+
+.. note::
+   It must be possible to move a ticket from one lane to all other lanes in the
+   project. You can also see this in our workflow were each state is reachable
+   by its previous and by `ALL`.
+
+
 Insert into configuration
 -------------------------
+
+Once you collected all required configuration values you can either set the
+environment variables or edit the :mod:`utils.config` file. From now on
+everything should be setup and configured in a way such that you can start
+the *Munki Promoter* for its initial run.
