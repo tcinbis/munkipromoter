@@ -26,9 +26,6 @@ class ConfigSections(Enum):
     JIRA = "Jira"
     LOGGER = "Logger"
 
-    def __repr__(self):
-        return self.value
-
 
 class MunkiPromoterConfig:
     """
