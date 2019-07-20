@@ -11,6 +11,7 @@ import configparser
 import os
 import sys
 from enum import Enum, auto
+from typing import Any
 
 config_from_file = configparser.ConfigParser(
     interpolation=configparser.ExtendedInterpolation()
@@ -233,39 +234,40 @@ class MunkiPromoterConfig:
             config_from_file.get(ConfigSections.LOGGER.value, "LOG_FILENAME"),
         )
 
-        @property
-        def CATALOGS_PATH(self):
-            return os.path.join(
-                self.REPO_PATH,
-                os.getenv(
-                    "MUNKIPROMOTER_CATALOGS_PATH",
-                    config_from_file.get(
-                        ConfigSections.MUNKI.value, "CATALOGS_PATH"
-                    ),
+    @property
+    def CATALOGS_PATH(self):
+        return os.path.join(
+            self.instance.REPO_PATH,
+            os.getenv(
+                "MUNKIPROMOTER_CATALOGS_DIR",
+                config_from_file.get(
+                    ConfigSections.MUNKI.value, "CATALOGS_DIR"
                 ),
-            )
+            ),
+        )
 
-        @property
-        def PKGS_INFO_PATH(self):
-            return os.path.join(
-                self.REPO_PATH,
-                os.getenv(
-                    "MUNKIPROMOTER_PKGS_INFO_PATH",
-                    config_from_file.get(
-                        ConfigSections.MUNKI.value, "PKGS_INFO_PATH"
-                    ),
+    @property
+    def PKGS_INFO_PATH(self):
+        return os.path.join(
+            self.instance.REPO_PATH,
+            os.getenv(
+                "MUNKIPROMOTER_PKGS_INFO_DIR",
+                config_from_file.get(
+                    ConfigSections.MUNKI.value, "PKGS_INFO_DIR"
                 ),
-            )
+            ),
+        )
 
-        @property
-        def JIRA_CONNECTION_INFO(self):
-            # Store Jira connection information in a dict. We can then create a
-            # connection by invoking
-            # JIRA(**JIRA_CONNECTION_INFO)
-            return {
-                "server": self.JIRA_URL,
-                "basic_auth": (self.JIRA_USER, self.JIRA_PASSWORD),
-            }
+    @property
+    def JIRA_CONNECTION_INFO(self):
+        # Store Jira connection information in a dict. We can then create a
+        # connection by invoking
+        # JIRA(**JIRA_CONNECTION_INFO)
+        return {
+            "server": self.instance.JIRA_URL,
+            "basic_auth": (self.instance.JIRA_USER, self.instance.JIRA_PASSWORD),
+        }
+
 
     instance = None
 
@@ -274,6 +276,9 @@ class MunkiPromoterConfig:
             MunkiPromoterConfig.instance = (
                 MunkiPromoterConfig.__MunkiPromoterConfig()
             )
+
+    def __getattribute__(self, name: str) -> Any:
+        return super().__getattribute__(name)
 
     def __getattr__(self, item):
         return getattr(self.instance, item)

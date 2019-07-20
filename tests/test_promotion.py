@@ -8,13 +8,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
-from utils.config import (
-    JiraLane,
-    Catalog,
-    Present,
-    JiraAutopromote,
-    PackageState,
-)
+from utils.config import JiraLane, Catalog, Present, JiraAutopromote, PackageState
 
 
 class TestPromotion:
@@ -28,9 +22,9 @@ class TestPromotion:
         set_up_promoter._date_promotions = Mock()
         set_up_promoter._lane_promotions = Mock()
 
-        config.DEFAULT_PROMOTION_DAY = (
-            datetime.today() + timedelta(days=1)
-        ).strftime("%A")
+        config.DEFAULT_PROMOTION_DAY = (datetime.today() + timedelta(days=1)).strftime(
+            "%A"
+        )
         set_up_promoter.promote()
 
         assert (
