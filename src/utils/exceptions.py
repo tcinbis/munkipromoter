@@ -60,3 +60,15 @@ class MunkiRepoNotFound(PromoterException):
         super().__init__()
         self.provider = "Munki"
         self.message = f"The given Munki repository: {repo} was not found."
+
+
+class ImproperlyConfigured(PromoterException):
+    """
+    The ImproperlyConfigured exception is raised when Munki Promoter is somehow
+    improperly configured – for example, if a value in config.py is incorrect or
+    unparseable.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.message = "Improper configuration values. See log."
