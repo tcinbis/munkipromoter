@@ -131,13 +131,16 @@ Jira
 Logger
 ------
 - LOG_LEVEL
-    TBD
+    The log level to be used when logging to the console.
+
 - LOG_BACKUP_COUNT
-    TBD
+    The number of backup logs to keep before rotating.
+
 - LOG_DIR
-    TBD
+    The directory where the logfile is written.
+
 - LOG_FILENAME
-    TBD
+    The name of the logfile.
 
 Default
 -------
@@ -153,27 +156,34 @@ Miscellaneous
    sake of completeness we will document them here anyway.
 
 - CATALOGS_DIR
-    TBD
+    Name of the folder where the catalogs are stored in. This is usually called
+    ``catalogs``.
+
 - PKGS_INFO_DIR
-    TBD
+    Name of the folder where the pkgsinfo files are stored in. This is usually
+    called ``pkgsinfo``.
+
 - MAKECATALOGS
-    TBD
+    The path of the ``makecatalogs`` tool which needs to be installed locally.
+    Default is ``/usr/local/munki/makecatalogs``.
+
 - MAKECATALOGS_PARAMS
-    TBD
+    Additional parameters which should be passed to the ``makecatalogs``
+    command.
 
 
 
 - JIRA_PROJECT_FIELD
-    TBD
+    Default field name to find and set the project.
 - JIRA_ISSUE_TYPE_FIELD
-    TBD
+    Default field name to find and set the issue type.
 - JIRA_ISSUE_TYPE
-    TBD
+    Default name to set the correct issue type.
 - JIRA_SUMMARY_FIELD
-    TBD
+    Default field name to find and set the summary.
 - JIRA_DESCRIPTION_FIELD
-    TBD
+    Default field name to find and set the description.
 - JIRA_DUEDATE_FIELD
-    TBD
+    Default field name to find and set the due date.
 - JIRA_LABELS_FIELD
-    TBD
+    Default field name to find and set labels.

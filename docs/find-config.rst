@@ -2,30 +2,38 @@ Finding Your Configuration Values
 =================================
 
 To make it as easy as possible for someone new to setup his instance of
-*Munki Promoter* all configuration values are stored in one file, the ``default.ini`` file. This means in
+*Munki Promoter* all configuration values are stored in one file, the
+``default.ini`` file. This means in
 theory that the average user does not need to touch any of the other files in
-this repository. To change the value, simply find the correct variable assignment.
+this repository. To change the value, simply find the correct variable
+assignment.
 
 In the config file 4 different config sections exist:
 
- - **Promotion**: These variables define, how often and when your packages are automatically promoted
- - **Munki**: These variables have information about the location and the structure of your munki repository
- - **Jira**: These variables are used to connect to the correct Jira instance and additionally all required
-   information about your Jira configuration can be set here, including the jira internal names of the fields.
+ - **Promotion**: These variables define, how often and when your packages are
+   automatically promoted
+ - **Munki**: These variables have information about the location and the
+   structure of your munki repository
+ - **Jira**: These variables are used to connect to the correct Jira instance
+   and additionally all required
+   information about your Jira configuration can be set here, including the
+   jira internal names of the fields.
  - **Logger** These variables define your logger configuration.
 
-An example for the ``JIRA_AUTOPROMOTE_FIELD`` is shown below. The different sections inside this config file
-have an information if they must be changed, but some of the default values have to be adapted to your project,
-especially the information about the jira project.
+An example for the ``JIRA_AUTOPROMOTE_FIELD`` is shown below. The different
+sections inside this config file have an information if they must be changed,
+but some of the default values have to be adapted to your project, especially
+the information about the jira project.
 
-There is additionally another way to set the config values in case you are using some sort of
-virtual environment or a configuration management tool such as ANTS_.
-You can just set the environment variables with the name as in the ``default.ini`` file and a ``MUNKIPROMOTER_``
-appended to the front.
-So if you want to set the config variable ``REPO_PATH``, it has to be named ``MUNKIPROMOTER_REPO_PATH`` in
-your environment.
-Using this approach no files need to be edited at all and it is unlikely that any existing environment variables
-get overwritten.
+There is additionally another way to set the config values in case you are using
+some sort of virtual environment or a configuration management tool such as
+ANTS_.
+You can just set the environment variables with the name as in the
+``default.ini`` file and a ``MUNKIPROMOTER_`` appended to the front.
+So if you want to set the config variable ``REPO_PATH``, it has to be named
+``MUNKIPROMOTER_REPO_PATH`` in your environment.
+Using this approach no files need to be edited at all and it is unlikely that
+any existing environment variables get overwritten.
 
 .. code-block:: ini
 
@@ -72,8 +80,8 @@ The fields we need are the following:
 - Present
 
 Below you can see an example of such an screen with the fields we need to add
-and **most importantly for you** the type of field. These types are critical to the
-proper out of the box functioning. In case the types you want to use, differ
+and **most importantly for you** the type of field. These types are critical to
+the proper out of the box functioning. In case the types you want to use, differ
 from the ones shown below, you need to manually adjust the
 :meth:`core.provider.jiraprovider.JiraBoardProvider.commit` method.
 

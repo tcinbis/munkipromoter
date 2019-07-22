@@ -4,9 +4,13 @@ Installation
 Prerequisites
 -------------
 
-To run *Munki Promoter* please install Python_ 3.7 or above
+To run *Munki Promoter* please install Python_ 3.7 or above. Additionally you
+need to install the munkitools_ on your system to apply changes to pkgsinfo
+files. This in turn requires Python 2, but is compatible with the system Python
+on Mac.
 
 .. _Python: https://python.org/downloads
+.. _munkiTools: https://github.com/munki/munki/releases
 
 Clone Repository
 ----------------
