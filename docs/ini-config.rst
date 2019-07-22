@@ -114,13 +114,19 @@ Jira
     :ref:`find-custom-fields`.
 
 - JIRA_DEVELOPMENT_TRANSITION_NAME
-    :ref:`jira-workflow`
+    This field should contain the name of the transition to move **any** ticket
+    into the development lane on the Jira board.
+    How to find the corresponding names is described in :ref:`jira-workflow`.
 
 - JIRA_TESTING_TRANSITION_NAME
-    TBD
+    This field should contain the name of the transition to move **any** ticket
+    into the testing lane on the Jira board.
+    How to find the corresponding names is described in :ref:`jira-workflow`.
 
 - JIRA_PRODUCTION_TRANSITION_NAME
-    TBD
+    This field should contain the name of the transition to move **any** ticket
+    into the production lane on the Jira board.
+    How to find the corresponding names is described in :ref:`jira-workflow`.
 
 Logger
 ------
