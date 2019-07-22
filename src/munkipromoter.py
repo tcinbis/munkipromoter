@@ -88,7 +88,6 @@ class MunkiPromoter:
             correct_config = False
             logger.critical("Your make catalogs path is wrong, please correct.")
 
-
         config_file_path = os.path.join(conf.LOG_DIR, conf.LOG_FILENAME)
         if not os.path.exists(config_file_path):
             correct_config = False
@@ -104,9 +103,10 @@ class MunkiPromoter:
             )
 
         if not correct_config and not isinstance(conf, MunkiPromoterTestConfig):
+            # if we are testing we do not want to supply a complete
+            # configuration therefore we only raise the exception when running
+            # in non testing mode.
             raise ImproperlyConfigured()
-
-
 
     @staticmethod
     def _setup_argparser():
