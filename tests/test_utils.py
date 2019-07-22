@@ -42,17 +42,10 @@ class TestUtils:
 
     def test_catalog(self):
         """Tests the jira catalog enum"""
+        assert Catalog.jira_lane_to_catalog(JiraLane.DEVELOPMENT) == Catalog.DEVELOPMENT
+        assert Catalog.jira_lane_to_catalog(JiraLane.DEVELOPMENT) == Catalog.DEVELOPMENT
         assert (
-            Catalog.jira_lane_to_catalog(JiraLane.DEVELOPMENT)
-            == Catalog.DEVELOPMENT
-        )
-        assert (
-            Catalog.jira_lane_to_catalog(JiraLane.DEVELOPMENT)
-            == Catalog.DEVELOPMENT
-        )
-        assert (
-            Catalog.jira_lane_to_catalog(JiraLane.TO_DEVELOPMENT)
-            == Catalog.DEVELOPMENT
+            Catalog.jira_lane_to_catalog(JiraLane.TO_DEVELOPMENT) == Catalog.DEVELOPMENT
         )
 
         assert Catalog.DEVELOPMENT.next_catalog == Catalog.TESTING
