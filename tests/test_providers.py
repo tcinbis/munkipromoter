@@ -49,9 +49,7 @@ class TestJiraBoardProvider:
 
         assert len(jira_board_provider.get()) != 0
 
-    def test_check_jira_issue_exists(
-        self, jira_board_provider, test_one_package
-    ):
+    def test_check_jira_issue_exists(self, jira_board_provider, test_one_package):
         """
         Tests if the `JiraBoardProvider.check_jira_issue_exists` works
         correctly.
@@ -147,9 +145,7 @@ class TestJiraBoardProvider:
         assert is_exact_match(random_package, jira_package, ["state"])
         assert jira_package.state == PackageState.NEW
 
-    def test_update_jira_from_repo(
-        self, munki_repo_provider, jira_board_provider
-    ):
+    def test_update_jira_from_repo(self, munki_repo_provider, jira_board_provider):
         """Tests update of jira from munki"""
         munki_repo_provider.load()
         munki_packages = copy.deepcopy(munki_repo_provider.get())

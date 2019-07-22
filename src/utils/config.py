@@ -7,9 +7,25 @@
 
 from __future__ import annotations
 
+import configparser
 import os
 import sys
 from enum import Enum, auto
+from typing import Any
+
+config_from_file = configparser.ConfigParser(
+    interpolation=configparser.ExtendedInterpolation()
+)
+config_from_file.read(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "default.ini")
+)
+
+
+class ConfigSections(Enum):
+    PROMOTION = "Promotion"
+    MUNKI = "Munki"
+    JIRA = "Jira"
+    LOGGER = "Logger"
 
 
 class MunkiPromoterConfig:
@@ -22,106 +38,154 @@ class MunkiPromoterConfig:
     """
 
     class __MunkiPromoterConfig:
-
-        # The path to the mounted munki repository
-        REPO_PATH = os.getenv("MUNKIPROMOTER_REPO_PATH", "/Volumes/munki_repo_test")
-
-        @property
-        def CATALOGS_PATH(self):
-            """The name of the folder in which all possible catalogs are saved."""
-            return os.path.join(
-                self.REPO_PATH, os.getenv("MUNKIPROMOTER_CATALOGS_PATH", "catalogs")
-            )
-
-        @property
-        def PKGS_INFO_PATH(self):
-            """The name of the folder in which all pkgsinfo in form of plists are saved."""
-            return os.path.join(
-                self.REPO_PATH, os.getenv("MUNKIPROMOTER_PKGS_INFO_PATH", "pkgsinfo")
-            )
+        REPO_PATH = os.getenv(
+            "MUNKIPROMOTER_REPO_PATH",
+            config_from_file.get(ConfigSections.MUNKI.value, "REPO_PATH"),
+        )
 
         DEBUG_PKGS_INFO_SAVE_PATH = os.getenv(
-            "MUNKIPROMOTER_DEBUG_PKGS_INFO_SAVE_PATH", None
+            "MUNKIPROMOTER_DEBUG_PKGS_INFO_SAVE_PATH",
+            config_from_file.get(
+                ConfigSections.MUNKI.value, "DEBUG_PKGS_INFO_SAVE_PATH"
+            ),
         )
-
-        # The path to the makecatalogs command
         MAKECATALOGS = os.getenv(
-            "MUNKIPROMOTER_MAKECATALOGS", "/usr/local/munki/makecatalogs"
+            "MUNKIPROMOTER_MAKECATALOGS",
+            config_from_file.get(ConfigSections.MUNKI.value, "MAKECATALOGS"),
         )
 
-        # Bool, if the munkipromoter should run as a dry run without commiting anything
-        DRY_RUN = os.getenv("MUNKIPROMOTER_DRY_RUN", False)
+        DRY_RUN = os.getenv(
+            "MUNKIPROMOTER_DRY_RUN",
+            config_from_file.get(ConfigSections.MUNKI.value, "DRY_RUN"),
+        )
 
-        # Optional parameters for the makecatalogs command
-        MAKECATALOGS_PARAMS = os.getenv("MUNKIPROMOTER_MAKECATALOGS_PARAMS", "")
+        MAKECATALOGS_PARAMS = os.getenv(
+            "MUNKIPROMOTER_MAKECATALOGS_PARAMS",
+            config_from_file.get(
+                ConfigSections.MUNKI.value, "MAKECATALOGS_PARAMS"
+            ),
+        )
 
-        # The url to the jira server. E.g. deployment-jira.organization.test.com
         JIRA_URL = os.getenv(
-            "MUNKIPROMOTER_JIRA_URL", "INSERT YOUR DEFAULT SERVER URL HERE"
+            "MUNKIPROMOTER_JIRA_URL",
+            config_from_file.get(ConfigSections.JIRA.value, "JIRA_URL"),
         )
-
-        # The username of the jira account
         JIRA_USER = os.getenv(
-            "MUNKIPROMOTER_JIRA_USER", "INSERT YOUR JIRA USERNAME HERE"
+            "MUNKIPROMOTER_JIRA_USER",
+            config_from_file.get(ConfigSections.JIRA.value, "JIRA_USER"),
         )
-
-        # The password for the jira account
         JIRA_PASSWORD = os.getenv(
-            "MUNKIPROMOTER_JIRA_PASSWORD", "INSERT YOUR JIRA PASSWORD HERE"
+            "MUNKIPROMOTER_JIRA_PASSWORD",
+            config_from_file.get(ConfigSections.JIRA.value, "JIRA_PASSWORD"),
         )
 
-        @property
-        def JIRA_CONNECTION_INFO(self):
-            # Store Jira connection information in a dict. We can then create a
-            # connection by invoking
-            # JIRA(**JIRA_CONNECTION_INFO)
-            return {
-                "server": self.JIRA_URL,
-                "basic_auth": (self.JIRA_USER, self.JIRA_PASSWORD),
-            }
-
-        # different jira board specific attributes
-        JIRA_PROJECT_KEY = os.getenv("MUNKIPROMOTER_JIRA_PROJECT_KEY", "SWPM")
-        JIRA_ISSUE_TYPE = os.getenv("MUNKIPROMOTER_JIRA_ISSUE_TYPE", "Story")
+        JIRA_PROJECT_KEY = os.getenv(
+            "MUNKIPROMOTER_JIRA_PROJECT_KEY",
+            config_from_file.get(ConfigSections.JIRA.value, "JIRA_PROJECT_KEY"),
+        )
+        JIRA_ISSUE_TYPE = os.getenv(
+            "MUNKIPROMOTER_JIRA_ISSUE_TYPE",
+            config_from_file.get(ConfigSections.JIRA.value, "JIRA_ISSUE_TYPE"),
+        )
 
         JIRA_SOFTWARE_NAME_FIELD = os.getenv(
-            "MUNKIPROMOTER_JIRA_SOFTWARE_NAME_FIELD", "customfield_12503"
+            "MUNKIPROMOTER_JIRA_SOFTWARE_NAME_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_SOFTWARE_NAME_FIELD"
+            ),
         )
-        JIRA_PROJECT_FIELD = "project"
-        JIRA_ISSUE_TYPE_FIELD = "issuetype"
-        JIRA_SUMMARY_FIELD = "summary"
-        JIRA_DESCRIPTION_FIELD = "description"
+        JIRA_PROJECT_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_PROJECT_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_PROJECT_FIELD"
+            ),
+        )
+        JIRA_ISSUE_TYPE_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_ISSUE_TYPE_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_ISSUE_TYPE_FIELD"
+            ),
+        )
+        JIRA_SUMMARY_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_SUMMARY_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_SUMMARY_FIELD"
+            ),
+        )
+        JIRA_DESCRIPTION_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_DESCRIPTION_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_DESCRIPTION_FIELD"
+            ),
+        )
         JIRA_SOFTWARE_VERSION_FIELD = os.getenv(
-            "MUNKIPROMOTER_JIRA_SOFTWARE_VERSION_FIELD", "customfield_12504"
+            "MUNKIPROMOTER_JIRA_SOFTWARE_VERSION_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_SOFTWARE_VERSION_FIELD"
+            ),
         )
-        JIRA_DUEDATE_FIELD = "duedate"
-        JIRA_LABELS_FIELD = "labels"
+        JIRA_DUEDATE_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_DUEDATE_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_DUEDATE_FIELD"
+            ),
+        )
+        JIRA_LABELS_FIELD = os.getenv(
+            "MUNKIPROMOTER_JIRA_LABELS_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_LABELS_FIELD"
+            ),
+        )
         JIRA_CATALOG_FIELD = os.getenv(
-            "MUNKIPROMOTER_JIRA_CATALOG_FIELD", "customfield_12703"
+            "MUNKIPROMOTER_JIRA_CATALOG_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_CATALOG_FIELD"
+            ),
         )
         JIRA_AUTOPROMOTE_FIELD = os.getenv(
-            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD", "customfield_12701"
+            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_AUTOPROMOTE_FIELD"
+            ),
         )
 
         _JIRA_AUTOPROMOTE_TRUE = os.getenv(
-            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_TRUE", "12003"
+            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_TRUE",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "_JIRA_AUTOPROMOTE_TRUE"
+            ),
         )
         _JIRA_AUTOPROMOTE_FALSE = os.getenv(
-            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FALSE", "12004"
+            "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FALSE",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "_JIRA_AUTOPROMOTE_FALSE"
+            ),
         )
 
         JIRA_PRESENT_FIELD = os.getenv(
-            "MUNKIPROMOTER_JIRA_PRESENT_FIELD", "customfield_12704"
+            "MUNKIPROMOTER_JIRA_PRESENT_FIELD",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_PRESENT_FIELD"
+            ),
         )
 
         JIRA_DEVELOPMENT_TRANSITION_NAME = os.getenv(
-            "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME", "all to development"
+            "MUNKIPROMOTER_JIRA_DEVELOPMENT_TRANSITION_NAME",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_DEVELOPMENT_TRANSITION_NAME"
+            ),
         )
         JIRA_TESTING_TRANSITION_NAME = os.getenv(
-            "MUNKIPROMOTER_JIRA_TESTING_TRANSITION_NAME", "all to test"
+            "MUNKIPROMOTER_JIRA_TESTING_TRANSITION_NAME",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_TESTING_TRANSITION_NAME"
+            ),
         )
         JIRA_PRODUCTION_TRANSITION_NAME = os.getenv(
-            "MUNKIPROMOTER_JIRA_PRODUCTION_TRANSITION_NAME", "all to prod"
+            "MUNKIPROMOTER_JIRA_PRODUCTION_TRANSITION_NAME",
+            config_from_file.get(
+                ConfigSections.JIRA.value, "JIRA_PRODUCTION_TRANSITION_NAME"
+            ),
         )
 
         ISSUE_FIELDS = [
@@ -135,24 +199,86 @@ class MunkiPromoterConfig:
             JIRA_PRESENT_FIELD,
         ]
 
-        DEFAULT_PROMOTION_INTERVAL = os.getenv(
-            "MUNKIPROMOTER_DEFAULT_PROMOTION_INTERVAL", 7
+        DEFAULT_PROMOTION_INTERVAL = int(
+            os.getenv(
+                "MUNKIPROMOTER_DEFAULT_PROMOTION_INTERVAL",
+                config_from_file.get(
+                    ConfigSections.PROMOTION.value, "DEFAULT_PROMOTION_INTERVAL"
+                ),
+            )
         )
         DEFAULT_PROMOTION_DAY = os.getenv(
-            "MUNKIPROMOTER_DEFAULT_PROMOTION_DAY", "Thursday"
+            "MUNKIPROMOTER_DEFAULT_PROMOTION_DAY",
+            config_from_file.get(
+                ConfigSections.PROMOTION.value, "DEFAULT_PROMOTION_DAY"
+            ),
         )
 
-        # logger attributes
-        LOG_LEVEL = os.getenv("MUNKIPROMOTER_LOG_LEVEL", "DEBUG")
-        LOG_BACKUP_COUNT = os.getenv("MUNKIPROMOTER_LOG_BACKUP_COUNT", 3)
-        LOG_DIR = os.getenv("MUNKIPROMOTER_LOG_DIR", "/var/log")
-        LOG_MAIL = os.getenv("MUNKIPROMOTER_LOG_MAIL", "tom.cinbis@unibas.ch")
+        LOG_LEVEL = os.getenv(
+            "MUNKIPROMOTER_LOG_LEVEL",
+            config_from_file.get(ConfigSections.LOGGER.value, "LOG_LEVEL"),
+        )
+        LOG_BACKUP_COUNT = os.getenv(
+            "MUNKIPROMOTER_LOG_BACKUP_COUNT",
+            config_from_file.get(
+                ConfigSections.LOGGER.value, "LOG_BACKUP_COUNT"
+            ),
+        )
+        LOG_DIR = os.getenv(
+            "MUNKIPROMOTER_LOG_DIR",
+            config_from_file.get(ConfigSections.LOGGER.value, "LOG_DIR"),
+        )
+
+        LOG_FILENAME = os.getenv(
+            "MUNKIPROMOTER_LOG_FILENAME",
+            config_from_file.get(ConfigSections.LOGGER.value, "LOG_FILENAME"),
+        )
+
+    @property
+    def CATALOGS_PATH(self):
+        return os.path.join(
+            self.instance.REPO_PATH,
+            os.getenv(
+                "MUNKIPROMOTER_CATALOGS_DIR",
+                config_from_file.get(
+                    ConfigSections.MUNKI.value, "CATALOGS_DIR"
+                ),
+            ),
+        )
+
+    @property
+    def PKGS_INFO_PATH(self):
+        return os.path.join(
+            self.instance.REPO_PATH,
+            os.getenv(
+                "MUNKIPROMOTER_PKGS_INFO_DIR",
+                config_from_file.get(
+                    ConfigSections.MUNKI.value, "PKGS_INFO_DIR"
+                ),
+            ),
+        )
+
+    @property
+    def JIRA_CONNECTION_INFO(self):
+        # Store Jira connection information in a dict. We can then create a
+        # connection by invoking
+        # JIRA(**JIRA_CONNECTION_INFO)
+        return {
+            "server": self.instance.JIRA_URL,
+            "basic_auth": (self.instance.JIRA_USER, self.instance.JIRA_PASSWORD),
+        }
+
 
     instance = None
 
     def __init__(self):
         if not MunkiPromoterConfig.instance:
-            MunkiPromoterConfig.instance = MunkiPromoterConfig.__MunkiPromoterConfig()
+            MunkiPromoterConfig.instance = (
+                MunkiPromoterConfig.__MunkiPromoterConfig()
+            )
+
+    def __getattribute__(self, name: str) -> Any:
+        return super().__getattribute__(name)
 
     def __getattr__(self, item):
         return getattr(self.instance, item)
@@ -178,7 +304,9 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
                 "MUNKIPROMOTER_TEST_REPO_PATH",
                 os.path.join(
                     os.path.dirname(
-                        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                        os.path.dirname(
+                            os.path.dirname(os.path.abspath(__file__))
+                        )
                     ),
                     "tests/data",
                 ),
@@ -192,7 +320,11 @@ class MunkiPromoterTestConfig(MunkiPromoterConfig):
         self.instance.DRY_RUN = True
 
 
-conf = MunkiPromoterTestConfig() if "pytest" in sys.modules else MunkiPromoterConfig()
+conf = (
+    MunkiPromoterTestConfig()
+    if "pytest" in sys.modules
+    else MunkiPromoterConfig()
+)
 
 
 class JiraEnum(Enum):
