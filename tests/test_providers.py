@@ -19,7 +19,8 @@ from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
 from tests.conftest import is_exact_match
 from utils.config import PackageState, Present
-from utils.exceptions import JiraIssueMissingFields, ProviderDoesNotImplement
+from utils.exceptions import JiraIssueMissingFields, ProviderDoesNotImplement, \
+    MunkiRepoNotFound
 
 
 @pytest.mark.usefixtures("run_makecatalogs_before")
@@ -170,7 +171,10 @@ class TestMunkiRepoProvider:
     def test_connect_fail(self, munki_repo_provider, config):
         """Tests the connection fail of the munki provider"""
         config.REPO_PATH = "/some/directory/which/does/not/exist"
-        assert not munki_repo_provider.connect()
+
+        with pytest.raises(MunkiRepoNotFound):
+            munki_repo_provider.connect()
+
         config.restore_defaults()
         assert munki_repo_provider.connect()
 
