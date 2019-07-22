@@ -86,6 +86,8 @@ from the ones shown below, you need to manually adjust the
    :scale: 40 %
    :align: center
 
+.. _find-custom-fields:
+
 Find Jira Customfields
 ----------------------
 
@@ -124,6 +126,9 @@ you would need to set the following configuration options:
 - ``_JIRA_AUTOPROMOTE_TRUE`` to ``12003``
 - ``_JIRA_AUTOPROMOTE_FALSE`` to ``12004``
 
+
+.. _jira-workflow:
+
 Jira Workflow & Transitions
 ----------------------------
 
@@ -146,6 +151,15 @@ package to the `production` catalog.
    It must be possible to move a ticket from one lane to all other lanes in the
    project. You can also see this in our workflow were each state is reachable
    by its previous and by `ALL`.
+
+Additionally we need to know the name of each transition to be able to execute
+it. You can find and edit these names if you enter the edit mode of the
+workflow, click on a transition (e.g. `ALL` to testing) and then on `Edit`.
+Next you should see a screen like shown below.
+
+.. image:: img/jira-edit-transition.png
+   :scale: 35 %
+   :align: center
 
 
 Insert into configuration

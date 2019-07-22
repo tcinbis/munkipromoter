@@ -48,3 +48,15 @@ class MunkiItemInMultipleCatalogs(PromoterException):
             f"{munki_item.get('version')} is in more than one catalog. "
             f"Can't process item."
         )
+
+
+class MunkiRepoNotFound(PromoterException):
+    """
+    In case we can not find or access the repository we will throw this
+    exception
+    """
+
+    def __init__(self, repo):
+        super().__init__()
+        self.provider = "Munki"
+        self.message = f"The given Munki repository: {repo} was not found."
