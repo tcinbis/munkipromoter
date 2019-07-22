@@ -7,26 +7,34 @@ Configuration
    ini-config
 
 To make it as easy as possible for someone new to setup his instance of
-*Munki Promoter* all configuration values are stored in one file. This means in
+*Munki Promoter* all configuration values are stored in one file, the ``default.ini`` file. This means in
 theory that the average user does not need to touch any of the other files in
-this repository.
+this repository. To change the value, simply find the correct variable assignment.
 
-To change the value, simply find the correct variable assignment. An example for
-the ``JIRA_AUTOPROMOTE_FIELD`` is shown below.
-In case you are using some sort of virtual environment or a configuration
-management tool such as ANTS_ you can just set the environment variables
-shown in :mod:`utils.config`. Thus no files need to be edited at all.
-Otherwise change the second value in the statement below
-(here: ``customfield_12701``).
-The second value is the one the method :meth:`os.getenv` will return in case the
-key (here: ``MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD``) is not found  in the
-current environment.
+In the config file 4 different config sections exist:
 
-.. code-block:: python
+ - **Promotion**: These variables define, how often and when your packages are automatically promoted
+ - **Munki**: These variables have information about the location and the structure of your munki repository
+ - **Jira**: These variables are used to connect to the correct Jira instance and additionally all required
+   information about your Jira configuration can be set here, including the jira internal names of the fields.
+ - **Logger** These variables define your logger configuration.
 
-   JIRA_AUTOPROMOTE_FIELD = os.getenv(
-      "MUNKIPROMOTER_JIRA_AUTOPROMOTE_FIELD", "customfield_12701"
-   )
+An example for the ``JIRA_AUTOPROMOTE_FIELD`` is shown below. The different sections inside this config file
+have an information if they must be changed, but some of the default values have to be adapted to your project,
+especially the information about the jira project.
+
+There is additionally another way to set the config values in case you are using some sort of
+virtual environment or a configuration management tool such as ANTS_.
+You can just set the environment variables with the name as in the ``default.ini`` file and a ``MUNKIPROMOTER_``
+appended to the front.
+So if you want to set the config variable ``REPO_PATH``, it has to be named ``MUNKIPROMOTER_REPO_PATH`` in
+your environment.
+Using this approach no files need to be edited at all and it is unlikely that any existing environment variables
+get overwritten.
+
+.. code-block:: ini
+
+   JIRA_AUTOPROMOTE_FIELD = customfield_12701
 
 
 .. warning::
