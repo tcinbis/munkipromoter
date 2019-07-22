@@ -24,7 +24,7 @@ from utils.config import (
     JiraAutopromote,
 )
 from utils.config import conf
-from utils.exceptions import MunkiItemInMultipleCatalogs
+from utils.exceptions import MunkiItemInMultipleCatalogs, MunkiRepoNotFound
 
 logger = log.get_logger(__file__)
 
@@ -50,8 +50,11 @@ class MunkiRepoProvider(Provider):
         """
         Checks if the munki repository is mounted on the executing device.
 
+        :raise: :class:`utils.exceptions.MunkiRepoNotFound` if we can not
+        connect to the given munki repository
         :return: True if the repository is mounted
         """
+
         if os.path.ismount(conf.REPO_PATH) or os.path.exists(conf.REPO_PATH):
             logger.debug(f"Repo {conf.REPO_PATH} mounted or exists.")
             return True
@@ -59,7 +62,7 @@ class MunkiRepoProvider(Provider):
             logger.critical(
                 f"Repo {conf.REPO_PATH} not mounted or does not exist."
             )
-            return False
+            raise MunkiRepoNotFound(conf.REPO_PATH)
 
     def _load_packages(self):
         """
