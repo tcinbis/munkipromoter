@@ -21,18 +21,15 @@ from core.base_classes import Package
 from core.promotion import Promoter
 from core.provider.jiraprovider import JiraBoardProvider
 from core.provider.munkiprovider import MunkiRepoProvider
-from utils.config import (
-    Catalog,
-    Present,
-    JiraLane,
-    PackageState,
-    JiraAutopromote,
-    conf,
-)
+from utils.config import Catalog, Present, JiraLane, PackageState, JiraAutopromote, conf
 
 
 @pytest.fixture
 def config():
+    """
+    :return: An instance of :class:MunkiPromoterTestConfig where defaults are
+    restored before returning
+    """
     conf.restore_defaults()
     return conf
 
