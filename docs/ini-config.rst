@@ -40,31 +40,85 @@ Munki
 Jira
 ----
 - JIRA_URL
-    TBD
+    The Jira url is the direct URL to your Jira server instance.
+
+    .. note:: Only the base URL is required here. **NOT** the complete link to
+       your specific project.
+
 - JIRA_USER
-    TBD
+    The username which the *Munki Promoter* shall use to login to. It must have
+    the correct permission to be able to see, edit and move all issues in your
+    project. Otherwise Jira will return error codes such as `403`.
+
 - JIRA_PASSWORD
-    TBD
+    Corresponding password to the user you want to use.
+
 - JIRA_PROJECT_KEY
-    TBD
+    This is the project key which is unique per instance. You can usually find
+    the key by looking at the ID of one of the issues you created. For example
+    one of our issues is called ``SWPM-140``. In this case the project key is
+    ``SWPM``.
+
 - JIRA_SOFTWARE_NAME_FIELD
-    TBD
+    Field to display the software name of a package.
+    To be able to access the correct field in the Jira issue, we need to know
+    the internal name of this field. An example for such a field name would be
+    ``customfield_12005``. How to find the names and IDs of fields is described in
+    :ref:`find-custom-fields`.
+
 - JIRA_SOFTWARE_VERSION_FIELD
-    TBD
+    Field to display the software version of a package.
+    To be able to access the correct field in the Jira issue, we need to know
+    the internal name of this field. An example for such a field name would be
+    ``customfield_12005``. How to find the names and IDs of fields is described in
+    :ref:`find-custom-fields`.
+
 - JIRA_CATALOG_FIELD
-    TBD
+    Field to display the current catalog a package is in.
+    To be able to access the correct field in the Jira issue, we need to know
+    the internal name of this field. An example for such a field name would be
+    ``customfield_12005``. How to find the names and IDs of fields is described in
+    :ref:`find-custom-fields`.
+
 - JIRA_AUTOPROMOTE_FIELD
-    TBD
+    Field to display whether to automatically promote a package or not.
+    To be able to access the correct field in the Jira issue, we need to know
+    the internal name of this field. An example for such a field name would be
+    ``customfield_12005``. How to find the names and IDs of fields is described in
+    :ref:`find-custom-fields`.
+
 - _JIRA_AUTOPROMOTE_TRUE
-    TBD
+    This describes the ``TRUE`` ID for the autopromote field. For example
+    ``12003``.
+    Because the autopromote field described above is a radio button field we can
+    not simply assign an arbitrary value to it. We need to know the different
+    IDs of these radio selections.
+    How to find the names and IDs of fields is described in
+    :ref:`find-custom-fields`.
+
 - _JIRA_AUTOPROMOTE_FALSE
-    TBD
+    This describes the ``FALSE`` ID for the autopromote field. For example
+    ``12004``.
+    Because the autopromote field described above is a radio button field we can
+    not simply assign an arbitrary value to it. We need to know the different
+    IDs of these radio selections.
+    How to find the names and IDs of fields is described in
+    :ref:`find-custom-fields`.
+
 - JIRA_PRESENT_FIELD
-    TBD
+    Field to display if a package is present in the Munki repository or if it is
+    missing.
+    To be able to access the correct field in the Jira issue, we need to know
+    the internal name of this field. An example for such a field name would be
+    ``customfield_12005``. How to find the names and IDs of fields is described in
+    :ref:`find-custom-fields`.
+
 - JIRA_DEVELOPMENT_TRANSITION_NAME
-    TBD
+    :ref:`jira-workflow`
+
 - JIRA_TESTING_TRANSITION_NAME
     TBD
+
 - JIRA_PRODUCTION_TRANSITION_NAME
     TBD
 
