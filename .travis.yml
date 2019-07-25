@@ -1,0 +1,33 @@
+language: python
+dist: xenial
+python: 3.7
+
+install:
+  - pip install -r requirements.txt
+  - pip install -e .
+  - sudo touch /var/log/munkipromoter.log
+  - sudo chown travis /var/log/munkipromoter.log
+
+before_script:
+  - black --line-length 80 src tests
+  - flake8 src tests
+
+script:
+  - coverage run -m pytest tests/* --cov=. --cov-report=xml
+
+after_success:
+  - python-codacy-coverage -r coverage.xml
+  - cd docs
+  - make html
+
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GH_TOKEN
+  keep-history: true
+  repo: tcinbis/munkipromoter-docs
+  target-branch: master
+  local_dir: docs/docs
+  on:
+    branch: master
