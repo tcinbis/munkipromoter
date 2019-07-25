@@ -265,9 +265,11 @@ class MunkiPromoterConfig:
         # JIRA(**JIRA_CONNECTION_INFO)
         return {
             "server": self.instance.JIRA_URL,
-            "basic_auth": (self.instance.JIRA_USER, self.instance.JIRA_PASSWORD),
+            "basic_auth": (
+                self.instance.JIRA_USER,
+                self.instance.JIRA_PASSWORD,
+            ),
         }
-
 
     instance = None
 
