@@ -8,11 +8,9 @@ install:
   - sudo touch /var/log/munkipromoter.log
   - sudo chown travis /var/log/munkipromoter.log
 
-before_script:
-  - black --line-length 80 src tests
-  - flake8 src tests
-
 script:
+  - black --check --line-length 80 src tests
+  - flake8 src tests
   - coverage run -m pytest tests/* --cov=. --cov-report=xml
 
 after_success:
