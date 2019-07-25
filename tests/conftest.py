@@ -139,7 +139,7 @@ def set_up_promoter(jira_board_provider, munki_repo_provider, jira_test_issues):
 
     munki_repo_provider.load()
     munki_repo_provider._packages_dict = {
-        # TODO: Document why we do this and what it does.
+        # Load only munki package which equals the loaded jira issue
         k: v
         for k, v in munki_repo_provider.get().items()
         if "EN60.8.0" in k
