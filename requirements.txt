@@ -14,3 +14,4 @@ codacy-coverage==1.3.11
 flake8==3.7.8
 flake8-bugbear==19.3.0 # see https://black.readthedocs.io/en/stable/the_black_code_style.html#line-length
 black==19.3b0
+. # install munki promoter into the local environment
