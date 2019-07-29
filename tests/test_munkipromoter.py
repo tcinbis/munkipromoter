@@ -7,7 +7,7 @@
 import sys
 from unittest.mock import Mock
 
-from munkipromoter import MunkiPromoter
+from src.munkipromoter import MunkiPromoter
 
 
 class TestMunkiPromoter:
