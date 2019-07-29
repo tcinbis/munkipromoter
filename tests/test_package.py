@@ -11,10 +11,10 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from core.base_classes import Package, PackageVersion
-from core.provider.jiraprovider import JiraBoardProvider
+from src.core.base_classes import Package, PackageVersion
+from src.core.provider.jiraprovider import JiraBoardProvider
+from src.utils.config import Catalog, JiraLane, Present, JiraAutopromote
 from tests.conftest import is_exact_match
-from utils.config import Catalog, JiraLane, Present, JiraAutopromote
 
 
 class TestPackage:

@@ -10,7 +10,7 @@ import os
 import sys
 from logging import handlers
 
-from utils.config import conf
+from src.utils.config import conf
 
 logfile_main = os.path.join(conf.LOG_DIR, conf.LOG_FILENAME)
 

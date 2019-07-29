@@ -5,12 +5,12 @@
 #
 #  Developed by Tom Cinbis and Tim Königl on 16/07/2019, 14:05
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name="munki_promoter",
     description="This tool manages Munki packages and utilizes a Jira Kanban"
-                "board as an user interface.",
+    "board as an user interface.",
     version="2.0",
     author=[
         "Tom Cinbis",
@@ -19,7 +19,8 @@ setup(
     ],
     author_email="cinbist@gmail.com, tim.koenigl@unibas.ch",
     license="GPLv3",
-    scripts=['src/munkipromoter.py'],
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
+    scripts=["src/munkipromoter.py"],
+    packages=["src", "src.core", "src.core.provider", "src.utils"],
+    package_data={"src.utils": ["default.ini"]},
+    python_requires="~=3.7",
 )

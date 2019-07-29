@@ -7,7 +7,7 @@ Submodules
 Config module
 -----------------------
 
-.. automodule:: utils.config
+.. automodule:: src.utils.config
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ Config module
 Exceptions module
 ---------------------------
 
-.. automodule:: utils.exceptions
+.. automodule:: src.utils.exceptions
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +23,7 @@ Exceptions module
 Logger module
 -----------------------
 
-.. automodule:: utils.logger
+.. automodule:: src.utils.logger
    :members:
    :undoc-members:
    :show-inheritance:

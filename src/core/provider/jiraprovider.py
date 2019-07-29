@@ -14,17 +14,17 @@ from typing import List, Dict
 import requests
 from jira import JIRA, Issue
 
-from core.base_classes import Provider, Package
-from utils import logger as log
-from utils.config import (
+from src.core.base_classes import Provider, Package
+from src.utils import logger as log
+from src.utils.config import (
     PackageState,
     JiraLane,
     Catalog,
     Present,
     JiraAutopromote,
 )
-from utils.config import conf
-from utils.exceptions import JiraIssueMissingFields
+from src.utils.config import conf
+from src.utils.exceptions import JiraIssueMissingFields
 
 logger = log.get_logger(__file__)
 

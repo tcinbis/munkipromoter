@@ -25,7 +25,6 @@ Create virtual environment
 
 .. code-block:: bash
 
-   cd munkipromoter
    pip3 install virtualenv
    virtualenv venv --python=python3.7
 
@@ -42,14 +41,21 @@ Install dependencies
 
 .. code-block:: bash
 
-   pip install -r requirements.txt
+   pip install -r munkipromoter/requirements.txt
 
 Install *Munki Promoter*
 ------------------------
 
 .. code-block:: bash
 
-   pip install -e .
+   pip install ./munkipromoter
+
+Create config file
+------------------
+*Munki Promoter* includes a default configuration file which you must edit
+before you are able to run ``munkipromoter.py``. Simply copy the existing file
+located in `src/utils/default.ini` to `/etc/munkipromoter/munkipromoter.ini` and
+insert your values there.
 
 Create log file
 ---------------
@@ -65,7 +71,7 @@ Create log file
 
 .. note::
    You may need to adjust the filename of the log in case you define another
-   name in the configuration :mod:`utils.config`.
+   name in the configuration :mod:`src.utils.config`.
 
 
 Now everything should be installed in a way such that we can continue with the

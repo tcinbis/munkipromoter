@@ -11,12 +11,12 @@ import argparse
 import logging
 import os
 
-from core.promotion import Promoter
-from core.provider.jiraprovider import JiraBoardProvider
-from core.provider.munkiprovider import MunkiRepoProvider
-from utils import logger as log
-from utils.config import conf, MunkiPromoterTestConfig
-from utils.exceptions import ImproperlyConfigured
+from src.core.promotion import Promoter
+from src.core.provider.jiraprovider import JiraBoardProvider
+from src.core.provider.munkiprovider import MunkiRepoProvider
+from src.utils import logger as log
+from src.utils.config import conf, MunkiPromoterTestConfig
+from src.utils.exceptions import ImproperlyConfigured
 
 
 class MunkiPromoter:

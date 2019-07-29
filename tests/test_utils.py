@@ -7,8 +7,8 @@
 
 import pytest
 
-from utils import logger as log
-from utils.config import JiraLane, Catalog, JiraAutopromote
+from src.utils import logger as log
+from src.utils.config import JiraLane, Catalog, JiraAutopromote
 
 
 class TestUtils:

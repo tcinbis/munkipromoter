@@ -8,7 +8,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
-from utils.config import (
+from src.utils.config import (
     JiraLane,
     Catalog,
     Present,
