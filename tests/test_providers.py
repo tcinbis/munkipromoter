@@ -14,16 +14,16 @@ import pytest
 from jira import Issue
 from jira.client import ResultList
 
-from core.base_classes import Package, Provider
-from core.provider.jiraprovider import JiraBoardProvider
-from core.provider.munkiprovider import MunkiRepoProvider
-from tests.conftest import is_exact_match
-from utils.config import PackageState, Present
-from utils.exceptions import (
+from src.core.base_classes import Package, Provider
+from src.core.provider.jiraprovider import JiraBoardProvider
+from src.core.provider.munkiprovider import MunkiRepoProvider
+from src.utils.config import PackageState, Present
+from src.utils.exceptions import (
     JiraIssueMissingFields,
     ProviderDoesNotImplement,
     MunkiRepoNotFound,
 )
+from tests.conftest import is_exact_match
 
 
 @pytest.mark.usefixtures("run_makecatalogs_before")

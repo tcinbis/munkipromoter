@@ -21,6 +21,6 @@ setup(
     license="GPLv3",
     scripts=["src/munkipromoter.py"],
     packages=["src", "src.core", "src.core.provider", "src.utils"],
-    package_data={"src.utils": ["src/utils/default.ini"]},
+    package_data={"src.utils": ["default.ini"]},
     python_requires="~=3.7",
 )

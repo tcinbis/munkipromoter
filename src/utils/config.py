@@ -16,9 +16,18 @@ from typing import Any
 config_from_file = configparser.ConfigParser(
     interpolation=configparser.ExtendedInterpolation()
 )
-config_from_file.read(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "default.ini")
-)
+
+# check if config file for munki promoter is present. Otherwise fallback to
+# default path in package
+
+if os.path.exists("/etc/munkipromoter/munkipromoter.ini"):
+    config_path = "/etc/munkipromoter/munkipromoter.ini"
+else:
+    config_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "default.ini"
+    )
+
+config_from_file.read(config_path)
 
 
 class ConfigSections(Enum):

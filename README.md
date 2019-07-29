@@ -31,8 +31,8 @@ machine running the application code
 Its dependencies can be installed by running `pip install -r requirements.txt`.
 Once the prerequisites are satisfied we can begin to add all necessary
 configuration values.The configuration is loaded and managed by the `config.py`
-module. It tries to load all values from the local environment.
-This offers the advantage to simply deploy and manage a machine with a
+module. It tries to load all values from the local environment or configuration
+file. This offers the advantage to simply deploy and manage a machine with a
 configuration management tool such as
 [Ansible](https://github.com/ansible/ansible).
 

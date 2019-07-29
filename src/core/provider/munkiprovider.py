@@ -14,17 +14,17 @@ import subprocess
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from core.base_classes import Provider, Package
-from utils import logger as log
-from utils.config import (
+from src.core.base_classes import Provider, Package
+from src.utils import logger as log
+from src.utils.config import (
     PackageState,
     JiraLane,
     Catalog,
     Present,
     JiraAutopromote,
 )
-from utils.config import conf
-from utils.exceptions import MunkiItemInMultipleCatalogs, MunkiRepoNotFound
+from src.utils.config import conf
+from src.utils.exceptions import MunkiItemInMultipleCatalogs, MunkiRepoNotFound
 
 logger = log.get_logger(__file__)
 

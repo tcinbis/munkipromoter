@@ -83,7 +83,7 @@ Below you can see an example of such an screen with the fields we need to add
 and **most importantly for you** the type of field. These types are critical to
 the proper out of the box functioning. In case the types you want to use, differ
 from the ones shown below, you need to manually adjust the
-:meth:`core.provider.jiraprovider.JiraBoardProvider.commit` method.
+:meth:`src.core.provider.jiraprovider.JiraBoardProvider.commit` method.
 
 .. image:: img/jira-screen-field-types.png
    :scale: 40 %
@@ -94,7 +94,7 @@ from the ones shown below, you need to manually adjust the
 Find Jira Customfields
 ----------------------
 
-For the configuration stored in :class:`utils.config.MunkiPromoterConfig` we
+For the configuration stored in :class:`src.utils.config.MunkiPromoterConfig` we
 need to know the name of each customfield and the corresponding ID of the
 possible values. This information can unfortunately not be queried
 automatically in an easy way yet. Therefore one must open a Jira Issue in his
@@ -122,7 +122,7 @@ see the following three information we need in case of the `Autopromote` field.
 
 - radio option two: ``12004``
 
-These information can now be added to the :mod:`utils.config`. For this example
+These information can now be added to the :mod:`src.utils.config`. For this example
 you would need to set the following configuration options:
 
 - ``JIRA_AUTOPROMOTE_FIELD`` to ``customfield_12701``
@@ -169,6 +169,6 @@ Insert into configuration
 -------------------------
 
 Once you collected all required configuration values you can either set the
-environment variables or edit the :mod:`utils.config` file. From now on
+environment variables or edit the :mod:`src.utils.config` file. From now on
 everything should be setup and configured in a way such that you can start
 the *Munki Promoter* for its initial run.

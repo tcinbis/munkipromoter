@@ -15,7 +15,7 @@ Submodules
 Base\_classes module
 -----------------------------
 
-.. automodule:: core.base_classes
+.. automodule:: src.core.base_classes
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +23,7 @@ Base\_classes module
 Promotion module
 -------------------------
 
-.. automodule:: core.promotion
+.. automodule:: src.core.promotion
    :members:
    :undoc-members:
    :show-inheritance:
