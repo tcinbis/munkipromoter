@@ -8,10 +8,10 @@
 from datetime import datetime
 from typing import Dict
 
-from core.base_classes import Package
-from utils import logger as log
-from utils.config import Catalog, PackageState, JiraLane, Present
-from utils.config import conf
+from src.core.base_classes import Package
+from src.utils import logger as log
+from src.utils.config import Catalog, PackageState, JiraLane, Present
+from src.utils.config import conf
 
 logger = log.get_logger(__file__)
 

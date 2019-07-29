@@ -17,11 +17,11 @@ import pytest
 from jira.client import ResultList
 from jira.resources import cls_for_resource
 
-from core.base_classes import Package
-from core.promotion import Promoter
-from core.provider.jiraprovider import JiraBoardProvider
-from core.provider.munkiprovider import MunkiRepoProvider
-from utils.config import (
+from src.core.base_classes import Package
+from src.core.promotion import Promoter
+from src.core.provider.jiraprovider import JiraBoardProvider
+from src.core.provider.munkiprovider import MunkiRepoProvider
+from src.utils.config import (
     Catalog,
     Present,
     JiraLane,

@@ -13,8 +13,8 @@ from distutils.version import LooseVersion
 from typing import Type, Dict
 from uuid import UUID
 
-from utils import logger as log
-from utils.config import (
+from src.utils import logger as log
+from src.utils.config import (
     PackageState,
     Catalog,
     JiraAutopromote,

@@ -7,7 +7,7 @@ Provider Package
 Jira Provider module
 -------------------------------------
 
-.. automodule:: core.provider.jiraprovider
+.. automodule:: src.core.provider.jiraprovider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -16,7 +16,7 @@ Jira Provider module
 Munki Provider module
 --------------------------------------
 
-.. automodule:: core.provider.munkiprovider
+.. automodule:: src.core.provider.munkiprovider
    :members:
    :undoc-members:
    :show-inheritance:

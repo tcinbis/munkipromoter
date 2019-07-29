@@ -35,7 +35,7 @@ Munki
     case this means no Jira issues will be updated and no Munki pkgsinfo files
     will be overwritten. This is especially useful when debugging code, because
     the code behaves exactly the same except for the
-    :func:`core.base_classes.Provider.commit()` method.
+    :func:`src.core.base_classes.Provider.commit()` method.
 
 Jira
 ----
