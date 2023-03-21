@@ -4,7 +4,7 @@ pytest==5.0.1
 # Because the jira package on pypi is still version 2.0.0 instead of 2.0.1rc2 (since 13.03.2019) we manually checkout
 # the commit for version 2.0.1rc1
 -e git://github.com/pycontribs/jira.git@bb37c2e65675e7877b9fb4dc120e020422160584#egg=jira
-sentry-sdk==0.10.2
+sentry-sdk==1.14.0
 sphinx==2.1.2
 sphinx_rtd_theme==0.4.3
 pytest-cov==2.7.1
